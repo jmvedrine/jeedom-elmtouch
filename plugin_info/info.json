@@ -1,0 +1,15 @@
+{
+    "id" : "elmtouch",
+    "name" : "ELM Touch",
+    "description" : "Plugin pour la régulation de chaudière ELM Touch",
+    "licence" : "AGPL",
+    "author" : "JMVedrine",
+    "require" : "3.0",
+    "category" : "wellness",
+    "hasDependency" : false,
+    "hasOwnDeamon" : false,
+    "maxDependancyInstallTime" : 0,
+    "changelog" : "https://jeedom.github.io/plugin-elmtouch/#language#/changelog",
+    "documentation" : "https://jeedom.github.io/plugin-elmtouch/#language#/",
+    "_version" : "1.1.0"
+}

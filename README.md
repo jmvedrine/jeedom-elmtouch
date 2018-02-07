@@ -1,17 +1,22 @@
-# Jeedom plugin for ELM Touch (alias Nefit easy, alias Worcester Wave) boiler Controler
+# Jeedom plugin for ELM Touch (alias Nefit easy, alias Worcester Wave) boiler Controller
 
 <img src="plugin_info/elmtouch_icon.png" align="right">
 
 This is a plugin for the Jeedom (https://www.jeedom.com) open source (https://github.com/jeedom) domotic system.
 
-It will pemrit to control the ELM Touch smart boiler controler from your Jeedom.
+It will pemrit to control the ELM Touch smart boiler controller from your Jeedom.
 
-The ELM Touch controler is made by Bosch and sold in diffent coi=untries under various names :
+The ELM Touch controller is made by Bosch and sold in different countries under various names :
 
+* Nefit Easy (Netherlands)
+* Junkers Control CT100 (Belgium)
+* Buderus Logamatic TC100 (Belgium)
+* E.L.M. Touch (France)
+* Worcester Wave (UK)
+* Bosch Control CT‑100 (Other)
 
+This plugin use the nefit-client-python library made by Patrick van der Leer https://github.com/patvdleer/nefit-client-python to communicate with Bosch servers.
 
-This plugin use the nefit-client-python library made by Patrick van der Leer https://github.com/patvdleer/nefit-client-python to communicate with Bosch server
-
-ELm touch, ELM Leblanc, Nefit Easy and Worcester Wave are trade marks of the Bosch group.
+ELm touch, ELM Leblanc, Nefit Easy Junkers, Buderus and Worcester Wave are trade marks of the Bosch group.
 
 BIG WARNING : This is a work in progress and not finished. I just committed it to Github to keep a state of my project do not use until further notice. You have been warned.

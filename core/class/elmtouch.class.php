@@ -134,6 +134,10 @@ class elmtouch extends eqLogic {
      */
 
     /*     * **********************Getteur Setteur*************************** */
+	public function getState() {
+        //TODO.
+		return true;
+	}
 }
 
 class elmtouchCmd extends cmd {

@@ -4,7 +4,7 @@
 
 This is a plugin for the Jeedom (https://www.jeedom.com) open source (https://github.com/jeedom) domotic system.
 
-It will pemrit to control the ELM Touch smart boiler controller from your Jeedom.
+It will permit to control the ELM Touch smart boiler controller from your Jeedom.
 
 The ELM Touch controller is made by Bosch and sold in different countries under various names :
 

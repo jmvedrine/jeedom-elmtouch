@@ -107,19 +107,19 @@ foreach (object::all() as $object) {
 		</div>
 	</div>
        <div class="form-group">
-        <label class="col-sm-3 control-label">{{Numéro de série :}}</label>
+        <label class="col-sm-3 control-label">{{Numéro de série}}</label>
         <div class="col-sm-3">
             <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="serialNumber" placeholder="Voir notice ou au dos"/>
         </div>
     </div>
        <div class="form-group">
-        <label class="col-sm-3 control-label">{{Clé d'accès :}}</label>
+        <label class="col-sm-3 control-label">{{Clé d'accès}}</label>
         <div class="col-sm-3">
             <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="accessKey" placeholder="Voir notice ou au dos"/>
         </div>
     </div>
        <div class="form-group">
-        <label class="col-sm-3 control-label">{{Mot de passe :}}</label>
+        <label class="col-sm-3 control-label">{{Mot de passe}}</label>
         <div class="col-sm-3">
             <input type="password" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="password" placeholder="Mot de passe choisi sur le smartphone"/>
         </div>
@@ -132,7 +132,11 @@ foreach (object::all() as $object) {
 <table id="table_cmd" class="table table-bordered table-condensed">
     <thead>
         <tr>
-            <th>{{Nom}}</th><th>{{Type}}</th><th>{{Action}}</th>
+            <th style="width: 50px;">#</th>
+            <th style="width: 200px;">{{Nom}}</th>
+            <th style="width: 200px;">{{Type}}</th>
+            <th style="width: 100px;">{{Paramètres}}</th>
+            <th style="width: 150px;"></th>
         </tr>
     </thead>
     <tbody>

@@ -110,7 +110,88 @@ class elmtouch extends eqLogic {
     }
 
     public function postSave() {
+        if ($this->getIsEnable() == 1) {
+            $order = $this->getCmd(null, 'order');
+            if (!is_object($order)) {
+                $order = new elmtouchCmd();
+                $order->setIsVisible(0);
+                $order->setUnite('°C');
+                $order->setName(__('Consigne', __FILE__));
+                $order->setConfiguration('historizeMode', 'none');
+                $order->setIsHistorized(1);
+            }
+            $order->setDisplay('generic_type', 'THERMOSTAT_SETPOINT');
+            $order->setEqLogic_id($this->getId());
+            $order->setType('info');
+            $order->setSubType('numeric');
+            $order->setLogicalId('order');
+            $order->setConfiguration('maxValue', 30);
+            $order->setConfiguration('minValue', 5);
+            $order->save();
 
+            $thermostat = $this->getCmd(null, 'thermostat');
+            if (!is_object($thermostat)) {
+                $thermostat = new elmtouchCmd();
+                $thermostat->setTemplate('dashboard', 'thermostat');
+                $thermostat->setTemplate('mobile', 'thermostat');
+                $thermostat->setUnite('°C');
+                $thermostat->setName(__('Thermostat', __FILE__));
+                $thermostat->setIsVisible(1);
+            }
+            $thermostat->setDisplay('generic_type', 'THERMOSTAT_SET_SETPOINT');
+            $thermostat->setEqLogic_id($this->getId());
+            $thermostat->setConfiguration('maxValue', 30);
+            $thermostat->setConfiguration('minValue', 5);
+            $thermostat->setType('action');
+            $thermostat->setSubType('slider');
+            $thermostat->setLogicalId('thermostat');
+            $thermostat->setValue($order->getId());
+            $thermostat->save();
+
+            $temperature = $this->getCmd(null, 'temperature');
+            if (!is_object($temperature)) {
+                $temperature = new elmtouchCmd();
+                $temperature->setTemplate('dashboard', 'line');
+                $temperature->setTemplate('mobile', 'line');
+                $temperature->setName(__('Température', __FILE__));
+                $temperature->setIsVisible(1);
+                $temperature->setIsHistorized(1);
+            }
+            $temperature->setEqLogic_id($this->getId());
+            $temperature->setType('info');
+            $temperature->setSubType('numeric');
+            $temperature->setLogicalId('temperature');
+            $temperature->setUnite('°C');
+
+            $value = '';
+
+            // $temperature->setValue($value);
+            $temperature->setDisplay('generic_type', 'THERMOSTAT_TEMPERATURE');
+            $temperature->save();
+
+            $temperature_outdoor = $this->getCmd(null, 'temperature_outdoor');
+            if (!is_object($temperature_outdoor)) {
+                $temperature_outdoor = new elmtouchCmd();
+                $temperature_outdoor->setTemplate('dashboard', 'line');
+                $temperature_outdoor->setTemplate('mobile', 'line');
+                $temperature_outdoor->setIsVisible(1);
+                $temperature_outdoor->setIsHistorized(1);
+                $temperature_outdoor->setName(__('Température extérieure', __FILE__));
+            }
+            $temperature_outdoor->setEqLogic_id($this->getId());
+            $temperature_outdoor->setType('info');
+            $temperature_outdoor->setSubType('numeric');
+            $temperature_outdoor->setLogicalId('temperature_outdoor');
+            $temperature_outdoor->setUnite('°C');
+
+            // TODO Retrouver la valeur
+            // $temperature_outdoor->setValue($value);
+            $temperature_outdoor->setDisplay('generic_type', 'THERMOSTAT_TEMPERATURE_OUTDOOR');
+            $temperature_outdoor->save();
+
+        } else {
+            // TODO supprimer crons et listeners
+        }
     }
 
     public function preUpdate() {

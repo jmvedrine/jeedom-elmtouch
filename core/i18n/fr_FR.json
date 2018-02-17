@@ -1,0 +1,46 @@
+{
+    "plugins\/elmtouch\/desktop\/php\/elmtouch.php": {
+        "Ajouter un ELM Touch": "Ajouter un ELM Touch",
+        "Rechercher": "Rechercher",
+        "Mes ELM Touchs": "Mes ELM Touchs",
+        "Gestion": "Gestion",
+        "Ajouter": "Ajouter",
+        "Général": "Général",
+        "Nom de l'équipement ELM Touch": "Nom de l'équipement ELM Touch",
+        "Objet parent": "Objet parent",
+        "Catégorie": "Catégorie",
+        "Sauvegarder": "Sauvegarder",
+        "Supprimer": "Supprimer",
+        "Aucun": "Aucun",
+        "Activer": "Activer",
+        "Visible": "Visible",
+        "Configuration": "Configuration",
+        "Dupliquer": "Dupliquer",
+        "Autoriser": "Autoriser",
+        "Numéro de série": "Numéro de série",
+        "Clé d'accès": "Clé d'accès",
+        "Mot de passe": "Mot de passe",
+        "Avancée": "Avancée",
+        "Type": "Type",
+        "Nom": "Nom",
+        "Action": "Action"
+    },
+
+    "plugins\/elmtouch\/core\/ajax\/elmtouch.ajax.php": {
+        "Aucune méthode correspondante à : ": "Aucune méthode correspondante à : ",
+        "401 - Accès non autorisé": "401 - Accès non autorisé",
+    },
+
+    "plugins\/elmtouch\/core\/class\/elmtouch.class.php": {
+        "ELM Touch": "ELM Touch",
+        "Consigne": "Consigne",
+        "Température": "Température",
+        "Température extérieure": "Température extérieure",
+        "Mode": "Mode"
+    },
+
+    "plugins\/elmtouch\/desktop\/js\/elmtouch.js": {
+        "Nom": "Nom",
+        "Tester": "Tester"
+    }
+}

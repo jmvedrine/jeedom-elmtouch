@@ -77,17 +77,17 @@ FAQ
 
 Quelle est la fréquence de rafraichissement ?
 
-Le systeme recupère les informations toutes les 15 min.
+:   Le systeme recupère les informations toutes les 15 min.
 
 Je voudrais récupérer les informations avec une fréquence plus grande est-ce possible ?
 
-Pour le moment non pas sans éditer le code du plugin.
+:   Non pour le moment ce n'est pas possible sans éditer le code du plugin.
 
-Il faut noter que le plugin émet une requête à chaque
-récupération. En cas d'abus il est à craindre que le compte ne soit bloqué.
+    Il faut noter que le plugin émet une requête à chaque
+    récupération. En cas d'abus il est à craindre que le compte ne soit bloqué.
 
-De plus accroitre la fréquence de récupération 
-accroit aussi les chances d'une collision lors de l'emploi simultané du plugin et de l'application sur mobile.
+    De plus accroitre la fréquence de récupération 
+    accroit aussi les chances d'une collision lors de l'emploi simultané du plugin et de l'application sur mobile.
 
-Enfin vu l'inertie les températures extérieurs et intérieures ne sont pas des grandeurs à variation rapide ;-)
+    Enfin vu l'inertie les températures extérieurs et intérieures ne sont pas des grandeurs à variation rapide ;-)
 

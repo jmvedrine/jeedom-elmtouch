@@ -39,7 +39,7 @@ l'application IOS ou Android.
 
 Lors de la création en plus des champs habituels pour tout plugin Jeedom
 
--   **Nom de l’équipement Netatmo** : nom de votre équipement Netatmo
+-   **Nom de l'équipement ELM Touch** : nom de votre équipement ELM Touch
 
 -   **Objet parent** : indique l’objet parent auquel appartient
     l’équipement
@@ -76,11 +76,18 @@ FAQ
 ===
 
 Quelle est la fréquence de rafraichissement ?
+
 Le systeme recupère les informations toutes les 15 min.
 
 Je voudrais récupérer les informations avec une fréquence plus grande est-ce possible ?
-Pour le moment non pas sans éditer le code du plugin. Il faut noter que le plugin émet une requête à chaque
-récupération. En cas d'abus il est à craindre que le compte ne soit bloqué. De plus accroitre la fréquence de récupération 
+
+Pour le moment non pas sans éditer le code du plugin.
+
+Il faut noter que le plugin émet une requête à chaque
+récupération. En cas d'abus il est à craindre que le compte ne soit bloqué.
+
+De plus accroitre la fréquence de récupération 
 accroit aussi les chances d'une collision lors de l'emploi simultané du plugin et de l'application sur mobile.
+
 Enfin vu l'inertie les températures extérieurs et intérieures ne sont pas des grandeurs à variation rapide ;-)
 

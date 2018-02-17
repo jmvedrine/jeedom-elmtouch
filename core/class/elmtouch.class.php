@@ -26,6 +26,21 @@ class elmtouch extends eqLogic {
 
     /*     * ***********************Methode static*************************** */
 
+    public static function deamon_info() {
+        $return = array();
+        $return['log'] = 'elmtouch';
+        $return['state'] = 'nok';
+        $pid_file = jeedom::getTmpFolder('elmtouch') . '/deamon.pid';
+        if (file_exists($pid_file)) {
+            if (@posix_getsid(trim(file_get_contents($pid_file)))) {
+                $return['state'] = 'ok';
+            } else {
+                shell_exec(system::getCmdSudo() . 'rm -rf ' . $pid_file . ' 2>&1 > /dev/null');
+            }
+        }
+        $return['launchable'] = 'ok';
+        return $return;
+    }
 
     public static function dependancy_info() {
         $return = array();
@@ -44,7 +59,7 @@ class elmtouch extends eqLogic {
     public static function start() {
         self::cron15();
     }
-    
+
     /*
      * Fonction exécutée automatiquement toutes les minutes par Jeedom
       public static function cron() {
@@ -83,35 +98,35 @@ class elmtouch extends eqLogic {
     /*     * *********************Méthodes d'instance************************* */
 
     public function preInsert() {
-        
+
     }
 
     public function postInsert() {
-        
+
     }
 
     public function preSave() {
-        
+
     }
 
     public function postSave() {
-        
+
     }
 
     public function preUpdate() {
-        
+
     }
 
     public function postUpdate() {
-        
+
     }
 
     public function preRemove() {
-        
+
     }
 
     public function postRemove() {
-        
+
     }
 
     /*
@@ -134,10 +149,10 @@ class elmtouch extends eqLogic {
      */
 
     /*     * **********************Getteur Setteur*************************** */
-	public function getState() {
+    public function getState() {
         //TODO.
-		return true;
-	}
+        return true;
+    }
 }
 
 class elmtouchCmd extends cmd {
@@ -157,7 +172,7 @@ class elmtouchCmd extends cmd {
      */
 
     public function execute($_options = array()) {
-        
+
     }
 
     /*     * **********************Getteur Setteur*************************** */

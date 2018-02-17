@@ -17,6 +17,6 @@ The ELM Touch controller is made by Bosch and sold in different countries under 
 
 This plugin use the nefit-client-python library made by Patrick van der Leer https://github.com/patvdleer/nefit-client-python to communicate with Bosch servers.
 
-ELm touch, ELM Leblanc, Nefit Easy Junkers, Buderus and Worcester Wave are trade marks of the Bosch group.
+ELm touch, ELM Leblanc, Nefit Easy, Junkers, Buderus, Worcester Wave and Bosch are trade marks of the Bosch group.
 
 BIG WARNING : This is a work in progress and not finished. I just committed it to Github to keep a state of my project do not use until further notice. You have been warned.

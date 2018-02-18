@@ -1,6 +1,6 @@
 <?php
 if (!isConnect('admin')) {
-	throw new Exception('{{401 - Accès non autorisé}}');
+    throw new Exception('{{401 - Accès non autorisé}}');
 }
 $plugin = plugin::byId('elmtouch');
 sendVarToJS('eqType', $plugin->getId());
@@ -15,10 +15,10 @@ $eqLogics = eqLogic::byType($plugin->getId());
                 <li class="filter" style="margin-bottom: 5px;"><input class="filter form-control input-sm" placeholder="{{Rechercher}}" style="width: 100%"/></li>
                 <?php
 foreach ($eqLogics as $eqLogic) {
-	$opacity = ($eqLogic->getIsEnable()) ? '' : jeedom::getConfiguration('eqLogic:style:noactive');
-	echo '<li class="cursor li_eqLogic" data-eqLogic_id="' . $eqLogic->getId() . '" style="' . $opacity .'"><a>' . $eqLogic->getHumanName(true) . '</a></li>';
+    $opacity = ($eqLogic->getIsEnable()) ? '' : jeedom::getConfiguration('eqLogic:style:noactive');
+    echo '<li class="cursor li_eqLogic" data-eqLogic_id="' . $eqLogic->getId() . '" style="' . $opacity .'"><a>' . $eqLogic->getHumanName(true) . '</a></li>';
 }
-		    ?>
+            ?>
            </ul>
        </div>
    </div>
@@ -42,19 +42,19 @@ foreach ($eqLogics as $eqLogic) {
 <div class="eqLogicThumbnailContainer">
     <?php
 foreach ($eqLogics as $eqLogic) {
-	$opacity = ($eqLogic->getIsEnable()) ? '' : jeedom::getConfiguration('eqLogic:style:noactive');
-	echo '<div class="eqLogicDisplayCard cursor" data-eqLogic_id="' . $eqLogic->getId() . '" style="text-align: center; background-color : #ffffff; height : 200px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;' . $opacity . '" >';
-	echo '<img src="' . $plugin->getPathImgIcon() . '" height="105" width="95" />';
-	echo "<br>";
-	echo '<span style="font-size : 1.1em;position:relative; top : 15px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;">' . $eqLogic->getHumanName(true, true) . '</span>';
-	echo '</div>';
+    $opacity = ($eqLogic->getIsEnable()) ? '' : jeedom::getConfiguration('eqLogic:style:noactive');
+    echo '<div class="eqLogicDisplayCard cursor" data-eqLogic_id="' . $eqLogic->getId() . '" style="text-align: center; background-color : #ffffff; height : 200px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;' . $opacity . '" >';
+    echo '<img src="' . $plugin->getPathImgIcon() . '" height="105" width="95" />';
+    echo "<br>";
+    echo '<span style="font-size : 1.1em;position:relative; top : 15px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;">' . $eqLogic->getHumanName(true, true) . '</span>';
+    echo '</div>';
 }
 ?>
 </div>
 </div>
 
 <div class="col-lg-10 col-md-9 col-sm-8 eqLogic" style="border-left: solid 1px #EEE; padding-left: 25px;display: none;">
-	<a class="btn btn-success eqLogicAction pull-right" data-action="save"><i class="fa fa-check-circle"></i> {{Sauvegarder}}</a>
+    <a class="btn btn-success eqLogicAction pull-right" data-action="save"><i class="fa fa-check-circle"></i> {{Sauvegarder}}</a>
   <a class="btn btn-danger eqLogicAction pull-right" data-action="remove"><i class="fa fa-minus-circle"></i> {{Supprimer}}</a>
   <a class="btn btn-default eqLogicAction pull-right" data-action="configure"><i class="fa fa-cogs"></i> {{Configuration avancée}}</a>
   <ul class="nav nav-tabs" role="tablist">
@@ -81,47 +81,62 @@ foreach ($eqLogics as $eqLogic) {
                         <option value="">{{Aucun}}</option>
                         <?php
 foreach (object::all() as $object) {
-	echo '<option value="' . $object->getId() . '">' . $object->getName() . '</option>';
+    echo '<option value="' . $object->getId() . '">' . $object->getName() . '</option>';
 }
 ?>
                    </select>
                </div>
            </div>
-	   <div class="form-group">
-                <label class="col-sm-3 control-label">{{Catégorie}}</label>
-                <div class="col-sm-9">
-                 <?php
-                    foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value) {
-                    echo '<label class="checkbox-inline">';
-                    echo '<input type="checkbox" class="eqLogicAttr" data-l1key="category" data-l2key="' . $key . '" />' . $value['name'];
-                    echo '</label>';
-                    }
-                  ?>
-               </div>
-           </div>
-	<div class="form-group">
-		<label class="col-sm-3 control-label"></label>
-		<div class="col-sm-9">
-			<label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="isEnable" checked/>{{Activer}}</label>
-			<label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="isVisible" checked/>{{Visible}}</label>
-		</div>
-	</div>
        <div class="form-group">
+        <label class="col-sm-3 control-label">{{Catégorie}}</label>
+        <div class="col-sm-9">
+         <?php
+            foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value) {
+            echo '<label class="checkbox-inline">';
+            echo '<input type="checkbox" class="eqLogicAttr" data-l1key="category" data-l2key="' . $key . '" />' . $value['name'];
+            echo '</label>';
+            }
+          ?>
+        </div>
+        </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label"></label>
+        <div class="col-sm-9">
+            <label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="isEnable" checked/>{{Activer}}</label>
+            <label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="isVisible" checked/>{{Visible}}</label>
+        </div>
+    </div>
+    <div class="form-group">
         <label class="col-sm-3 control-label">{{Numéro de série}}</label>
         <div class="col-sm-3">
-            <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="serialNumber" placeholder="Voir notice ou au dos"/>
+            <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="serialNumber" placeholder="{{Voir notice ou au dos}}"/>
         </div>
     </div>
-       <div class="form-group">
+    <div class="form-group">
         <label class="col-sm-3 control-label">{{Clé d'accès}}</label>
         <div class="col-sm-3">
-            <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="accessKey" placeholder="Voir notice ou au dos"/>
+            <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="accessKey" placeholder="{{Voir notice ou au dos}}"/>
         </div>
     </div>
-       <div class="form-group">
+    <div class="form-group">
         <label class="col-sm-3 control-label">{{Mot de passe}}</label>
         <div class="col-sm-3">
-            <input type="password" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="password" placeholder="Mot de passe choisi sur le smartphone"/>
+            <input type="password" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="password" placeholder="{{Mot de passe choisi sur le smartphone}}"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label">{{Auto-actualisation (cron)}}</label>
+        <div class="col-sm-8">
+            <input type="checkbox" class="eqLogicAttr" data-label-text="{{Activer}}" data-l1key="configuration" data-l2key="cron_isEnable" checked/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label"></label>
+        <div class="col-sm-2">
+            <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="autorefresh" placeholder="{{Auto-actualisation (cron)}}"/>
+        </div>
+        <div class="col-sm-1">
+            <i class="fa fa-question-circle cursor floatright" id="bt_cronGenerator"></i>
         </div>
     </div>
 </fieldset>

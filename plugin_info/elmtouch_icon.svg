@@ -14,7 +14,7 @@
    width="309"
    height="348"
    viewBox="0 0 309 348"
-   sodipodi:docname="elmtouch_icon3.svg"
+   sodipodi:docname="elmtouch_icon.svg"
    inkscape:version="0.92.2 (5c3e80d, 2017-08-06)"
    inkscape:export-filename="C:\wamp\www\jeedom-elmtouch\travail\elmtouch_icon3.png"
    inkscape:export-xdpi="96"
@@ -27,7 +27,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -47,14 +47,14 @@
      id="namedview817"
      showgrid="false"
      inkscape:zoom="2.4425287"
-     inkscape:cx="100.49859"
+     inkscape:cx="25.780942"
      inkscape:cy="81.34327"
      inkscape:window-x="26"
      inkscape:window-y="0"
      inkscape:window-maximized="0"
      inkscape:current-layer="svg815" />
   <rect
-     style="fill:#fe80f0;fill-opacity:1;stroke:none"
+     style="fill:#c60000;fill-opacity:1;stroke:none"
      id="rect825"
      width="307.46823"
      height="308.28705"
@@ -63,7 +63,7 @@
      ry="58.5714" />
   <text
      xml:space="preserve"
-     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.34482765px;line-height:125%;font-family:'HelveticaNeue LT 65 Medium';-inkscape-font-specification:'HelveticaNeue LT 65 Medium, ';letter-spacing:0px;word-spacing:0px;fill:#fe80f0;fill-opacity:1;stroke:none;stroke-width:0.97931033px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.34482765px;line-height:125%;font-family:'HelveticaNeue LT 65 Medium';-inkscape-font-specification:'HelveticaNeue LT 65 Medium, ';letter-spacing:0px;word-spacing:0px;fill:#c60000;fill-opacity:1;stroke:none;stroke-width:0.97931033px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;"
      x="90.758476"
      y="298.56491"
      id="text829"
@@ -74,7 +74,7 @@
        id="tspan827"
        x="90.758476"
        y="298.56491"
-       style="font-style:normal;font-variant:normal;font-weight:900;font-stretch:normal;font-size:28.72643661px;font-family:Eurostar;-inkscape-font-specification:'Eurostar Heavy';fill:#fe80f0;fill-opacity:1;stroke-width:0.97931033px">ELM TOUCH</tspan></text>
+       style="font-style:normal;font-variant:normal;font-weight:900;font-stretch:normal;font-size:28.72643661px;font-family:Eurostar;-inkscape-font-specification:'Eurostar Heavy';fill:#c60000;fill-opacity:1;stroke-width:0.97931033px;">ELM TOUCH</tspan></text>
   <ellipse
      style="fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:3.36364555;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
      id="path825"

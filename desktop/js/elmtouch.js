@@ -15,6 +15,14 @@
  * along with Jeedom. If not, see <http://www.gnu.org/licenses/>.
  */
 
+$('#typeEq').change(function(){
+});
+
+$('#bt_cronGenerator').on('click',function(){
+   jeedom.getCronSelectModal({},function (result) {
+       $('.eqLogicAttr[data-l1key=configuration][data-l2key=autorefresh]').value(result.value);
+   });
+});
 
 $("#table_cmd").sortable({axis: "y", cursor: "move", items: ".cmd", placeholder: "ui-state-highlight", tolerance: "intersect", forcePlaceholderSize: true});
 /*

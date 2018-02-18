@@ -77,17 +77,18 @@ FAQ
 
 Quelle est la fréquence de rafraichissement ?
 
-:   Le systeme recupère les informations toutes les 15 min.
+Par défaut le plugin recupère les informations toutes les 5 min.
 
 Je voudrais récupérer les informations avec une fréquence plus grande est-ce possible ?
 
-:   Non pour le moment ce n'est pas possible sans éditer le code du plugin.
+Sur la page Equipement, modifiez la valeur du champ **Auto-actualisation (cron)**
+Si vous ne connaissez pas la syntaxe des expressions cron, utilisez l'assistant.
 
-    Il faut noter que le plugin émet une requête à chaque
-    récupération. En cas d'abus il est à craindre que le compte ne soit bloqué.
+Il faut noter que le plugin émet une requête vers le serveur Bosch à chaque
+récupération. En cas d'abus il est à craindre que le compte ne soit bloqué.
 
-    De plus accroitre la fréquence de récupération 
-    accroit aussi les chances d'une collision lors de l'emploi simultané du plugin et de l'application sur mobile.
+De plus accroitre la fréquence de récupération accroit aussi les chances d'une collision
+lors de l'emploi simultané du plugin et de l'application sur mobile.
 
-    Enfin vu l'inertie les températures extérieurs et intérieures ne sont pas des grandeurs à variation rapide ;-)
+Enfin vu l'inertie les températures extérieurs et intérieures ne sont pas des grandeurs à variation rapide !
 

@@ -41,6 +41,30 @@ class elmtouch extends eqLogic {
         $return['launchable'] = 'ok';
         return $return;
     }
+    
+    public static function cron() {
+        foreach (self::byType('elmtouch') as $elmtouch) {
+            $cron_isEnable = $elmtouch->getConfiguration('cron_isEnable',0);
+            $autorefresh = $elmtouch->getConfiguration('autorefresh','');
+            $serial = 
+            $password = $elmtouch->getConfiguration('password','');
+            if ($elmtouch->getIsEnable() == 1 && $cron_isEnable == 1 && $password != '' && $autorefresh != '') {
+                try {
+                    $c = new Cron\CronExpression($autorefresh, new Cron\FieldFactory);
+                    if ($c->isDue()) {
+                        try {
+                            $elmtouch->status();
+                            $elmtouch->refreshWidget();
+                        } catch (Exception $exc) {
+                            log::add('elmtouch', 'error', __('Error in ', __FILE__) . $elmtouch->getHumanName() . ' : ' . $exc->getMessage());
+                        }
+                    }
+                } catch (Exception $exc) {
+                    log::add('elmtouch', 'error', __('Expression cron non valide pour ', __FILE__) . $elmtouch->getHumanName() . ' : ' . $autorefresh);
+                }
+            }
+        }
+    }
 
     public static function dependancy_info() {
         $return = array();
@@ -106,7 +130,12 @@ class elmtouch extends eqLogic {
     }
 
     public function preSave() {
-
+        if ($this->getConfiguration('autorefresh') == '') {
+            $this->setConfiguration('autorefresh', '*/5 * * * *');
+        }
+        if ($this->getConfiguration('cron_isEnable',"initial") == 'initial') {
+            $this->setConfiguration('cron_isEnable', 1);
+        }
     }
 
     public function postSave() {

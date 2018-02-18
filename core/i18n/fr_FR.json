@@ -18,12 +18,15 @@
         "Dupliquer": "Dupliquer",
         "Autoriser": "Autoriser",
         "Numéro de série": "Numéro de série",
+        "Voir notice ou au dos": "Voir notice ou au dos",
         "Clé d'accès": "Clé d'accès",
         "Mot de passe": "Mot de passe",
+        "Mot de passe choisi sur le smartphone": "Mot de passe choisi sur le smartphone",
         "Avancée": "Avancée",
         "Type": "Type",
         "Nom": "Nom",
-        "Action": "Action"
+        "Action": "Action",
+        "Auto-actualisation (cron)": "Auto-actualisation (cron)"
     },
 
     "plugins\/elmtouch\/core\/ajax\/elmtouch.ajax.php": {
@@ -36,7 +39,8 @@
         "Consigne": "Consigne",
         "Température": "Température",
         "Température extérieure": "Température extérieure",
-        "Mode": "Mode"
+        "Mode": "Mode",
+        "Expression cron non valide pour ": "Expression cron non valide pour "
     },
 
     "plugins\/elmtouch\/desktop\/js\/elmtouch.js": {

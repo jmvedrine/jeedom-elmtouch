@@ -7,13 +7,9 @@ echo 0 > ${PROGRESS_FILE}
 echo "********************************************************"
 echo "*             Installation des dépendances             *"
 echo "********************************************************"
-echo $1
-echo $0
 sudo apt-get update
-pip uninstall pyaes -y
-echo 20 > ${PROGRESS_FILE}
-pip uninstall sleekxmpp -y
-echo 35 > ${PROGRESS_FILE}
+echo 30 > ${PROGRESS_FILE}
+sudo npm i nefit-easy-http-server -g
 
 echo 100 > ${PROGRESS_FILE}
 echo "********************************************************"

@@ -55,8 +55,12 @@ class elmtouch extends eqLogic {
         $return = array();
         $return['log'] = 'elmtouch_update';
         $return['progress_file'] = jeedom::getTmpFolder('elmtouch') . '/dependance';
-        $return['state'] = 'ok';
-        // TODO détecter si nefit easy server est installé.
+        if (shell_exec('ls /usr/bin/easy-server 2>/dev/null | wc -l') == 1 || shell_exec('ls /usr/local/bin/easy-server 2>/dev/null | wc -l') == 1) {
+			$state = 'ok';
+		}else{
+			$state = 'nok';
+		}	
+		$return['state'] = $state;
         return $return;
     }
 

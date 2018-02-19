@@ -1,4 +1,5 @@
 <?php
+
 /* This file is part of Jeedom.
  *
  * Jeedom is free software: you can redistribute it and/or modify
@@ -14,38 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Jeedom. If not, see <http://www.gnu.org/licenses/>.
  */
+
 require_once dirname(__FILE__) . '/../../../core/php/core.inc.php';
 
-function elmtouch_install() {
-    $cron = cron::byClassAndFunction('elmtouch', 'pull');
-    if (!is_object($cron)) {
-        $cron = new cron();
-        $cron->setClass('elmtouch');
-        $cron->setFunction('pull');
-        $cron->setEnable(1);
-        $cron->setDeamon(1);
-        $cron->setSchedule('* * * * *');
-        $cron->save();
-    }
-}
-
 function elmtouch_update() {
-    $cron = cron::byClassAndFunction('elmtouch', 'pull');
-    if (!is_object($cron)) {
-        $cron = new cron();
-        $cron->setClass('elmtouch');
-        $cron->setFunction('pull');
-        $cron->setEnable(1);
-        $cron->setDeamon(1);
-        $cron->setSchedule('* * * * *');
-        $cron->save();
-    }
-    $cron->stop();
-}
-
-function elmtouch_remove() {
-    $cron = cron::byClassAndFunction('elmtouch', 'pull');
-    if (is_object($cron)) {
-        $cron->remove();
+    foreach (eqLogic::byType('elmtouch') as $elmtouch) {
+		$elmtouch->save();
     }
 }
+?>

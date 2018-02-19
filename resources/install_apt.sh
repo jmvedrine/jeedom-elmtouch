@@ -7,17 +7,14 @@ echo 0 > ${PROGRESS_FILE}
 echo "********************************************************"
 echo "*             Installation des dépendances             *"
 echo "********************************************************"
+echo $1
+echo $0
 sudo apt-get update
-pip install pyaes
+pip uninstall pyaes -y
 echo 20 > ${PROGRESS_FILE}
-pip install sleekxmpp
+pip uninstall sleekxmpp -y
 echo 35 > ${PROGRESS_FILE}
-echo "Installation de nefit-client-python"
-echo 50 > ${PROGRESS_FILE}
-cd "$(dirname "$0")/elmtouchd"
-sudo rm -R nefit-client-python
-sudo git clone --depth 1 https://github.com/patvdleer/nefit-client-python.git
-cd nefit-client-python
+
 echo 100 > ${PROGRESS_FILE}
 echo "********************************************************"
 echo "*             Installation terminée                    *"

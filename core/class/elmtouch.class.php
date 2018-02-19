@@ -25,35 +25,20 @@ class elmtouch extends eqLogic {
 
 
     /*     * ***********************Methode static*************************** */
-
-    public static function deamon_info() {
-        $return = array();
-        $return['log'] = 'elmtouch';
-        $return['state'] = 'nok';
-        $pid_file = jeedom::getTmpFolder('elmtouch') . '/deamon.pid';
-        if (file_exists($pid_file)) {
-            if (@posix_getsid(trim(file_get_contents($pid_file)))) {
-                $return['state'] = 'ok';
-            } else {
-                shell_exec(system::getCmdSudo() . 'rm -rf ' . $pid_file . ' 2>&1 > /dev/null');
-            }
-        }
-        $return['launchable'] = 'ok';
-        return $return;
-    }
-    
     public static function cron() {
         foreach (self::byType('elmtouch') as $elmtouch) {
-            $cron_isEnable = $elmtouch->getConfiguration('cron_isEnable',0);
-            $autorefresh = $elmtouch->getConfiguration('autorefresh','');
-            $serial = 
-            $password = $elmtouch->getConfiguration('password','');
-            if ($elmtouch->getIsEnable() == 1 && $cron_isEnable == 1 && $password != '' && $autorefresh != '') {
+            $cron_isEnable = $elmtouch->getConfiguration('cron_isEnable', 0);
+            $autorefresh = $elmtouch->getConfiguration('autorefresh', '');
+            $serial = $elmtouch->getConfiguration('serialNumber', '');
+            $access = $elmtouch->getConfiguration('accessKey', '');
+            $password = $elmtouch->getConfiguration('password', '');
+            if ($elmtouch->getIsEnable() == 1 && $cron_isEnable == 1 && $serial != '' && $access != '' && $password != '' && $autorefresh != '') {
                 try {
                     $c = new Cron\CronExpression($autorefresh, new Cron\FieldFactory);
                     if ($c->isDue()) {
                         try {
-                            $elmtouch->status();
+                            $elmtouch->getStatus();
+                            $elmtouch->getOutdoorTemp();
                             $elmtouch->refreshWidget();
                         } catch (Exception $exc) {
                             log::add('elmtouch', 'error', __('Error in ', __FILE__) . $elmtouch->getHumanName() . ' : ' . $exc->getMessage());
@@ -80,17 +65,9 @@ class elmtouch extends eqLogic {
         return array('script' => dirname(__FILE__) . '/../../resources/install_#stype#.sh ' . jeedom::getTmpFolder('elmtouch') . '/dependance', 'log' => log::getPathToLog(__CLASS__ . '_update'));
     }
 
-    public static function start() {
+/*    public static function start() {
         self::cron15();
-    }
-
-    /*
-     * Fonction exécutée automatiquement toutes les minutes par Jeedom
-      public static function cron() {
-
-      }
-     */
-
+    }   */
 
     /*
      * Fonction exécutée automatiquement toutes les heures par Jeedom
@@ -105,17 +82,6 @@ class elmtouch extends eqLogic {
 
       }
      */
-
-    public static function cron15() {
-        foreach (self::byType('elmtouch') as $eqLogic) {
-            if ($eqLogic->getConfiguration('enable') == 1 && !$eqLogic->getState()) {
-                // TODO
-            }
-            if ($eqLogic->getConfiguration('enable') == 0 && $eqLogic->getState()) {
-                // DODO
-            }
-        }
-    }
 
 
 
@@ -136,6 +102,8 @@ class elmtouch extends eqLogic {
         if ($this->getConfiguration('cron_isEnable',"initial") == 'initial') {
             $this->setConfiguration('cron_isEnable', 1);
         }
+        // Force la categorie "chauffage".
+        $this->setCategory('heating', 1);
     }
 
     public function postSave() {
@@ -192,11 +160,21 @@ class elmtouch extends eqLogic {
             $temperature->setLogicalId('temperature');
             $temperature->setUnite('°C');
 
-            $value = '';
-
-            // $temperature->setValue($value);
-            $temperature->setDisplay('generic_type', 'THERMOSTAT_TEMPERATURE');
-            $temperature->save();
+            $clockmode = $this->getCmd(null, 'clockmode');
+            if (!is_object($clockmode)) {
+                $clockmode = new elmtouchCmd();
+                $clockmode->setTemplate('dashboard', 'clockmode');
+                $clockmode->setTemplate('mobile', 'clockmode');
+                $clockmode->setName(__('Mode programme', __FILE__));
+                $clockmode->setIsVisible(1);
+                $clockmode->setIsHistorized(1);
+            }
+            $clockmode->setEqLogic_id($this->getId());
+            $clockmode->setType('info');
+            $clockmode->setSubType('binary');
+            $clockmode->setLogicalId('clockmode');
+            $clockmode->setDisplay('generic_type', 'DONT');
+            $clockmode->save();
 
             $temperature_outdoor = $this->getCmd(null, 'temperature_outdoor');
             if (!is_object($temperature_outdoor)) {
@@ -259,10 +237,85 @@ class elmtouch extends eqLogic {
      */
 
     /*     * **********************Getteur Setteur*************************** */
-    public function getState() {
-        //TODO.
-        return true;
+    public function getStatus() {
+        // log::add('elmtouch', 'debug', 'Running getStatus');
+        $url = 'http://127.0.0.1:3000/api/status';
+        $request_http = new com_http($url);
+        $json_string = $request_http->exec(30);
+        if ($json_string === false) {
+            log::add('elmtouch', 'debug', 'Problème de lecture status');
+            return;
+        }
+        $parsed_json = json_decode($json_string, true);
+        // log::add('elmtouch', 'debug', print_r($json_string, true));
+        // log::add('elmtouch', 'debug', print_r($parsed_json, true));
+        $inhousetemp = floatval($parsed_json['in house temp']);
+        if ( $inhousetemp >= 5 && $inhousetemp <= 30) {
+            log::add('elmtouch', 'debug', 'Température intérieure : ' . $inhousetemp);
+            $this->checkAndUpdateCmd('temperature', $inhousetemp);
+        } else {
+            log::add('elmtouch', 'debug', 'temp incorrecte ' . $inhousetemp);
+        }
+        // log::add('elmtouch', 'debug', 'Result6 : ' . $parsed_json['temp setpoint']);
+        $tempsetpoint = floatval($parsed_json['temp setpoint']);
+        if ( $tempsetpoint >= 5 && $tempsetpoint <= 30) {
+            log::add('elmtouch', 'debug', 'Consigne : ' . $tempsetpoint);
+            $this->checkAndUpdateCmd('order', $tempsetpoint);
+        } else {
+            log::add('elmtouch', 'debug', 'tempsetpoint incorrecte ' . $tempsetpoint);
+        }
+        $clockmode = $parsed_json['user mode'];
+        log::add('elmtouch', 'debug', 'user mode ' . $clockmode);
+        if ($clockmode =='clock') {
+            $this->checkAndUpdateCmd('clockmode', true);
+        } else {
+            $this->checkAndUpdateCmd('clockmode', false);
+        }
+         //   $this->toHtml('mobile');
+         //   $this->toHtml('dashboard');
     }
+
+    public function getOutdoorTemp() {
+        // log::add('elmtouch', 'debug', 'Running getOutdoorTemp');
+        $url = 'http://127.0.0.1:3000/bridge/system/sensors/temperatures/outdoor_t1';
+        $request_http = new com_http($url);
+        $json_string = $request_http->exec(30);
+        if ($json_string === false) {
+            log::add('elmtouch', 'debug', 'Problème de lecture outdoortemp');
+            return;
+        }
+        $parsed_json = json_decode($json_string, true);
+        // log::add('elmtouch', 'debug', print_r($json_string, true));
+        // log::add('elmtouch', 'debug', 'Result7 : ' . print_r($parsed_json, true));
+        $outdoortemp = floatval($parsed_json['value']);
+        if ( $outdoortemp >= 5 && $outdoortemp <= 30) {
+            log::add('elmtouch', 'debug', 'Température extérieure : ' . $outdoortemp);
+            $this->checkAndUpdateCmd('temperature_outdoor', $outdoortemp);
+        } else {
+            log::add('elmtouch', 'debug', 'outdoortemp incorrecte ' . $outdoortemp);
+        }
+         //   $this->toHtml('mobile');
+         //   $this->toHtml('dashboard');
+    }
+
+    public function writeData($endpoint, $data) {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, 'http://127.0.0.1:3000/bridge' . $endpoint);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($ch,CURLOPT_HTTPHEADER,array('Content-Type: application/json'));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $server_output = curl_exec ($ch);
+        curl_close ($ch);
+        log::add('elmtouch', 'debug', 'writedata '. $endpoint . ' ' . $data . ' > ' . $server_output);
+    }
+
+    public function setTemperature($value) {
+        $this->writeData('/heatingCircuits/hc1/temperatureRoomManual', '{ "value" : ' .$value . ' }');
+        $this->writeData('/heatingCircuits/hc1/manualTempOverride/status', '{ "value" : "on" }');
+        $this->writeData('/heatingCircuits/hc1/manualTempOverride/temperature', '{ "value" : ' . $value . ' }');
+    }
+
 }
 
 class elmtouchCmd extends cmd {
@@ -282,7 +335,28 @@ class elmtouchCmd extends cmd {
      */
 
     public function execute($_options = array()) {
-
+        if ($this->getType() == '') {
+            return '';
+        }
+        $eqLogic = $this->getEqlogic();
+        $action= $this->getLogicalId();
+        if ($action == 'thermostat') {
+            log::add('elmtouch', 'debug', 'action thermostat');
+            log::add('elmtouch', 'debug', print_r($_options, true));
+            if (!isset($_options['slider']) || $_options['slider'] == '' || !is_numeric(intval($_options['slider']))) {
+                log::add('elmtouch', 'debug', 'mauvaise valeur du slider dans execute thermostat');
+            }
+            if ($_options['slider'] > 30) {
+                $_options['slider'] = 30;
+            }
+            if ($_options['slider'] < 5) {
+                $_options['slider'] = 5;
+            }
+            $eqLogic->getCmd(null, 'order')->event($_options['slider']);
+            
+            $eqLogic->setTemperature(floatval($_options['slider']));
+            $eqLogic->refresh_place();
+        }
     }
 
     /*     * **********************Getteur Setteur*************************** */

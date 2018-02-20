@@ -23,19 +23,37 @@ de la chaudière soit au niveau du thermostat. Après réflexion je n'ai pas pou
 dans cette voie, mais si un jour le serveur Bosch venait à être indisponible
 ou si Bosch restreignait la connexion, il resterait cette solution.
 
+Avant d'activer le plugin il faut que votre compte sur le serveur de Bosch soit créé avec un mot de passe
+et il faut que le thermostat fonctionne.
+
 Configuration du plugin 
 ===
 
-Ce plugin ne comporte pas de configuration particulière, il suffit de l'activer
-et de vérifier que l'installation des dépendances et le statut du démon sont bien OK.
+Vérifier que l'installation des dépendances et le statut du démon sont bien OK.
+
+Les dépendances installent le module nodejs nefit-easy http server de Robert Klep  
+(https://github.com/robertklep/nefit-easy-http-server).
+
+Le démon se charge de le démarrer et de l'arrêter. Il faut que le numéro de série, le
+code d'accès et le mot de passe soient corrects pour que le démon puisse fonctionner
+
+Il faut entrer :
+
+-   **Numéro de série** : le numéro de série à 9 chiffres (Serial) qui figure sur la notice et au dos du thermostat
+
+-   **Clé d'accès** : la clé d'accès alphanumérique (Access) qui figure sur la notice et au dos du thermostat
+
+-   **Mot de passe** : Le mot de passe que vous avez choisi lors de la création du compte sur le serveur de Bosch.
 
 Création des équipement
 ===
 
-Ce plugin peut gérer plusieurs thermostats Elm Touch. Chaque thermostat correspond à un
-équipement. Avant de créer l'équipement il faut que le thermostat fonctionne et que le compte
-correspondant ait été créé sur le serveur de Bosch avec son mot de passe à l'aide de
-l'application IOS ou Android.
+Attention, pour le moment ce plugin ne peut gérer qu'un seul thermostat Elm Touch. 
+
+Je pense qu'il serait sans doute
+possible de gérer plusieurs thermostats en leur donnant à chacun un port diffrérent pour le serveur. Mais je n'ai pas codé cela
+
+Veillez à ne créer qu'un seul équipement !
 
 Lors de la création en plus des champs habituels pour tout plugin Jeedom
 
@@ -48,13 +66,8 @@ Lors de la création en plus des champs habituels pour tout plugin Jeedom
 
 -   **Visible** : le rend visible sur le dashboard
 
-, il faut entrer :
-
--   **Numéro de série** : le numéro de série à 9 chiffres (Serial) qui figure sur la notice et au dos du thermostat
-
--   **Clé d'accès** : la clé d'accès alphanumérique (Access) qui figure sur la notice et au dos du thermostat
-
--   **Mot de passe** : Le mot de passe que vous avez choisi lors de la création du compte sur le serveur de Bosch
+-   **Auto-actualisation (cron)** Expression cron pour le rafraichissement des informations.
+Si vous ne connaissez pas la syntaxe des expressions cron, utilisez l'assistant.
 
 Cliquez ensuite sur Sauvegarder, l'équipement est créé avec les commandes correspondantes.
 

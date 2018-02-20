@@ -1,8 +1,7 @@
 {
     "plugins\/elmtouch\/desktop\/php\/elmtouch.php": {
-        "Ajouter un ELM Touch": "Ajouter un ELM Touch",
         "Rechercher": "Rechercher",
-        "Mes ELM Touchs": "Mes ELM Touchs",
+        "Mon thermostat ELM Touch": "Mon thermostat ELM Touch",
         "Gestion": "Gestion",
         "Ajouter": "Ajouter",
         "Général": "Général",

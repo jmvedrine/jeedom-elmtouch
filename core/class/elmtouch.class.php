@@ -25,13 +25,90 @@ class elmtouch extends eqLogic {
 
 
     /*     * ***********************Methode static*************************** */
+    public static function deamon_info() {
+        $return = [];
+        $return['log'] = 'elmtouch';
+        $return['state'] = 'nok';
+
+        $result = exec("ps -eo pid,command | grep 'easy-server' | grep -v grep | awk '{print $1}'");
+        if ($result <> 0) {
+            $return['state'] = 'ok';
+        }
+        $return['launchable'] = 'ok';
+        return $return;
+    }
+
+    public static function deamon_start($_debug = false) {
+        if(log::getLogLevel('elmtouch')==100) $_debug=true;
+        log::add('elmtouch', 'info', 'Mode debug : ' . $_debug);
+        self::deamon_stop();
+        $deamon_info = self::deamon_info();
+        if ($deamon_info['launchable'] != 'ok') {
+            throw new Exception(__('Veuillez vérifier la configuration', __FILE__));
+        }
+        $serial = config::byKey('serialNumber','elmtouch');
+        $access = config::byKey('accessKey','elmtouch');
+        $password = config::byKey('password','elmtouch');
+        $easyserver = ' easy-server --serial=' . $serial . ' --access-key=' . $access . ' --password=' . $password;
+        // check easy-server started, if not, start
+        $cmd = 'if [ $(ps -ef | grep -v grep | grep "easy-server" | wc -l) -eq 0 ]; then ' . system::getCmdSudo() . $easyserver . ';echo "Démarrage easy-server";sleep 1; fi';
+        log::add('elmtouch', 'debug', $cmd);
+        exec($cmd . ' >> ' . log::getPathToLog('elmtouch') . ' 2>&1 &');
+
+        $i = 0;
+        while ($i < 30) {
+            $deamon_info = self::deamon_info();
+            if ($deamon_info['state'] == 'ok') {
+                break;
+            }
+            sleep(1);
+            $i++;
+        }
+        if ($i >= 30) {
+            log::add('elmtouch', 'error', 'Impossible de lancer le démon Elm Touch, relancez le démon en debug et vérifiez la log', 'unableStartDeamon');
+            return false;
+        }
+        message::removeAll('elmtouch', 'unableStartDeamon');
+        log::add('elmtouch', 'info', 'Démon Elm Touch lancé');
+
+        return true;
+    }
+
+    public static function deamon_stop() {
+        $deamon_info = self::deamon_info();
+        if ($deamon_info['state'] <> 'ok') {
+            return true;
+        }
+
+        $pid = exec("ps -eo pid,command | grep 'easy-server' | grep -v grep | awk '{print $1}'");
+        log::add('elmtouch', 'info', 'pid=' . $pid);
+
+        if ($pid) {
+            system::kill($pid);
+        }
+        system::kill('easy-server');
+        system::fuserk(3000);
+
+        $check = self::deamon_info();
+        $retry = 0;
+        while ($deamon_info['state'] == 'ok') {
+           $retry++;
+            if ($retry > 10) {
+                return;
+            } else {
+                sleep(1);
+            }
+        }
+        return self::deamon_info();
+    }
+
     public static function cron() {
         foreach (self::byType('elmtouch') as $elmtouch) {
             $cron_isEnable = $elmtouch->getConfiguration('cron_isEnable', 0);
             $autorefresh = $elmtouch->getConfiguration('autorefresh', '');
-            $serial = $elmtouch->getConfiguration('serialNumber', '');
-            $access = $elmtouch->getConfiguration('accessKey', '');
-            $password = $elmtouch->getConfiguration('password', '');
+            $serial = config::byKey('serialNumber','elmtouch');
+            $access = config::byKey('accessKey','elmtouch');
+            $password = config::byKey('password','elmtouch');
             if ($elmtouch->getIsEnable() == 1 && $cron_isEnable == 1 && $serial != '' && $access != '' && $password != '' && $autorefresh != '') {
                 try {
                     $c = new Cron\CronExpression($autorefresh, new Cron\FieldFactory);
@@ -56,11 +133,11 @@ class elmtouch extends eqLogic {
         $return['log'] = 'elmtouch_update';
         $return['progress_file'] = jeedom::getTmpFolder('elmtouch') . '/dependance';
         if (shell_exec('ls /usr/bin/easy-server 2>/dev/null | wc -l') == 1 || shell_exec('ls /usr/local/bin/easy-server 2>/dev/null | wc -l') == 1) {
-			$state = 'ok';
-		}else{
-			$state = 'nok';
-		}	
-		$return['state'] = $state;
+            $state = 'ok';
+        }else{
+            $state = 'nok';
+        }
+        $return['state'] = $state;
         return $return;
     }
 
@@ -90,6 +167,24 @@ class elmtouch extends eqLogic {
 
 
     /*     * *********************Méthodes d'instance************************* */
+    public function createMachine($_ip = false) {
+        $eqLogic = eqLogic::byLogicalId($_ip,'elmtouch');
+        if (!is_object($eqLogic)) {
+            $eqLogic = new self();
+            $eqLogic->setLogicalId($_ip);
+            $eqLogic->setCategory('automatism', 1);
+            $eqLogic->setName('Elm Touch');
+            $eqLogic->setEqType_name('elmtouch');
+            $eqLogic->setIsVisible(1);
+            $eqLogic->setIsEnable(1);
+            $eqLogic->save();
+            log::add('elmtouch','debug','Création d\'un thermostat avec l\'ip suivante : ' .$_ip);
+        }
+    }
+
+    public function getImage(){
+        return 'plugins/ikettle/core/template/images/bouilloire.png';
+    }
 
     public function preInsert() {
 
@@ -163,6 +258,8 @@ class elmtouch extends eqLogic {
             $temperature->setSubType('numeric');
             $temperature->setLogicalId('temperature');
             $temperature->setUnite('°C');
+            $temperature->setDisplay('generic_type', 'THERMOSTAT_TEMPERATURE');
+            $temperature->save();
 
             $clockmode = $this->getCmd(null, 'clockmode');
             if (!is_object($clockmode)) {
@@ -357,7 +454,7 @@ class elmtouchCmd extends cmd {
                 $_options['slider'] = 5;
             }
             $eqLogic->getCmd(null, 'order')->event($_options['slider']);
-            
+
             $eqLogic->setTemperature(floatval($_options['slider']));
             $eqLogic->refresh_place();
         }
@@ -365,5 +462,3 @@ class elmtouchCmd extends cmd {
 
     /*     * **********************Getteur Setteur*************************** */
 }
-
-

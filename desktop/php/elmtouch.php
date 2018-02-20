@@ -107,24 +107,6 @@ foreach (object::all() as $object) {
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-3 control-label">{{Numéro de série}}</label>
-        <div class="col-sm-3">
-            <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="serialNumber" placeholder="{{Voir notice ou au dos}}"/>
-        </div>
-    </div>
-    <div class="form-group">
-        <label class="col-sm-3 control-label">{{Clé d'accès}}</label>
-        <div class="col-sm-3">
-            <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="accessKey" placeholder="{{Voir notice ou au dos}}"/>
-        </div>
-    </div>
-    <div class="form-group">
-        <label class="col-sm-3 control-label">{{Mot de passe}}</label>
-        <div class="col-sm-3">
-            <input type="password" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="password" placeholder="{{Mot de passe choisi sur le smartphone}}"/>
-        </div>
-    </div>
-    <div class="form-group">
         <label class="col-sm-3 control-label">{{Auto-actualisation (cron)}}</label>
         <div class="col-sm-8">
             <input type="checkbox" class="eqLogicAttr" data-label-text="{{Activer}}" data-l1key="configuration" data-l2key="cron_isEnable" checked/>

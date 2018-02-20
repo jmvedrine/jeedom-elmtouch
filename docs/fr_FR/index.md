@@ -35,7 +35,7 @@ Les dépendances installent le module nodejs nefit-easy http server de Robert Kl
 (https://github.com/robertklep/nefit-easy-http-server).
 
 Le démon se charge de le démarrer et de l'arrêter. Il faut que le numéro de série, le
-code d'accès et le mot de passe soient corrects pour que le démon puisse fonctionner
+code d'accès et le mot de passe soient corrects pour que le démon puisse fonctionner.
 
 Il faut entrer :
 
@@ -44,6 +44,8 @@ Il faut entrer :
 -   **Clé d'accès** : la clé d'accès alphanumérique (Access) qui figure sur la notice et au dos du thermostat
 
 -   **Mot de passe** : Le mot de passe que vous avez choisi lors de la création du compte sur le serveur de Bosch.
+
+Et ne pas oublier de cliquer sur **Sauvegarder**.
 
 Création des équipement
 ===
@@ -66,7 +68,9 @@ Lors de la création en plus des champs habituels pour tout plugin Jeedom
 
 -   **Visible** : le rend visible sur le dashboard
 
--   **Auto-actualisation (cron)** Expression cron pour le rafraichissement des informations.
+-   **Auto-actualisation (cron)** Expression cron pour le rafraichissement des informations (Par défaut '*/5 * * * *'
+    soit toutes les 5 minutes).
+
 Si vous ne connaissez pas la syntaxe des expressions cron, utilisez l'assistant.
 
 Cliquez ensuite sur Sauvegarder, l'équipement est créé avec les commandes correspondantes.
@@ -97,11 +101,11 @@ Je voudrais récupérer les informations avec une fréquence plus grande est-ce 
 Sur la page Equipement, modifiez la valeur du champ **Auto-actualisation (cron)**
 Si vous ne connaissez pas la syntaxe des expressions cron, utilisez l'assistant.
 
-Il faut noter que le plugin émet une requête vers le serveur Bosch à chaque
+Il faut noter que le plugin émet deux requêtes vers le serveur Bosch à chaque
 récupération. En cas d'abus il est à craindre que le compte ne soit bloqué.
 
 De plus accroitre la fréquence de récupération accroit aussi les chances d'une collision
 lors de l'emploi simultané du plugin et de l'application sur mobile.
 
-Enfin vu l'inertie les températures extérieurs et intérieures ne sont pas des grandeurs à variation rapide !
+Enfin vu l'inertie, les températures extérieurs et intérieures ne sont pas des grandeurs à variation rapide !
 

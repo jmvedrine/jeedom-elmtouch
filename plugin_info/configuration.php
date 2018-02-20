@@ -40,7 +40,7 @@ if (!isConnect()) {
     <div class="form-group">
         <label class="col-lg-2 control-label">{{Mot de passe}}</label>
         <div class="col-lg-2">
-            <input id="elmtouchpassword" class="configKey form-control" data-l1key="password" style="margin-top:-5px" placeholder="{{Mot de passe choisi sur le smartphone}}"/>
+            <input id="elmtouchpassword" type="password" class="configKey form-control" data-l1key="password" style="margin-top:-5px" placeholder="{{Mot de passe choisi sur le smartphone}}"/>
         </div>
     </div>
     </fieldset> 

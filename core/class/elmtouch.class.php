@@ -38,8 +38,9 @@ class elmtouch extends eqLogic {
         return $return;
     }
 
-    public static function deamon_start($_debug = false) {
+    public static function deamon_start() {
         if(log::getLogLevel('elmtouch')==100) $_debug=true;
+        log::add('elmtouch', 'debug', 'logLevel : ' . log::getLogLevel('elmtouch'));
         log::add('elmtouch', 'info', 'Mode debug : ' . $_debug);
         self::deamon_stop();
         $deamon_info = self::deamon_info();
@@ -53,7 +54,11 @@ class elmtouch extends eqLogic {
         // check easy-server started, if not, start
         $cmd = 'if [ $(ps -ef | grep -v grep | grep "easy-server" | wc -l) -eq 0 ]; then ' . system::getCmdSudo() . $easyserver . ';echo "Démarrage easy-server";sleep 1; fi';
         log::add('elmtouch', 'debug', $cmd);
-        exec($cmd . ' >> ' . log::getPathToLog('elmtouch') . ' 2>&1 &');
+        if ($_debug) {
+            exec($cmd . ' >> ' . log::getPathToLog('elmtouch') . ' 2>&1 &');
+        } else {
+            $result = exec($cmd);
+        }
 
         $i = 0;
         while ($i < 30) {
@@ -81,7 +86,7 @@ class elmtouch extends eqLogic {
         }
 
         $pid = exec("ps -eo pid,command | grep 'easy-server' | grep -v grep | awk '{print $1}'");
-        log::add('elmtouch', 'info', 'pid=' . $pid);
+        log::add('elmtouch', 'debug', 'pid=' . $pid);
 
         if ($pid) {
             system::kill($pid);

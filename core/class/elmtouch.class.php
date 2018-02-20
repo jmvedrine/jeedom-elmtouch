@@ -357,7 +357,7 @@ class elmtouch extends eqLogic {
         // log::add('elmtouch', 'debug', print_r($parsed_json, true));
         $inhousetemp = floatval($parsed_json['in house temp']);
         if ( $inhousetemp >= 5 && $inhousetemp <= 30) {
-            log::add('elmtouch', 'debug', 'Température intérieure : ' . $inhousetemp);
+            log::add('elmtouch', 'info', 'Température intérieure : ' . $inhousetemp);
             $this->checkAndUpdateCmd('temperature', $inhousetemp);
         } else {
             log::add('elmtouch', 'debug', 'temp incorrecte ' . $inhousetemp);
@@ -365,13 +365,13 @@ class elmtouch extends eqLogic {
         // log::add('elmtouch', 'debug', 'Result6 : ' . $parsed_json['temp setpoint']);
         $tempsetpoint = floatval($parsed_json['temp setpoint']);
         if ( $tempsetpoint >= 5 && $tempsetpoint <= 30) {
-            log::add('elmtouch', 'debug', 'Consigne : ' . $tempsetpoint);
+            log::add('elmtouch', 'info', 'Consigne : ' . $tempsetpoint);
             $this->checkAndUpdateCmd('order', $tempsetpoint);
         } else {
             log::add('elmtouch', 'debug', 'tempsetpoint incorrecte ' . $tempsetpoint);
         }
         $clockmode = $parsed_json['user mode'];
-        log::add('elmtouch', 'debug', 'user mode ' . $clockmode);
+        log::add('elmtouch', 'info', 'user mode ' . $clockmode);
         if ($clockmode =='clock') {
             $this->checkAndUpdateCmd('clockmode', true);
         } else {
@@ -395,7 +395,7 @@ class elmtouch extends eqLogic {
         // log::add('elmtouch', 'debug', 'Result7 : ' . print_r($parsed_json, true));
         $outdoortemp = floatval($parsed_json['value']);
         if ( $outdoortemp >= 5 && $outdoortemp <= 30) {
-            log::add('elmtouch', 'debug', 'Température extérieure : ' . $outdoortemp);
+            log::add('elmtouch', 'info', 'Température extérieure : ' . $outdoortemp);
             $this->checkAndUpdateCmd('temperature_outdoor', $outdoortemp);
         } else {
             log::add('elmtouch', 'debug', 'outdoortemp incorrecte ' . $outdoortemp);

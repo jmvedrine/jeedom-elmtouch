@@ -23,24 +23,24 @@ this solution would remain.
 To activate the plugin it is necessary that your account on the Bosch server is already created with a password
 and it is necessary that the thermostat is online and working.
 
-Plugin configuration 
-=== 
+Plugin configuration
+===
 
-Please check that the dependences installation and the deamon status are OK. 
+Please check that the dependences installation and the deamon status are OK.
 
-The dependences install the nodejs module nefit-easy HTTP server from Robert Klep (https://github.com/robertklep/nefit-easy-http-server). 
+The dependences install the nodejs module nefit-easy HTTP server from Robert Klep (https://github.com/robertklep/nefit-easy-http-server).
 
-The deamon start it and stop it. 
+The deamon start it and stop it.
 
-It is necessary that the serial number, the access code and the password are correct so that the demon can work. 
+It is necessary that the serial number, the access code and the password are correct so that the demon can work.
 
-It is necessary to enter: 
+It is necessary to enter:
 
-- ** Serial number **: the serial number with 9 digits (Serial) which appears on the note and on the back of thermostat 
+- ** Serial number **: the serial number with 9 digits (Serial) which appears on the note and on the back of thermostat
 
-- ** Access key **: the alphanumeric access key (Access) which appears on the note and on the back of thermostat 
+- ** Access key **: the alphanumeric access key (Access) which appears on the note and on the back of thermostat
 
-- ** Password **: The password you choose during the account creation on the Bosch server. 
+- ** Password **: The password you choose during the account creation on the Bosch server.
 
 And not to forget to click on ** Saving **.
 

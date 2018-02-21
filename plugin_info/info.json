@@ -6,9 +6,9 @@
     "author" : "JMVedrine",
     "require" : "3.0",
     "category" : "wellness",
-    "hasDependency" : true,
-    "hasOwnDeamon" : true,
+    "hasDependency" : 1,
+    "hasOwnDeamon" : 1,
     "changelog" : "https://jeedom.github.io/plugin-elmtouch/#language#/changelog",
     "documentation" : "https://jeedom.github.io/plugin-elmtouch/#language#/",
-    "_version" : "1.0"
+    "_version" : "1.0.1"
 }

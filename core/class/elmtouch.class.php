@@ -371,8 +371,7 @@ class elmtouch extends eqLogic {
         // log::add('elmtouch', 'debug', 'Running getStatus');
         $url = 'http://127.0.0.1:3000/api/status';
         $request_http = new com_http($url);
-        $request_http->setAllowEmptyReponse(true);
-        $request_http->setLogError(true);
+        $request_http->setNoReportError(true);
         $json_string = $request_http->exec(30);
         if ($json_string === false) {
             log::add('elmtouch', 'debug', 'Problème de lecture status');
@@ -411,8 +410,7 @@ class elmtouch extends eqLogic {
         // log::add('elmtouch', 'debug', 'Running getOutdoorTemp');
         $url = 'http://127.0.0.1:3000/bridge/system/sensors/temperatures/outdoor_t1';
         $request_http = new com_http($url);
-        $request_http->setAllowEmptyReponse(true);
-        $request_http->setLogError(true);
+        $request_http->setNoReportError(true);
         $json_string = $request_http->exec(30);
         if ($json_string === false) {
             log::add('elmtouch', 'debug', 'Problème de lecture outdoortemp');
@@ -435,8 +433,7 @@ class elmtouch extends eqLogic {
         // log::add('elmtouch', 'debug', 'Running getActualSupplyTemp');
         $url = 'http://127.0.0.1:3000/bridge/heatingCircuits/hc1/actualSupplyTemperature';
         $request_http = new com_http($url);
-        $request_http->setAllowEmptyReponse(true);
-        $request_http->setLogError(true);
+        $request_http->setNoReportError(true);
         $json_string = $request_http->exec(30);
         if ($json_string === false) {
             log::add('elmtouch', 'debug', 'Problème de lecture actualSupplyTemp');

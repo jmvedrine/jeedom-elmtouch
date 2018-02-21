@@ -121,6 +121,7 @@ class elmtouch extends eqLogic {
                         try {
                             $elmtouch->getStatus();
                             $elmtouch->getOutdoorTemp();
+                            $elmtouch->getActualSupplyTemp();
                             $elmtouch->refreshWidget();
                         } catch (Exception $exc) {
                             log::add('elmtouch', 'error', __('Error in ', __FILE__) . $elmtouch->getHumanName() . ' : ' . $exc->getMessage());
@@ -212,6 +213,7 @@ class elmtouch extends eqLogic {
 
     public function postSave() {
         if ($this->getIsEnable() == 1) {
+            // Température de consigne (info).
             $order = $this->getCmd(null, 'order');
             if (!is_object($order)) {
                 $order = new elmtouchCmd();
@@ -230,6 +232,7 @@ class elmtouch extends eqLogic {
             $order->setConfiguration('minValue', 5);
             $order->save();
 
+            // Température de consigne (action)
             $thermostat = $this->getCmd(null, 'thermostat');
             if (!is_object($thermostat)) {
                 $thermostat = new elmtouchCmd();
@@ -249,6 +252,7 @@ class elmtouch extends eqLogic {
             $thermostat->setValue($order->getId());
             $thermostat->save();
 
+            // Température de la pièce.
             $temperature = $this->getCmd(null, 'temperature');
             if (!is_object($temperature)) {
                 $temperature = new elmtouchCmd();
@@ -266,6 +270,7 @@ class elmtouch extends eqLogic {
             $temperature->setDisplay('generic_type', 'THERMOSTAT_TEMPERATURE');
             $temperature->save();
 
+            // User mode.
             $clockmode = $this->getCmd(null, 'clockmode');
             if (!is_object($clockmode)) {
                 $clockmode = new elmtouchCmd();
@@ -282,6 +287,7 @@ class elmtouch extends eqLogic {
             $clockmode->setDisplay('generic_type', 'DONT');
             $clockmode->save();
 
+            // Température extérieure.
             $temperature_outdoor = $this->getCmd(null, 'temperature_outdoor');
             if (!is_object($temperature_outdoor)) {
                 $temperature_outdoor = new elmtouchCmd();
@@ -301,6 +307,24 @@ class elmtouch extends eqLogic {
             // $temperature_outdoor->setValue($value);
             $temperature_outdoor->setDisplay('generic_type', 'THERMOSTAT_TEMPERATURE_OUTDOOR');
             $temperature_outdoor->save();
+
+            // Température eau de chauffage en sortie de chaudière.
+            $heatingsupplytemp = $this->getCmd(null, 'heatingsupplytemp');
+            if (!is_object($heatingsupplytemp)) {
+                $heatingsupplytemp = new elmtouchCmd();
+                $heatingsupplytemp->setTemplate('dashboard', 'line');
+                $heatingsupplytemp->setTemplate('mobile', 'line');
+                $heatingsupplytemp->setIsVisible(1);
+                $heatingsupplytemp->setIsHistorized(1);
+                $heatingsupplytemp->setName(__('Température eau de chauffage', __FILE__));
+            }
+            $heatingsupplytemp->setEqLogic_id($this->getId());
+            $heatingsupplytemp->setType('info');
+            $heatingsupplytemp->setSubType('numeric');
+            $heatingsupplytemp->setLogicalId('heatingsupplytemp');
+            $heatingsupplytemp->setUnite('°C');
+            $heatingsupplytemp->setDisplay('generic_type', 'DONT');
+            $heatingsupplytemp->save();
 
         } else {
             // TODO supprimer crons et listeners
@@ -347,14 +371,14 @@ class elmtouch extends eqLogic {
         // log::add('elmtouch', 'debug', 'Running getStatus');
         $url = 'http://127.0.0.1:3000/api/status';
         $request_http = new com_http($url);
+        $request_http->setNoReportError(true);
         $json_string = $request_http->exec(30);
         if ($json_string === false) {
             log::add('elmtouch', 'debug', 'Problème de lecture status');
             return;
         }
         $parsed_json = json_decode($json_string, true);
-        // log::add('elmtouch', 'debug', print_r($json_string, true));
-        // log::add('elmtouch', 'debug', print_r($parsed_json, true));
+        log::add('elmtouch', 'debug', 'getStatus : ' . print_r($json_string, true));
         $inhousetemp = floatval($parsed_json['in house temp']);
         if ( $inhousetemp >= 5 && $inhousetemp <= 30) {
             log::add('elmtouch', 'info', 'Température intérieure : ' . $inhousetemp);
@@ -362,7 +386,7 @@ class elmtouch extends eqLogic {
         } else {
             log::add('elmtouch', 'debug', 'temp incorrecte ' . $inhousetemp);
         }
-        log::add('elmtouch', 'debug', 'Réponse serveur getStatus : ' . $parsed_json['temp setpoint']);
+
         $tempsetpoint = floatval($parsed_json['temp setpoint']);
         if ( $tempsetpoint >= 5 && $tempsetpoint <= 30) {
             log::add('elmtouch', 'info', 'Consigne : ' . $tempsetpoint);
@@ -385,20 +409,43 @@ class elmtouch extends eqLogic {
         // log::add('elmtouch', 'debug', 'Running getOutdoorTemp');
         $url = 'http://127.0.0.1:3000/bridge/system/sensors/temperatures/outdoor_t1';
         $request_http = new com_http($url);
+        $request_http->setNoReportError(true);
         $json_string = $request_http->exec(30);
         if ($json_string === false) {
             log::add('elmtouch', 'debug', 'Problème de lecture outdoortemp');
             return;
         }
         $parsed_json = json_decode($json_string, true);
-        // log::add('elmtouch', 'debug', print_r($json_string, true));
-        log::add('elmtouch', 'debug', 'Réponse serveur getOutdoorTemp : ' . print_r($parsed_json, true));
+        log::add('elmtouch', 'debug', 'Réponse serveur getOutdoorTemp : ' . print_r($json_string, true));
         $outdoortemp = floatval($parsed_json['value']);
         if ( $outdoortemp >= -40 && $outdoortemp <= 50) {
             log::add('elmtouch', 'info', 'Température extérieure : ' . $outdoortemp);
             $this->checkAndUpdateCmd('temperature_outdoor', $outdoortemp);
         } else {
             log::add('elmtouch', 'debug', 'outdoortemp incorrecte ' . $outdoortemp);
+        }
+         //   $this->toHtml('mobile');
+         //   $this->toHtml('dashboard');
+    }
+
+    public function getActualSupplyTemp() {
+        // log::add('elmtouch', 'debug', 'Running getActualSupplyTemp');
+        $url = 'http://127.0.0.1:3000/bridge/heatingCircuits/hc1/actualSupplyTemperature';
+        $request_http = new com_http($url);
+        $request_http->setNoReportError(true);
+        $json_string = $request_http->exec(30);
+        if ($json_string === false) {
+            log::add('elmtouch', 'debug', 'Problème de lecture actualSupplyTemp');
+            return;
+        }
+        $parsed_json = json_decode($json_string, true);
+        log::add('elmtouch', 'debug', 'Réponse serveur getActualSupplyTemp : ' . print_r($json_string, true));
+        $supplytemp = floatval($parsed_json['value']);
+        if ( $supplytemp >= 0 && $supplytemp <= 100) {
+            log::add('elmtouch', 'info', 'Température eau de chauffage : ' . $supplytemp);
+            $this->checkAndUpdateCmd('heatingsupplytemp', $supplytemp);
+        } else {
+            log::add('elmtouch', 'debug', 'supplytemp incorrecte ' . $supplytemp);
         }
          //   $this->toHtml('mobile');
          //   $this->toHtml('dashboard');
@@ -433,12 +480,32 @@ class elmtouchCmd extends cmd {
 
     /*     * *********************Methode d'instance************************* */
 
-    /*
-     * Non obligatoire permet de demander de ne pas supprimer les commandes même si elles ne sont pas dans la nouvelle configuration de l'équipement envoyé en JS
-      public function dontRemoveCmd() {
-      return true;
-      }
+    /**
+     * Indique que les commandes obligatoires ne peuvent pas être supprimée.
+     * @return boolean
      */
+    public function dontRemoveCmd() {
+        if ($this->getLogicalId() == 'order') {
+            return true;
+        }
+        if ($this->getLogicalId() == 'heatingsupplytemp') {
+            return true;
+        }
+        if ($this->getLogicalId() == 'consigne') {
+            return true;
+        }
+        if ($this->getLogicalId() == 'thermostat') {
+            return true;
+        }
+        if ($this->getLogicalId() == 'temperature_outdoor') {
+            return true;
+        }
+        if ($this->getLogicalId() == 'clockmode') {
+            return true;
+        }
+        return false;
+    }
+
 
     public function execute($_options = array()) {
         if ($this->getType() == '') {
@@ -461,7 +528,7 @@ class elmtouchCmd extends cmd {
             $eqLogic->getCmd(null, 'order')->event($_options['slider']);
 
             $eqLogic->setTemperature(floatval($_options['slider']));
-            $eqLogic->refresh_place();
+            return true;
         }
     }
 

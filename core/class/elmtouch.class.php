@@ -119,7 +119,7 @@ class elmtouch extends eqLogic {
                     $c = new Cron\CronExpression($autorefresh, new Cron\FieldFactory);
                     if ($c->isDue()) {
                         try {
-                            $elmtouch->getStatus();
+                            $elmtouch->getThermostatStatus();
                             $elmtouch->getOutdoorTemp();
                             $elmtouch->getActualSupplyTemp();
                             $elmtouch->refreshWidget();
@@ -367,8 +367,8 @@ class elmtouch extends eqLogic {
      */
 
     /*     * **********************Getteur Setteur*************************** */
-    public function getStatus() {
-        // log::add('elmtouch', 'debug', 'Running getStatus');
+    public function getThermostatStatus() {
+        // log::add('elmtouch', 'debug', 'Running getThermostatStatus');
         $url = 'http://127.0.0.1:3000/api/status';
         $request_http = new com_http($url);
         $request_http->setNoReportError(true);
@@ -378,7 +378,8 @@ class elmtouch extends eqLogic {
             return;
         }
         $parsed_json = json_decode($json_string, true);
-        log::add('elmtouch', 'debug', 'getStatus : ' . print_r($json_string, true));
+        log::add('elmtouch', 'debug', 'getThermostatStatus : ' . print_r($json_string, true));
+
         $inhousetemp = floatval($parsed_json['in house temp']);
         if ( $inhousetemp >= 5 && $inhousetemp <= 30) {
             log::add('elmtouch', 'info', 'Température intérieure : ' . $inhousetemp);

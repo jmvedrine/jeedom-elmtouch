@@ -122,6 +122,7 @@ class elmtouch extends eqLogic {
                             $elmtouch->getThermostatStatus();
                             $elmtouch->getOutdoorTemp();
                             $elmtouch->getActualSupplyTemp();
+                            // $elmtouch->getGasConsommation();
                             $elmtouch->refreshWidget();
                         } catch (Exception $exc) {
                             log::add('elmtouch', 'error', __('Error in ', __FILE__) . $elmtouch->getHumanName() . ' : ' . $exc->getMessage());
@@ -164,11 +165,14 @@ class elmtouch extends eqLogic {
      */
 
     /*
-     * Fonction exécutée automatiquement tous les jours par Jeedom
-      public static function cronDaily() {
-
-      }
+     * Fonction exécutée automatiquement tous les jours par Jeedom.
      */
+    public static function cronDaily() {
+        foreach (eqLogic::byType('elmtouch', true) as $elmtouch) {
+            $elmtouch->getGasConsommation();
+        }
+    }
+
 
 
 
@@ -326,6 +330,74 @@ class elmtouch extends eqLogic {
             $heatingsupplytemp->setDisplay('generic_type', 'DONT');
             $heatingsupplytemp->save();
 
+            // Conso gaz chauffage jour kwh (info).
+            $heatingdaykwh = $this->getCmd(null, 'heatingdaykwh');
+            if (!is_object($heatingdaykwh)) {
+                $heatingdaykwh = new elmtouchCmd();
+                $heatingdaykwh->setIsVisible(0);
+                $heatingdaykwh->setUnite('kWh');
+                $heatingdaykwh->setName(__('Consommation jour chauffage', __FILE__));
+                $heatingdaykwh->setConfiguration('historizeMode', 'none');
+                $heatingdaykwh->setIsHistorized(1);
+            }
+            $heatingdaykwh->setDisplay('generic_type', 'DONT');
+            $heatingdaykwh->setEqLogic_id($this->getId());
+            $heatingdaykwh->setType('info');
+            $heatingdaykwh->setSubType('numeric');
+            $heatingdaykwh->setLogicalId('heatingdaykwh');
+            $heatingdaykwh->save();
+            
+            // Conso gaz eau chaude jour kwh (info).
+            $hotwaterdaykwh = $this->getCmd(null, 'hotwaterdaykwh');
+            if (!is_object($hotwaterdaykwh)) {
+                $hotwaterdaykwh = new elmtouchCmd();
+                $hotwaterdaykwh->setIsVisible(0);
+                $hotwaterdaykwh->setUnite('kWh');
+                $hotwaterdaykwh->setName(__('Consommation jour eau chaude', __FILE__));
+                $hotwaterdaykwh->setConfiguration('historizeMode', 'none');
+                $hotwaterdaykwh->setIsHistorized(1);
+            }
+            $hotwaterdaykwh->setDisplay('generic_type', 'DONT');
+            $hotwaterdaykwh->setEqLogic_id($this->getId());
+            $hotwaterdaykwh->setType('info');
+            $hotwaterdaykwh->setSubType('numeric');
+            $hotwaterdaykwh->setLogicalId('hotwaterdaykwh');
+            $hotwaterdaykwh->save();
+            
+            // Conso gaz totale jour kwh (info).
+            $totaldaykwh = $this->getCmd(null, 'totaldaykwh');
+            if (!is_object($totaldaykwh)) {
+                $totaldaykwh = new elmtouchCmd();
+                $totaldaykwh->setIsVisible(0);
+                $totaldaykwh->setUnite('kWh');
+                $totaldaykwh->setName(__('Consommation jour totale', __FILE__));
+                $totaldaykwh->setConfiguration('historizeMode', 'none');
+                $totaldaykwh->setIsHistorized(1);
+            }
+            $totaldaykwh->setDisplay('generic_type', 'DONT');
+            $totaldaykwh->setEqLogic_id($this->getId());
+            $totaldaykwh->setType('info');
+            $totaldaykwh->setSubType('numeric');
+            $totaldaykwh->setLogicalId('totaldaykwh');
+            $totaldaykwh->save();
+            
+            // Température extérieure moyenne jour (info).
+            $averageoutdoortemp = $this->getCmd(null, 'averageoutdoortemp');
+            if (!is_object($averageoutdoortemp)) {
+                $averageoutdoortemp = new elmtouchCmd();
+                $averageoutdoortemp->setIsVisible(0);
+                $averageoutdoortemp->setUnite('kWh');
+                $averageoutdoortemp->setName(__('Température extérieure moyenne', __FILE__));
+                $averageoutdoortemp->setConfiguration('historizeMode', 'none');
+                $averageoutdoortemp->setIsHistorized(1);
+            }
+            $averageoutdoortemp->setDisplay('generic_type', 'DONT');
+            $averageoutdoortemp->setEqLogic_id($this->getId());
+            $averageoutdoortemp->setType('info');
+            $averageoutdoortemp->setSubType('numeric');
+            $averageoutdoortemp->setLogicalId('averageoutdoortemp');
+            $averageoutdoortemp->save();
+
         } else {
             // TODO supprimer crons et listeners
         }
@@ -452,7 +524,7 @@ class elmtouch extends eqLogic {
          //   $this->toHtml('dashboard');
     }
 
-    public function writeData($endpoint, $data) {
+    public function writeThermostatData($endpoint, $data) {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, 'http://127.0.0.1:3000/bridge' . $endpoint);
         curl_setopt($ch, CURLOPT_POST, 1);
@@ -461,15 +533,62 @@ class elmtouch extends eqLogic {
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $server_output = curl_exec ($ch);
         curl_close ($ch);
-        log::add('elmtouch', 'debug', 'writedata '. $endpoint . ' ' . $data . ' > ' . $server_output);
+        log::add('elmtouch', 'debug', 'writeThermostatData '. $endpoint . ' ' . $data . ' > ' . $server_output);
+    }
+    
+    public function readThermostatData($endpoint) {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, 'http://127.0.0.1:3000/bridge' . $endpoint);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $server_output = curl_exec ($ch);
+        curl_close ($ch);
+        log::add('elmtouch', 'debug', 'readThermostatData '. $endpoint . ' > ' . $server_output);
+        return $server_output;
     }
 
     public function setTemperature($value) {
-        $this->writeData('/heatingCircuits/hc1/temperatureRoomManual', '{ "value" : ' .$value . ' }');
-        $this->writeData('/heatingCircuits/hc1/manualTempOverride/status', '{ "value" : "on" }');
-        $this->writeData('/heatingCircuits/hc1/manualTempOverride/temperature', '{ "value" : ' . $value . ' }');
+        $this->writeThermostatData('/heatingCircuits/hc1/temperatureRoomManual', '{ "value" : ' .$value . ' }');
+        $this->writeThermostatData('/heatingCircuits/hc1/manualTempOverride/status', '{ "value" : "on" }');
+        $this->writeThermostatData('/heatingCircuits/hc1/manualTempOverride/temperature', '{ "value" : ' . $value . ' }');
     }
 
+    public function getGasConsommation() {
+        $cmdheatingdaykwh = $this->getCmd(null, 'heatingdaykwh');
+        $cmdhotwaterdaykwh = $this->getCmd(null, 'hotwaterdaykwh');
+        $cmdtotaldaykwh = $this->getCmd(null, 'totaldaykwh');
+        $cmdaverageoutdoortemp = $this->getCmd(null, 'averageoutdoortemp');
+        $json_string = $this->readThermostatData('/ecus/rrc/recordings/gasusagePointer');
+        // log::add('elmtouch', 'debug', 'pointer = '. $json_string);
+        $pointer = intval(json_decode($json_string, true)['value']);
+        // log::add('elmtouch', 'debug', 'pointer = '. $pointer);
+        $page = (int)($pointer / 32) + 1;
+        // log::add('elmtouch', 'debug', 'page = '. $page);
+        if ($page >= 1 && $page < 6400) {
+            $json_string = $this->readThermostatData('/ecus/rrc/recordings/gasusage?page=' . $page);
+            // log::add('elmtouch', 'debug', 'Réponse serveur gasconsojson : ' . print_r($json_string, true));
+            $parsed_json = json_decode($json_string, true);
+            // log::add('elmtouch', 'debug', 'Réponse serveur gasconsojsonparsed : ' . print_r($parsed_json, true));
+            foreach($parsed_json['value'] as $dailyconso) {
+                $invalid = "255-256-65535";
+                if ($dailyconso['d'] !== $invalid) {
+                    log::add('elmtouch', 'debug', 'Daily : ' . print_r($dailyconso, true));
+                    $server_date = date_create_from_format('d-m-Y', $dailyconso['d']);
+                    if ($server_date !== false) {
+                        $jeedom_event_date = $server_date->format("Y-m-d");
+                        $heatingday_value = floatval($dailyconso['ch']);
+                        $cmdheatingdaykwh->event($heatingday_value, $jeedom_event_date);
+                        $hotwaterday_value = floatval($dailyconso['hw']);
+                        $cmdhotwaterdaykwh->event($hotwaterday_value, $jeedom_event_date);
+                        $totalday_value = $heatingday_value + $hotwaterday_value;
+                        $cmdtotaldaykwh->event($totalday_value, $jeedom_event_date);
+                        $outdoortemp_value = floatval($dailyconso['T']) / 10;
+                        $cmdaverageoutdoortemp->event($outdoortemp_value, $jeedom_event_date);
+                    }
+                }
+            }
+        }
+        
+    }
 }
 
 class elmtouchCmd extends cmd {

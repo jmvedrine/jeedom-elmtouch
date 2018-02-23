@@ -40,8 +40,8 @@ class elmtouch extends eqLogic {
 
     public static function deamon_start() {
         if(log::getLogLevel('elmtouch')==100) $_debug=true;
-        log::add('elmtouch', 'debug', 'logLevel : ' . log::getLogLevel('elmtouch'));
-        log::add('elmtouch', 'info', 'Mode debug : ' . $_debug);
+        // log::add('elmtouch', 'debug', 'logLevel : ' . log::getLogLevel('elmtouch'));
+        // log::add('elmtouch', 'info', 'Mode debug : ' . $_debug);
         self::deamon_stop();
         $deamon_info = self::deamon_info();
         if ($deamon_info['launchable'] != 'ok') {
@@ -53,11 +53,11 @@ class elmtouch extends eqLogic {
         $easyserver = ' easy-server --serial=' . $serial . ' --access-key=' . $access . ' --password=' . $password;
         // check easy-server started, if not, start
         $cmd = 'if [ $(ps -ef | grep -v grep | grep "easy-server" | wc -l) -eq 0 ]; then ' . system::getCmdSudo() . $easyserver . ';echo "Démarrage easy-server";sleep 1; fi';
-        log::add('elmtouch', 'debug', $cmd);
+        // log::add('elmtouch', 'debug', $cmd);
         if ($_debug) {
             exec($cmd . ' >> ' . log::getPathToLog('elmtouch') . ' 2>&1 &');
         } else {
-            $result = exec($cmd);
+            $result = exec($cmd . ' > /dev/null 2>&1 &');
         }
 
         $i = 0;
@@ -86,7 +86,7 @@ class elmtouch extends eqLogic {
         }
 
         $pid = exec("ps -eo pid,command | grep 'easy-server' | grep -v grep | awk '{print $1}'");
-        log::add('elmtouch', 'debug', 'pid=' . $pid);
+        // log::add('elmtouch', 'debug', 'pid=' . $pid);
 
         if ($pid) {
             system::kill($pid);
@@ -122,7 +122,6 @@ class elmtouch extends eqLogic {
                             $elmtouch->getThermostatStatus();
                             $elmtouch->getOutdoorTemp();
                             $elmtouch->getActualSupplyTemp();
-                            // $elmtouch->getGasConsommation();
                             $elmtouch->refreshWidget();
                         } catch (Exception $exc) {
                             log::add('elmtouch', 'error', __('Error in ', __FILE__) . $elmtouch->getHumanName() . ' : ' . $exc->getMessage());
@@ -153,48 +152,54 @@ class elmtouch extends eqLogic {
         return array('script' => dirname(__FILE__) . '/../../resources/install_#stype#.sh ' . jeedom::getTmpFolder('elmtouch') . '/dependance', 'log' => log::getPathToLog(__CLASS__ . '_update'));
     }
 
-/*    public static function start() {
-        self::cron15();
-    }   */
-
-    /*
-     * Fonction exécutée automatiquement toutes les heures par Jeedom
-      public static function cronHourly() {
-
-      }
-     */
-
-    /*
-     * Fonction exécutée automatiquement tous les jours par Jeedom.
-     */
-    public static function cronDaily() {
-        foreach (eqLogic::byType('elmtouch', true) as $elmtouch) {
-            $elmtouch->getGasConsommation();
+    public static function getGasDaily() {
+        foreach (self::byType('elmtouch') as $elmtouch) {
+            log::add('elmtouch', 'info', 'Debut de récupération des consommations journalières');
+            if ($elmtouch->getIsEnable() == 1) {
+                $result = $elmtouch->getGasConsommation();
+            }
+            log::add('elmtouch', 'info', 'Fin de récupération des consommations journalières');
         }
     }
 
+    public static function cron15() {
+        log::add('elmtouch', 'debug', 'Début cron15');
+        foreach (self::byType('elmtouch') as $elmtouch) {
+            $cache = cache::byKey('elmtouch::lastgaspage::'.$elmtouch->getId());
+            $page = $cache->getValue();
+            log::add('elmtouch', 'debug', 'page = ' . $page);
+            if ($page == 8400) {
+                // Plus rien à faire.
+                log::add('elmtouch', 'debug', 'Récupération terminée');
+                return;
+            }
+            $page++;
+            $lastPage = $elmtouch->getGasLastPage();
+            log::add('elmtouch', 'debug', 'lastPage = ' . $lastPage);
+            if ($page > $lastPage) {
+                // Job terminé.
+                log::add('elmtouch', 'debug', 'Fini !');
+                cache::set('elmtouch::lastgaspage::'.$elmtouch->getId(), 8400, 0);
+            } else {
+                log::add('elmtouch', 'debug', 'On récupère la page ' . $page);
+                $result = $elmtouch->getGasPage($page);
+                if ($result > 0) {
+                    cache::set('elmtouch::lastgaspage::'.$elmtouch->getId(), $page, 0);
+                }
+            }
+        }
+        log::add('elmtouch', 'debug', 'Fin cron15');
+    }
 
-
+    /*
+     * Fonction pour permettre de relancer la récupération de tout l'historique.
+     */
+    public static function resetHistory() {
+        log::add('elmtouch', 'debug', 'Reset  History');
+        cache::set('elmtouch::lastgaspage::'.$elmtouch->getId(), 0, 0);
+    }
 
     /*     * *********************Méthodes d'instance************************* */
-    public function createMachine($_ip = false) {
-        $eqLogic = eqLogic::byLogicalId($_ip,'elmtouch');
-        if (!is_object($eqLogic)) {
-            $eqLogic = new self();
-            $eqLogic->setLogicalId($_ip);
-            $eqLogic->setCategory('automatism', 1);
-            $eqLogic->setName('Elm Touch');
-            $eqLogic->setEqType_name('elmtouch');
-            $eqLogic->setIsVisible(1);
-            $eqLogic->setIsEnable(1);
-            $eqLogic->save();
-            log::add('elmtouch','debug','Création d\'un thermostat avec l\'ip suivante : ' .$_ip);
-        }
-    }
-
-    public function getImage(){
-        return 'plugins/ikettle/core/template/images/bouilloire.png';
-    }
 
     public function preInsert() {
 
@@ -346,7 +351,7 @@ class elmtouch extends eqLogic {
             $heatingdaykwh->setSubType('numeric');
             $heatingdaykwh->setLogicalId('heatingdaykwh');
             $heatingdaykwh->save();
-            
+
             // Conso gaz eau chaude jour kwh (info).
             $hotwaterdaykwh = $this->getCmd(null, 'hotwaterdaykwh');
             if (!is_object($hotwaterdaykwh)) {
@@ -363,7 +368,7 @@ class elmtouch extends eqLogic {
             $hotwaterdaykwh->setSubType('numeric');
             $hotwaterdaykwh->setLogicalId('hotwaterdaykwh');
             $hotwaterdaykwh->save();
-            
+
             // Conso gaz totale jour kwh (info).
             $totaldaykwh = $this->getCmd(null, 'totaldaykwh');
             if (!is_object($totaldaykwh)) {
@@ -380,7 +385,7 @@ class elmtouch extends eqLogic {
             $totaldaykwh->setSubType('numeric');
             $totaldaykwh->setLogicalId('totaldaykwh');
             $totaldaykwh->save();
-            
+
             // Température extérieure moyenne jour (info).
             $averageoutdoortemp = $this->getCmd(null, 'averageoutdoortemp');
             if (!is_object($averageoutdoortemp)) {
@@ -397,7 +402,6 @@ class elmtouch extends eqLogic {
             $averageoutdoortemp->setSubType('numeric');
             $averageoutdoortemp->setLogicalId('averageoutdoortemp');
             $averageoutdoortemp->save();
-
         } else {
             // TODO supprimer crons et listeners
         }
@@ -489,7 +493,7 @@ class elmtouch extends eqLogic {
             return;
         }
         $parsed_json = json_decode($json_string, true);
-        log::add('elmtouch', 'debug', 'Réponse serveur getOutdoorTemp : ' . print_r($json_string, true));
+        // log::add('elmtouch', 'debug', 'Réponse serveur getOutdoorTemp : ' . print_r($json_string, true));
         $outdoortemp = floatval($parsed_json['value']);
         if ( $outdoortemp >= -40 && $outdoortemp <= 50) {
             log::add('elmtouch', 'info', 'Température extérieure : ' . $outdoortemp);
@@ -512,7 +516,7 @@ class elmtouch extends eqLogic {
             return;
         }
         $parsed_json = json_decode($json_string, true);
-        log::add('elmtouch', 'debug', 'Réponse serveur getActualSupplyTemp : ' . print_r($json_string, true));
+        // log::add('elmtouch', 'debug', 'Réponse serveur getActualSupplyTemp : ' . print_r($json_string, true));
         $supplytemp = floatval($parsed_json['value']);
         if ( $supplytemp >= 0 && $supplytemp <= 100) {
             log::add('elmtouch', 'info', 'Température eau de chauffage : ' . $supplytemp);
@@ -535,7 +539,7 @@ class elmtouch extends eqLogic {
         curl_close ($ch);
         log::add('elmtouch', 'debug', 'writeThermostatData '. $endpoint . ' ' . $data . ' > ' . $server_output);
     }
-    
+
     public function readThermostatData($endpoint) {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, 'http://127.0.0.1:3000/bridge' . $endpoint);
@@ -552,19 +556,23 @@ class elmtouch extends eqLogic {
         $this->writeThermostatData('/heatingCircuits/hc1/manualTempOverride/temperature', '{ "value" : ' . $value . ' }');
     }
 
-    public function getGasConsommation() {
+    public function getGasLastPage() {
+        $json_string = $this->readThermostatData('/ecus/rrc/recordings/gasusagePointer');
+        $pointer = intval(json_decode($json_string, true)['value']);
+        $page = (int)($pointer / 32) + 1;
+        return $page;
+    }
+
+    public function getGasPage($pagenum) {
         $cmdheatingdaykwh = $this->getCmd(null, 'heatingdaykwh');
         $cmdhotwaterdaykwh = $this->getCmd(null, 'hotwaterdaykwh');
         $cmdtotaldaykwh = $this->getCmd(null, 'totaldaykwh');
         $cmdaverageoutdoortemp = $this->getCmd(null, 'averageoutdoortemp');
-        $json_string = $this->readThermostatData('/ecus/rrc/recordings/gasusagePointer');
-        // log::add('elmtouch', 'debug', 'pointer = '. $json_string);
-        $pointer = intval(json_decode($json_string, true)['value']);
-        // log::add('elmtouch', 'debug', 'pointer = '. $pointer);
-        $page = (int)($pointer / 32) + 1;
-        // log::add('elmtouch', 'debug', 'page = '. $page);
-        if ($page >= 1 && $page < 6400) {
-            $json_string = $this->readThermostatData('/ecus/rrc/recordings/gasusage?page=' . $page);
+
+        // Nombre de jours récupérés.
+        $count = 0;
+        if ($pagenum >= 1 && $pagenum < 6400) {
+            $json_string = $this->readThermostatData('/ecus/rrc/recordings/gasusage?page=' . $pagenum);
             // log::add('elmtouch', 'debug', 'Réponse serveur gasconsojson : ' . print_r($json_string, true));
             $parsed_json = json_decode($json_string, true);
             // log::add('elmtouch', 'debug', 'Réponse serveur gasconsojsonparsed : ' . print_r($parsed_json, true));
@@ -574,6 +582,7 @@ class elmtouch extends eqLogic {
                     log::add('elmtouch', 'debug', 'Daily : ' . print_r($dailyconso, true));
                     $server_date = date_create_from_format('d-m-Y', $dailyconso['d']);
                     if ($server_date !== false) {
+                        $count++;
                         $jeedom_event_date = $server_date->format("Y-m-d");
                         $heatingday_value = floatval($dailyconso['ch']);
                         $cmdheatingdaykwh->event($heatingday_value, $jeedom_event_date);
@@ -586,8 +595,25 @@ class elmtouch extends eqLogic {
                     }
                 }
             }
+        } else {
+            log::add('elmtouch', 'debug', 'Numéro de page incorrect : '. $pagenum);
         }
-        
+        return $count;
+    }
+
+    public function getGasConsommation() {
+        // On ne récupère que la dernière page.
+        $lastPage = $this->getGasLastPage();
+        log::add('elmtouch', 'debug', 'getGasConsommation page : '. $lastPage);
+        $this->getGasPage($lastPage);
+    }
+
+    public function getGasHistory() {
+        $lastPage = $this->getGasLastPage();
+        for ($page = 1; $page <= $lastPage; $page++) {
+            log::add('elmtouch', 'debug', 'getGasHistory page : '. $page);
+            $this->getGasPage($page);
+        }
     }
 }
 
@@ -608,19 +634,28 @@ class elmtouchCmd extends cmd {
         if ($this->getLogicalId() == 'order') {
             return true;
         }
-        if ($this->getLogicalId() == 'heatingsupplytemp') {
-            return true;
-        }
-        if ($this->getLogicalId() == 'consigne') {
-            return true;
-        }
         if ($this->getLogicalId() == 'thermostat') {
+            return true;
+        }
+        if ($this->getLogicalId() == 'temperature') {
+            return true;
+        }
+        if ($this->getLogicalId() == 'clockmode') {
             return true;
         }
         if ($this->getLogicalId() == 'temperature_outdoor') {
             return true;
         }
-        if ($this->getLogicalId() == 'clockmode') {
+        if ($this->getLogicalId() == 'heatingsupplytemp') {
+            return true;
+        }
+        if ($this->getLogicalId() == 'heatingdaykwh') {
+            return true;
+        }
+        if ($this->getLogicalId() == 'hotwaterdaykwh') {
+            return true;
+        }
+        if ($this->getLogicalId() == 'totaldaykwh') {
             return true;
         }
         return false;

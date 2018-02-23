@@ -18,9 +18,47 @@
 
 require_once dirname(__FILE__) . '/../../../core/php/core.inc.php';
 
+function elmtouch_install() {
+    // Cron de récupération des consommations de gaz.
+    $cron = cron::byClassAndFunction('elmtouch', 'getGasDaily');
+    if (!is_object($cron)) {
+        $cron = new cron();
+        $cron->setClass('elmtouch');
+        $cron->setFunction('getGasDaily');
+        $cron->setEnable(1);
+        $cron->setDeamon(0);
+        $cron->setSchedule(rand(10, 59) . ' 0' . rand(1, 5) . ' * * *');
+        $cron->save();
+    }
+}
+
 function elmtouch_update() {
     foreach (eqLogic::byType('elmtouch') as $elmtouch) {
-		$elmtouch->save();
+        $elmtouch->save();
+        cache::set('elmtouch::lastgaspage::'.$elmtouch->getId(), 0, 0);
+    }
+    
+    // Cron de récupération des consommations de gaz.
+    $cron = cron::byClassAndFunction('elmtouch', 'getGasDaily');
+    if (!is_object($cron)) {
+        $cron = new cron();
+        $cron->setClass('elmtouch');
+        $cron->setFunction('getGasDaily');
+        $cron->setEnable(1);
+        $cron->setDeamon(0);
+        $cron->setSchedule(rand(10, 59) . ' 0' . rand(1, 5) . ' * * *');
+        $cron->save();
+    }
+    $cron->setSchedule(rand(10, 59) . ' 0' . rand(1, 5) . ' * * *');
+    $cron->save();
+}
+
+
+function elmtouch_remove() {
+    $cron = cron::byClassAndFunction('elmtouch', 'getGasDaily');
+    if (is_object($cron)) {
+        $cron->stop();
+        $cron->remove();
     }
 }
 ?>

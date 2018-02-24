@@ -8,6 +8,7 @@
     "category" : "wellness",
     "hasDependency" : 1,
     "hasOwnDeamon" : 1,
+    "display" : "panel",
     "changelog" : "https://jeedom.github.io/plugin-elmtouch/#language#/changelog",
     "documentation" : "https://jeedom.github.io/plugin-elmtouch/#language#/",
     "_version" : "1.0.1"

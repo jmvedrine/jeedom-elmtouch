@@ -549,6 +549,20 @@ class elmtouch extends eqLogic {
             $hotwateractive->setSubType('binary');
             $hotwateractive->setLogicalId('hotwateractive');
             $hotwateractive->save();
+            
+            $actif = $this->getCmd(null, 'actif');
+			if (!is_object($actif)) {
+				$actif = new elmtouchCmd();
+				$actif->setName(__('Chauffage actif', __FILE__));
+				$actif->setIsVisible(0);
+				$actif->setIsHistorized(1);
+			}
+			$actif->setDisplay('generic_type', 'THERMOSTAT_STATE');
+			$actif->setEqLogic_id($this->getId());
+			$actif->setType('info');
+			$actif->setSubType('binary');
+			$actif->setLogicalId('actif');
+			$actif->save();
         } else {
             // TODO supprimer crons et listeners
         }
@@ -630,12 +644,18 @@ class elmtouch extends eqLogic {
         switch ($boilerindicator) {
             case 'central heating' :
                 $this->checkAndUpdateCmd('boilerindicator', __('Chauffage', __FILE__));
+                if (!$this->getCmd(null,'actif')->execCmd()) {
+                    $this->getCmd(null, 'actif')->event(1);
+                }
                 break;
             case 'hot water' :
                 $this->checkAndUpdateCmd('boilerindicator', __('Eau chaude', __FILE__));
                 break;
             case 'off' :
                 $this->checkAndUpdateCmd('boilerindicator', __('Arrêt', __FILE__));
+                if ($this->getCmd(null,'actif')->execCmd()) {
+                    $this->getCmd(null, 'actif')->event(0);
+                }
                 break;
             default :
                 $this->checkAndUpdateCmd('boilerindicator', __('Inconnu', __FILE__));
@@ -804,6 +824,46 @@ class elmtouch extends eqLogic {
             $this->getGasPage($page);
         }
     }
+    
+    public function runtimeByDay($_startDate = null, $_endDate = null) {
+		$actifCmd = $this->getCmd(null, 'actif');
+		if (!is_object($actifCmd)) {
+			return array();
+		}
+		$return = array();
+		$prevValue = 0;
+		$prevDatetime = 0;
+		$day = null;
+		$day = strtotime($_startDate . ' 00:00:00 UTC');
+		$endDatetime = strtotime($_endDate . ' 00:00:00 UTC');
+		while ($day <= $endDatetime) {
+			$return[date('Y-m-d', $day)] = array($day * 1000, 0);
+			$day = $day + 3600 * 24;
+		}
+		foreach ($actifCmd->getHistory($_startDate, $_endDate) as $history) {
+			if (date('Y-m-d', strtotime($history->getDatetime())) != $day && $prevValue == 1 && $day != null) {
+				if (strtotime($day . ' 23:59:59') > $prevDatetime) {
+					$return[$day][1] += (strtotime($day . ' 23:59:59') - $prevDatetime) / 60;
+				}
+				$prevDatetime = strtotime(date('Y-m-d 00:00:00', strtotime($history->getDatetime())));
+			}
+			$day = date('Y-m-d', strtotime($history->getDatetime()));
+			if (!isset($return[$day])) {
+				$return[$day] = array(strtotime($day . ' 00:00:00 UTC') * 1000, 0);
+			}
+			if ($history->getValue() == 1 && $prevValue == 0) {
+				$prevDatetime = strtotime($history->getDatetime());
+				$prevValue = 1;
+			}
+			if ($history->getValue() == 0 && $prevValue == 1) {
+				if ($prevDatetime > 0 && strtotime($history->getDatetime()) > $prevDatetime) {
+					$return[$day][1] += (strtotime($history->getDatetime()) - $prevDatetime) / 60;
+				}
+				$prevValue = 0;
+			}
+		}
+		return $return;
+	}
 }
 
 class elmtouchCmd extends cmd {

@@ -134,6 +134,39 @@ class elmtouch extends eqLogic {
         }
     }
 
+    public static function cron15() {
+        log::add('elmtouch', 'debug', 'Début cron15');
+        foreach (self::byType('elmtouch') as $elmtouch) {
+            if (floatval($elmtouch->getConfiguration('convkwhm3', 0)) == 0 || floatval($elmtouch->getConfiguration('prixgazkwh', 0)) == 0) {
+                // Si les coefficients ne sont pas rentrés, on ne fait rien.
+                return;
+            }
+            $cache = cache::byKey('elmtouch::lastgaspage::'.$elmtouch->getId());
+            $page = $cache->getValue();
+            log::add('elmtouch', 'debug', 'page = ' . $page);
+            if ($page == 8400) {
+                // Plus rien à faire.
+                log::add('elmtouch', 'debug', 'Récupération terminée');
+                return;
+            }
+            $page++;
+            $lastPage = $elmtouch->getGasLastPage();
+            log::add('elmtouch', 'debug', 'lastPage = ' . $lastPage);
+            if ($page > $lastPage) {
+                // Job terminé.
+                log::add('elmtouch', 'debug', 'Fini !');
+                cache::set('elmtouch::lastgaspage::'.$elmtouch->getId(), 8400, 0);
+            } else {
+                log::add('elmtouch', 'debug', 'On récupère la page ' . $page);
+                $result = $elmtouch->getGasPage($page);
+                if ($result > 0) {
+                    cache::set('elmtouch::lastgaspage::'.$elmtouch->getId(), $page, 0);
+                }
+            }
+        }
+        log::add('elmtouch', 'debug', 'Fin cron15');
+    }
+
     public static function dependancy_info() {
         $return = array();
         $return['log'] = 'elmtouch_update';
@@ -162,54 +195,34 @@ class elmtouch extends eqLogic {
         }
     }
 
-    public static function cron15() {
-        log::add('elmtouch', 'debug', 'Début cron15');
-        foreach (self::byType('elmtouch') as $elmtouch) {
-            $cache = cache::byKey('elmtouch::lastgaspage::'.$elmtouch->getId());
-            $page = $cache->getValue();
-            log::add('elmtouch', 'debug', 'page = ' . $page);
-            if ($page == 8400) {
-                // Plus rien à faire.
-                log::add('elmtouch', 'debug', 'Récupération terminée');
-                return;
-            }
-            $page++;
-            $lastPage = $elmtouch->getGasLastPage();
-            log::add('elmtouch', 'debug', 'lastPage = ' . $lastPage);
-            if ($page > $lastPage) {
-                // Job terminé.
-                log::add('elmtouch', 'debug', 'Fini !');
-                cache::set('elmtouch::lastgaspage::'.$elmtouch->getId(), 8400, 0);
-            } else {
-                log::add('elmtouch', 'debug', 'On récupère la page ' . $page);
-                $result = $elmtouch->getGasPage($page);
-                if ($result > 0) {
-                    cache::set('elmtouch::lastgaspage::'.$elmtouch->getId(), $page, 0);
-                }
-            }
-        }
-        log::add('elmtouch', 'debug', 'Fin cron15');
-    }
-
     /*
      * Fonction pour permettre de relancer la récupération de tout l'historique.
      */
     public static function resetHistory() {
-        log::add('elmtouch', 'debug', 'Reset  History');
-        cache::set('elmtouch::lastgaspage::'.$elmtouch->getId(), 0, 0);
+        foreach (self::byType('elmtouch') as $elmtouch) {
+            cache::set('elmtouch::lastgaspage::'.$elmtouch->getId(), 0, 0);
+        }
     }
 
     /*     * *********************Méthodes d'instance************************* */
 
     public function preInsert() {
-
+        $this->setConfiguration('convkwhm3', 8.125);
+        $this->setConfiguration('prixgazkwh', 0.05);
     }
 
     public function postInsert() {
-
+        // Récupérer les consos à partir de la page 1.
+        self::resetHistory();
     }
 
     public function preSave() {
+        if ($this->getConfiguration('convkwhm3') == '') {
+            $this->setConfiguration('convkwhm3', 8.125);
+        }
+        if ($this->getConfiguration('prixgazkwh') == '') {
+            $this->setConfiguration('prixgazkwh', 0.05);
+        }
         if ($this->getConfiguration('autorefresh') == '') {
             $this->setConfiguration('autorefresh', '*/5 * * * *');
         }
@@ -341,7 +354,7 @@ class elmtouch extends eqLogic {
                 $heatingdaykwh = new elmtouchCmd();
                 $heatingdaykwh->setIsVisible(0);
                 $heatingdaykwh->setUnite('kWh');
-                $heatingdaykwh->setName(__('Consommation jour chauffage', __FILE__));
+                $heatingdaykwh->setName(__('Consommation chauffage en kWh', __FILE__));
                 $heatingdaykwh->setConfiguration('historizeMode', 'none');
                 $heatingdaykwh->setIsHistorized(1);
             }
@@ -358,7 +371,7 @@ class elmtouch extends eqLogic {
                 $hotwaterdaykwh = new elmtouchCmd();
                 $hotwaterdaykwh->setIsVisible(0);
                 $hotwaterdaykwh->setUnite('kWh');
-                $hotwaterdaykwh->setName(__('Consommation jour eau chaude', __FILE__));
+                $hotwaterdaykwh->setName(__('Consommation eau chaude en kWh', __FILE__));
                 $hotwaterdaykwh->setConfiguration('historizeMode', 'none');
                 $hotwaterdaykwh->setIsHistorized(1);
             }
@@ -375,7 +388,7 @@ class elmtouch extends eqLogic {
                 $totaldaykwh = new elmtouchCmd();
                 $totaldaykwh->setIsVisible(0);
                 $totaldaykwh->setUnite('kWh');
-                $totaldaykwh->setName(__('Consommation jour totale', __FILE__));
+                $totaldaykwh->setName(__('Consommation jour en kWh', __FILE__));
                 $totaldaykwh->setConfiguration('historizeMode', 'none');
                 $totaldaykwh->setIsHistorized(1);
             }
@@ -391,7 +404,7 @@ class elmtouch extends eqLogic {
             if (!is_object($averageoutdoortemp)) {
                 $averageoutdoortemp = new elmtouchCmd();
                 $averageoutdoortemp->setIsVisible(0);
-                $averageoutdoortemp->setUnite('kWh');
+                $averageoutdoortemp->setUnite('°C');
                 $averageoutdoortemp->setName(__('Température extérieure moyenne', __FILE__));
                 $averageoutdoortemp->setConfiguration('historizeMode', 'none');
                 $averageoutdoortemp->setIsHistorized(1);
@@ -402,6 +415,108 @@ class elmtouch extends eqLogic {
             $averageoutdoortemp->setSubType('numeric');
             $averageoutdoortemp->setLogicalId('averageoutdoortemp');
             $averageoutdoortemp->save();
+            
+            // Conso gaz chauffage jour m3 (info).
+            $heatingdaym3 = $this->getCmd(null, 'heatingdaym3');
+            if (!is_object($heatingdaym3)) {
+                $heatingdaym3 = new elmtouchCmd();
+                $heatingdaym3->setIsVisible(0);
+                $heatingdaym3->setUnite('m3');
+                $heatingdaym3->setName(__('Consommation chauffage en m3', __FILE__));
+                $heatingdaym3->setConfiguration('historizeMode', 'none');
+                $heatingdaym3->setIsHistorized(1);
+            }
+            $heatingdaym3->setDisplay('generic_type', 'DONT');
+            $heatingdaym3->setEqLogic_id($this->getId());
+            $heatingdaym3->setType('info');
+            $heatingdaym3->setSubType('numeric');
+            $heatingdaym3->setLogicalId('heatingdaym3');
+            $heatingdaym3->save();
+
+            // Conso gaz eau chaude jour m3 (info).
+            $hotwaterdaym3 = $this->getCmd(null, 'hotwaterdaym3');
+            if (!is_object($hotwaterdaym3)) {
+                $hotwaterdaym3 = new elmtouchCmd();
+                $hotwaterdaym3->setIsVisible(0);
+                $hotwaterdaym3->setUnite('m3');
+                $hotwaterdaym3->setName(__('Consommation eau chaude en m3', __FILE__));
+                $hotwaterdaym3->setConfiguration('historizeMode', 'none');
+                $hotwaterdaym3->setIsHistorized(1);
+            }
+            $hotwaterdaym3->setDisplay('generic_type', 'DONT');
+            $hotwaterdaym3->setEqLogic_id($this->getId());
+            $hotwaterdaym3->setType('info');
+            $hotwaterdaym3->setSubType('numeric');
+            $hotwaterdaym3->setLogicalId('hotwaterdaym3');
+            $hotwaterdaym3->save();
+
+            // Conso gaz totale jour m3 (info).
+            $totaldaym3 = $this->getCmd(null, 'totaldaym3');
+            if (!is_object($totaldaym3)) {
+                $totaldaym3 = new elmtouchCmd();
+                $totaldaym3->setIsVisible(0);
+                $totaldaym3->setUnite('m3');
+                $totaldaym3->setName(__('Consommation jour en m3', __FILE__));
+                $totaldaym3->setConfiguration('historizeMode', 'none');
+                $totaldaym3->setIsHistorized(1);
+            }
+            $totaldaym3->setDisplay('generic_type', 'DONT');
+            $totaldaym3->setEqLogic_id($this->getId());
+            $totaldaym3->setType('info');
+            $totaldaym3->setSubType('numeric');
+            $totaldaym3->setLogicalId('totaldaym3');
+            $totaldaym3->save();
+            
+            // Conso gaz chauffage jour euro (info).
+            $heatingdayeuro = $this->getCmd(null, 'heatingdayeuro');
+            if (!is_object($heatingdayeuro)) {
+                $heatingdayeuro = new elmtouchCmd();
+                $heatingdayeuro->setIsVisible(0);
+                $heatingdayeuro->setUnite('euro');
+                $heatingdayeuro->setName(__('Consommation chauffage en euro', __FILE__));
+                $heatingdayeuro->setConfiguration('historizeMode', 'none');
+                $heatingdayeuro->setIsHistorized(1);
+            }
+            $heatingdayeuro->setDisplay('generic_type', 'DONT');
+            $heatingdayeuro->setEqLogic_id($this->getId());
+            $heatingdayeuro->setType('info');
+            $heatingdayeuro->setSubType('numeric');
+            $heatingdayeuro->setLogicalId('heatingdayeuro');
+            $heatingdayeuro->save();
+
+            // Conso gaz eau chaude jour euro (info).
+            $hotwaterdayeuro = $this->getCmd(null, 'hotwaterdayeuro');
+            if (!is_object($hotwaterdayeuro)) {
+                $hotwaterdayeuro = new elmtouchCmd();
+                $hotwaterdayeuro->setIsVisible(0);
+                $hotwaterdayeuro->setUnite('euro');
+                $hotwaterdayeuro->setName(__('Consommation eau chaude en euro', __FILE__));
+                $hotwaterdayeuro->setConfiguration('historizeMode', 'none');
+                $hotwaterdayeuro->setIsHistorized(1);
+            }
+            $hotwaterdayeuro->setDisplay('generic_type', 'DONT');
+            $hotwaterdayeuro->setEqLogic_id($this->getId());
+            $hotwaterdayeuro->setType('info');
+            $hotwaterdayeuro->setSubType('numeric');
+            $hotwaterdayeuro->setLogicalId('hotwaterdayeuro');
+            $hotwaterdayeuro->save();
+
+            // Conso gaz totale jour euro (info).
+            $totaldayeuro = $this->getCmd(null, 'totaldayeuro');
+            if (!is_object($totaldayeuro)) {
+                $totaldayeuro = new elmtouchCmd();
+                $totaldayeuro->setIsVisible(0);
+                $totaldayeuro->setUnite('euro');
+                $totaldayeuro->setName(__('Consommation jour en euro', __FILE__));
+                $totaldayeuro->setConfiguration('historizeMode', 'none');
+                $totaldayeuro->setIsHistorized(1);
+            }
+            $totaldayeuro->setDisplay('generic_type', 'DONT');
+            $totaldayeuro->setEqLogic_id($this->getId());
+            $totaldayeuro->setType('info');
+            $totaldayeuro->setSubType('numeric');
+            $totaldayeuro->setLogicalId('totaldayeuro');
+            $totaldayeuro->save();
         } else {
             // TODO supprimer crons et listeners
         }
@@ -565,8 +680,14 @@ class elmtouch extends eqLogic {
 
     public function getGasPage($pagenum) {
         $cmdheatingdaykwh = $this->getCmd(null, 'heatingdaykwh');
+        $cmdheatingdaym3 = $this->getCmd(null, 'heatingdaym3');
+        $cmdheatingdayeuro = $this->getCmd(null, 'heatingdayeuro');
         $cmdhotwaterdaykwh = $this->getCmd(null, 'hotwaterdaykwh');
+        $cmdhotwaterdaym3 = $this->getCmd(null, 'hotwaterdaym3');
+        $cmdhotwaterdayeuro = $this->getCmd(null, 'hotwaterdayeuro');
         $cmdtotaldaykwh = $this->getCmd(null, 'totaldaykwh');
+        $cmdtotaldaym3 = $this->getCmd(null, 'totaldaym3');
+        $cmdtotaldayeuro = $this->getCmd(null, 'totaldayeuro');
         $cmdaverageoutdoortemp = $this->getCmd(null, 'averageoutdoortemp');
 
         // Nombre de jours récupérés.
@@ -584,12 +705,24 @@ class elmtouch extends eqLogic {
                     if ($server_date !== false) {
                         $count++;
                         $jeedom_event_date = $server_date->format("Y-m-d");
-                        $heatingday_value = floatval($dailyconso['ch']);
-                        $cmdheatingdaykwh->event($heatingday_value, $jeedom_event_date);
-                        $hotwaterday_value = floatval($dailyconso['hw']);
-                        $cmdhotwaterdaykwh->event($hotwaterday_value, $jeedom_event_date);
-                        $totalday_value = $heatingday_value + $hotwaterday_value;
-                        $cmdtotaldaykwh->event($totalday_value, $jeedom_event_date);
+                        $heatingday_kwh = floatval($dailyconso['ch']);
+                        $cmdheatingdaykwh->event($heatingday_kwh, $jeedom_event_date);
+                        $heatingday_m3 = round($heatingday_kwh / floatval($this->getConfiguration('convkwhm3', '8.125')), 1);
+                        $cmdheatingdaym3->event($heatingday_m3, $jeedom_event_date);
+                        $heatingday_euro = round($heatingday_kwh * floatval($this->getConfiguration('prixgazkwh', '0.05')), 2);
+                        $cmdheatingdayeuro->event($heatingday_euro, $jeedom_event_date);
+                        $hotwaterday_kwh = floatval($dailyconso['hw']);
+                        $cmdhotwaterdaykwh->event($hotwaterday_kwh, $jeedom_event_date);
+                        $hotwaterday_m3 = round($hotwaterday_kwh / floatval($this->getConfiguration('convkwhm3', '8.125')), 1);
+                        $cmdhotwaterdaym3->event($hotwaterday_m3, $jeedom_event_date);
+                        $hotwaterday_euro = round($hotwaterday_kwh * floatval($this->getConfiguration('prixgazkwh', '0.05')), 2);
+                        $cmdhotwaterdayeuro->event($hotwaterday_euro, $jeedom_event_date);
+                        $totalday_kwh = $heatingday_kwh + $hotwaterday_kwh;
+                        $cmdtotaldaykwh->event($totalday_kwh, $jeedom_event_date);
+                        $totalday_m3 = $heatingday_m3 + $hotwaterday_m3;
+                        $cmdtotaldaym3->event($totalday_m3, $jeedom_event_date);
+                        $totalday_euro = $heatingday_euro + $hotwaterday_euro;
+                        $cmdtotaldayeuro->event($totalday_euro, $jeedom_event_date);
                         $outdoortemp_value = floatval($dailyconso['T']) / 10;
                         $cmdaverageoutdoortemp->event($outdoortemp_value, $jeedom_event_date);
                     }

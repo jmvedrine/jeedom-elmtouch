@@ -110,6 +110,26 @@ foreach (object::all() as $object) {
             <label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="isVisible" checked/>{{Visible}}</label>
         </div>
     </div>
+        <div class="form-group">
+        <label class="col-sm-3 control-label">{{Coefficient de conversion}}
+            <sup>
+                <i class="fa fa-question-circle tooltips" title="{{Un m3 de gaz possède un pouvoir calorifique variable. GRDF calcule un coefficient de conversion m3 -> kWh suivant la ville et la période. L'application Bosch utilise 8.125.}}"></i>
+			</sup>
+        </label>
+        <div class="col-sm-3">
+            <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="convkwhm3" placeholder="{{Facteur de conversion kWh / m3}}"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label">{{Prix du gaz par kWh}}
+            <sup>
+                <i class="fa fa-question-circle tooltips" title="{{Le gaz en France est facturé par kWh même si le compeur affiche des m3, consultez votre facture pour connaître ce prix.}}"></i>
+			</sup>
+        </label>
+        <div class="col-sm-3">
+            <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="prixgazkwh" placeholder="{{Prix en € par kWh}}"/>
+        </div>
+    </div>
     <div class="form-group">
         <label class="col-sm-3 control-label">{{Auto-actualisation (cron)}}</label>
         <div class="col-sm-8">

@@ -1,0 +1,14 @@
+<div style="width:90px;min-height:80px;" class="cmd #history# tooltips cmd-widget" data-type="info" data-subtype="binary" data-cmd_id="#id#" data-cmd_uid="#uid#" title="Valeur du #valueDate#, collectée le #collectDate#">
+    <center>
+        <p class='cmdName' style="font-weight: bold;font-size : 12px;">#name_display#</p>
+        <img class="iconCmd#uid#" src="plugins/Volets/core/template/images/clockmode_Off.png" width="40px">
+    </center>
+    <script>
+        $('.iconCmd#uid#').empty();
+        if ('#state#' == '1') {
+            $('.iconCmd#uid#').attr('src','plugins/elmtouch/core/template/images/hotwater_On.png');
+        }else {
+            $('.iconCmd#uid#').attr('src','plugins/elmtouch/core/template/images/hotwater_Off.png');
+        }
+    </script>
+</div>

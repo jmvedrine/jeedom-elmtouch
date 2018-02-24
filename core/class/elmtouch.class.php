@@ -517,6 +517,38 @@ class elmtouch extends eqLogic {
             $totaldayeuro->setSubType('numeric');
             $totaldayeuro->setLogicalId('totaldayeuro');
             $totaldayeuro->save();
+            
+            // Boiler Indicator.
+            $boilerindicator = $this->getCmd(null, 'boilerindicator');
+            if (!is_object($boilerindicator)) {
+                $boilerindicator = new elmtouchCmd();
+                $boilerindicator->setIsVisible(1);
+                $boilerindicator->setName(__('Etat chaudière', __FILE__));
+            }
+            $boilerindicator->setDisplay('generic_type', 'DONT');
+            $boilerindicator->setEqLogic_id($this->getId());
+            $boilerindicator->setType('info');
+            $boilerindicator->setSubType('string');
+            $boilerindicator->setLogicalId('boilerindicator');
+            $boilerindicator->save();
+            
+            // Eau chaude active.
+            $hotwateractive = $this->getCmd(null, 'hotwateractive');
+            if (!is_object($hotwateractive)) {
+                $hotwateractive = new elmtouchCmd();
+                $hotwateractive->setIsVisible(1);
+                $hotwateractive->setName(__('Eau chaude', __FILE__));
+                $hotwateractive->setConfiguration('historizeMode', 'none');
+                $hotwateractive->setIsHistorized(1);
+            }
+            $hotwateractive->setTemplate('dashboard', 'hotwateractive');
+            $hotwateractive->setTemplate('mobile', 'hotwateractive');
+            $hotwateractive->setDisplay('generic_type', 'DONT');
+            $hotwateractive->setEqLogic_id($this->getId());
+            $hotwateractive->setType('info');
+            $hotwateractive->setSubType('binary');
+            $hotwateractive->setLogicalId('hotwateractive');
+            $hotwateractive->save();
         } else {
             // TODO supprimer crons et listeners
         }
@@ -592,6 +624,30 @@ class elmtouch extends eqLogic {
             $this->checkAndUpdateCmd('clockmode', true);
         } else {
             $this->checkAndUpdateCmd('clockmode', false);
+        }
+        $boilerindicator = $parsed_json['boiler indicator'];
+        log::add('elmtouch', 'info', 'boiler indicator ' . $boilerindicator);
+        switch ($boilerindicator) {
+            case 'central heating' :
+                $this->checkAndUpdateCmd('boilerindicator', __('Chauffage', __FILE__));
+                break;
+            case 'hot water' :
+                $this->checkAndUpdateCmd('boilerindicator', __('Eau chaude', __FILE__));
+                break;
+            case 'off' :
+                $this->checkAndUpdateCmd('boilerindicator', __('Arrêt', __FILE__));
+                break;
+            default :
+                $this->checkAndUpdateCmd('boilerindicator', __('Inconnu', __FILE__));
+                log::add('elmtouch', 'debug', 'Boiler indicator inconnu : ' . $boilerindicator);
+                break;
+        }
+        $hotwateractive = $parsed_json['hot water active'];
+        log::add('elmtouch', 'info', 'hot water active ' . $hotwateractive);
+        if ($hotwateractive =='true') {
+            $this->checkAndUpdateCmd('hotwateractive', true);
+        } else {
+            $this->checkAndUpdateCmd('hotwateractive', false);
         }
          //   $this->toHtml('mobile');
          //   $this->toHtml('dashboard');

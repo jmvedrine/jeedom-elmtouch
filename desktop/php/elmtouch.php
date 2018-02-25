@@ -129,6 +129,9 @@ foreach (object::all() as $object) {
         <div class="col-sm-3">
             <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="prixgazkwh" placeholder="{{Prix en € par kWh}}"/>
         </div>
+        <div class="col-lg-2">
+              <a class="btn btn-info bt_reImport" id="bt_reImport"><i class='fa fa-qrcode'></i> {{Ré-importer les consommations}}</a>
+        </div>
     </div>
     <div class="form-group">
         <label class="col-sm-3 control-label">{{Auto-actualisation (cron)}}</label>
@@ -168,6 +171,51 @@ foreach (object::all() as $object) {
 
 </div>
 </div>
-
+<div id="md_modal_elmtouch" title="{{Ré-importer les consommations}}">
+  <p>
+    <span class="glyphicon glyphicon-warning-sign" style="float:left; margin:12px 12px 20px 0;"></span>
+    {{Ce bouton va relancer l'importation des consommations.}}<br />
+    {{A raison de 32 jours toutes les 15 minutes.}}<br />
+    {{Les anciennes valeurs seront remplacées par les nouvelles.}}<br />
+    {{Les consommations en m3 et en kWh seront recalculées.}}<br />
+    {{Assurez vous que vos facteurs de conversion sont bien corrects.}}
+  </p>
+</div>
+<script>
+  $('#md_modal_elmtouch').dialog({
+    autoOpen: false,
+    buttons: {
+      "{{Continue}}": function() {
+        $( this ).dialog( "close" );
+        $.ajax({// fonction permettant de faire de l'ajax
+            type: "POST", // methode de transmission des données au fichier php
+            url: "plugins/elmtouch/core/ajax/elmtouch.ajax.php", // url du fichier php
+            data: {
+                action: "resetConso",
+                
+            },
+            dataType: 'json',
+            error: function (request, status, error) {
+                handleAjaxError(request, status, error);
+            },
+            success: function (data) { // si l'appel a bien fonctionné
+                if (data.state != 'ok') {
+                    $('#div_alert').showAlert({message: data.result, level: 'danger'});
+                    return;
+                }
+                $('#div_alert').showAlert({message: '{{Ré-importation lancée, soyez patient}}', level: 'success'});
+            }
+        });
+      },
+      Cancel: function() {
+        $( this ).dialog( "close" );
+      }
+    }
+  });
+  $('#bt_reImport').on('click', function () {
+    $('#md_modal_elmtouch').dialog('open');
+    return false;
+  });
+</script>
 <?php include_file('desktop', 'elmtouch', 'js', 'elmtouch');?>
 <?php include_file('core', 'plugin.template', 'js');?>

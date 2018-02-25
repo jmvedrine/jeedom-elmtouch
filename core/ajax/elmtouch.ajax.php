@@ -17,79 +17,87 @@
  */
 
 try {
-	require_once dirname(__FILE__) . '/../../../../core/php/core.inc.php';
-	include_file('core', 'authentification', 'php');
+    require_once dirname(__FILE__) . '/../../../../core/php/core.inc.php';
+    include_file('core', 'authentification', 'php');
 
-	if (!isConnect()) {
-		throw new Exception(__('401 - Accès non autorisé', __FILE__));
-	}
+    if (!isConnect()) {
+        throw new Exception(__('401 - Accès non autorisé', __FILE__));
+    }
 
-	if (init('action') == 'getThermostat') {
-		if (init('object_id') == '') {
-			$_GET['object_id'] = $_SESSION['user']->getOptions('defaultDashboardObject');
-		}
-		$object = object::byId(init('object_id'));
-		if (!is_object($object)) {
-			$object = object::rootObject();
-		}
-		if (!is_object($object)) {
-			throw new Exception(__('Aucun objet racine trouvé', __FILE__));
-		}
-		$return = array('object' => utils::o2a($object));
+    if (init('action') == 'resetConso') {
+        $eqLogics = eqLogic::byType('elmtouch');
+        foreach ($eqLogics as $eqLogic) {
+            $eqLogic->resetHistory();
+            ajax::success($password);
+        }
+    }
 
-		$date = array(
-			'start' => init('dateStart'),
-			'end' => init('dateEnd'),
-		);
+    if (init('action') == 'getThermostat') {
+        if (init('object_id') == '') {
+            $_GET['object_id'] = $_SESSION['user']->getOptions('defaultDashboardObject');
+        }
+        $object = object::byId(init('object_id'));
+        if (!is_object($object)) {
+            $object = object::rootObject();
+        }
+        if (!is_object($object)) {
+            throw new Exception(__('Aucun objet racine trouvé', __FILE__));
+        }
+        $return = array('object' => utils::o2a($object));
 
-		if ($date['start'] == '') {
-			$date['start'] = date('Y-m-d', strtotime('-1 months ' . date('Y-m-d')));
-		}
-		if ($date['end'] == '') {
-			$date['end'] = date('Y-m-d', strtotime('+1 days ' . date('Y-m-d')));
-		}
-		$return['date'] = $date;
-		foreach ($object->getEqLogic(true, false, 'elmtouch') as $eqLogic) {
-			$return['eqLogics'][] = array('eqLogic' => utils::o2a($eqLogic), 'html' => $eqLogic->toHtml(init('version')), 'runtimeByDay' => array_values($eqLogic->runtimeByDay($date['start'], $date['end'])));
-		}
-		ajax::success($return);
-	}
+        $date = array(
+            'start' => init('dateStart'),
+            'end' => init('dateEnd'),
+        );
 
-	if (init('action') == 'getLinkCalendar') {
-		if (!isConnect('admin')) {
-			throw new Exception(__('401 - Accès non autorisé', __FILE__));
-		}
-		$elmtouch = elmtouch::byId(init('id'));
-		if (!is_object($elmtouch)) {
-			throw new Exception(__('Thermostat non trouvé : ', __FILE__) . init('id'));
-		}
-		try {
-			$plugin = plugin::byId('calendar');
-			if (!is_object($plugin) || $plugin->isActive() != 1) {
-				ajax::success(array());
-			}
-		} catch (Exception $e) {
-			ajax::success(array());
-		}
-		if (!class_exists('calendar_event')) {
-			ajax::success(array());
-		}
-		$return = array();
-		foreach ($elmtouch->getCmd(null, 'modeAction', null, true) as $mode) {
-			foreach (calendar_event::searchByCmd($mode->getId()) as $event) {
-				$return[$event->getId()] = $event;
-			}
-		}
-		$elmtouch_cmd = $elmtouch->getCmd(null, 'thermostat');
-		if (is_object($elmtouch_cmd)) {
-			foreach (calendar_event::searchByCmd($elmtouch_cmd->getId()) as $event) {
-				$return[$event->getId()] = $event;
-			}
-		}
-		ajax::success(utils::o2a($return));
-	}
+        if ($date['start'] == '') {
+            $date['start'] = date('Y-m-d', strtotime('-1 months ' . date('Y-m-d')));
+        }
+        if ($date['end'] == '') {
+            $date['end'] = date('Y-m-d', strtotime('+1 days ' . date('Y-m-d')));
+        }
+        $return['date'] = $date;
+        foreach ($object->getEqLogic(true, false, 'elmtouch') as $eqLogic) {
+            $return['eqLogics'][] = array('eqLogic' => utils::o2a($eqLogic), 'html' => $eqLogic->toHtml(init('version')), 'runtimeByDay' => array_values($eqLogic->runtimeByDay($date['start'], $date['end'])));
+        }
+        ajax::success($return);
+    }
 
-	throw new Exception(__('Aucune methode correspondante à : ', __FILE__) . init('action'));
+    if (init('action') == 'getLinkCalendar') {
+        if (!isConnect('admin')) {
+            throw new Exception(__('401 - Accès non autorisé', __FILE__));
+        }
+        $elmtouch = elmtouch::byId(init('id'));
+        if (!is_object($elmtouch)) {
+            throw new Exception(__('Thermostat non trouvé : ', __FILE__) . init('id'));
+        }
+        try {
+            $plugin = plugin::byId('calendar');
+            if (!is_object($plugin) || $plugin->isActive() != 1) {
+                ajax::success(array());
+            }
+        } catch (Exception $e) {
+            ajax::success(array());
+        }
+        if (!class_exists('calendar_event')) {
+            ajax::success(array());
+        }
+        $return = array();
+        foreach ($elmtouch->getCmd(null, 'modeAction', null, true) as $mode) {
+            foreach (calendar_event::searchByCmd($mode->getId()) as $event) {
+                $return[$event->getId()] = $event;
+            }
+        }
+        $elmtouch_cmd = $elmtouch->getCmd(null, 'thermostat');
+        if (is_object($elmtouch_cmd)) {
+            foreach (calendar_event::searchByCmd($elmtouch_cmd->getId()) as $event) {
+                $return[$event->getId()] = $event;
+            }
+        }
+        ajax::success(utils::o2a($return));
+    }
+
+    throw new Exception(__('Aucune methode correspondante à : ', __FILE__) . init('action'));
 } catch (Exception $e) {
-	ajax::error(displayExeption($e), $e->getCode());
+    ajax::error(displayExeption($e), $e->getCode());
 }

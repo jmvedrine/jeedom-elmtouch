@@ -19,8 +19,8 @@
 require_once dirname(__FILE__) . '/../../../core/php/core.inc.php';
 
 function elmtouch_install() {
-    // Cron de récupération des consommations de gaz.
-    $cron = cron::byClassAndFunction('elmtouch', 'getGasDaily');
+    // Cron de récupération des consommations de gaz (obsolète).
+    /* $cron = cron::byClassAndFunction('elmtouch', 'getGasDaily');
     if (!is_object($cron)) {
         $cron = new cron();
         $cron->setClass('elmtouch');
@@ -29,7 +29,7 @@ function elmtouch_install() {
         $cron->setDeamon(0);
         $cron->setSchedule(rand(10, 59) . ' 0' . rand(1, 5) . ' * * *');
         $cron->save();
-    }
+    } */
 }
 
 function elmtouch_update() {
@@ -41,10 +41,15 @@ function elmtouch_update() {
             // Si le cache vaut 8400 la récupération des consommation a déjà été faite.
             cache::set('elmtouch::lastgaspage::'.$elmtouch->getId(), 0, 0);;
         }
+        // Correction du bug des unités.
+        $averageoutdoortemp = $this->getCmd(null, 'averageoutdoortemp');
+        if (is_object($averageoutdoortemp)) {
+            $averageoutdoortemp->setUnite('°C');
+        }
     }
     
-    // Cron de récupération des consommations de gaz.
-    $cron = cron::byClassAndFunction('elmtouch', 'getGasDaily');
+    // Cron de récupération des consommations de gaz (obsolète).
+    /* $cron = cron::byClassAndFunction('elmtouch', 'getGasDaily');
     if (!is_object($cron)) {
         $cron = new cron();
         $cron->setClass('elmtouch');
@@ -55,7 +60,13 @@ function elmtouch_update() {
         $cron->save();
     }
     $cron->setSchedule(rand(10, 59) . ' 0' . rand(1, 5) . ' * * *');
-    $cron->save();
+    $cron->save(); */
+     // On supprime l'ancien cron qui n'est plus utilisé.
+    $cron = cron::byClassAndFunction('elmtouch', 'getGasDaily');
+    if (is_object($cron)) {
+        $cron->stop();
+        $cron->remove();
+    }
 }
 
 

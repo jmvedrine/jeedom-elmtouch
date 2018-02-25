@@ -143,24 +143,26 @@ class elmtouch extends eqLogic {
             }
             $cache = cache::byKey('elmtouch::lastgaspage::'.$elmtouch->getId());
             $page = $cache->getValue();
-            log::add('elmtouch', 'debug', 'page = ' . $page);
-            if ($page == 8400) {
+            // log::add('elmtouch', 'debug', 'page = ' . $page);
+            /* if ($page == 8400) {
                 // Plus rien à faire.
                 log::add('elmtouch', 'debug', 'Récupération terminée');
                 return;
-            }
+            } */
             $page++;
             $lastPage = $elmtouch->getGasLastPage();
             log::add('elmtouch', 'debug', 'lastPage = ' . $lastPage);
             if ($page > $lastPage) {
                 // Job terminé.
-                log::add('elmtouch', 'debug', 'Fini !');
-                cache::set('elmtouch::lastgaspage::'.$elmtouch->getId(), 8400, 0);
+                log::add('elmtouch', 'debug', 'Pas de page de conso à récupérer');
+                // cache::set('elmtouch::lastgaspage::'.$elmtouch->getId(), 8400, 0);
             } else {
                 log::add('elmtouch', 'debug', 'On récupère la page ' . $page);
                 $result = $elmtouch->getGasPage($page);
                 if ($result > 0) {
+                    // On incrémente la valeur en cache si on a récupéré au moins un jour.
                     cache::set('elmtouch::lastgaspage::'.$elmtouch->getId(), $page, 0);
+                    log::add('elmtouch', 'debug', 'Nouvelle valeur en cache : ' . $page);
                 }
             }
         }
@@ -195,15 +197,6 @@ class elmtouch extends eqLogic {
         }
     }
 
-    /*
-     * Fonction pour permettre de relancer la récupération de tout l'historique.
-     */
-    public static function resetHistory() {
-        foreach (self::byType('elmtouch') as $elmtouch) {
-            cache::set('elmtouch::lastgaspage::'.$elmtouch->getId(), 0, 0);
-        }
-    }
-
     /*     * *********************Méthodes d'instance************************* */
 
     public function preInsert() {
@@ -213,7 +206,9 @@ class elmtouch extends eqLogic {
 
     public function postInsert() {
         // Récupérer les consos à partir de la page 1.
-        self::resetHistory();
+        foreach (self::byType('elmtouch') as $elmtouch) {
+            $elmtouch->resetHistory();
+        }
     }
 
     public function preSave() {
@@ -415,7 +410,7 @@ class elmtouch extends eqLogic {
             $averageoutdoortemp->setSubType('numeric');
             $averageoutdoortemp->setLogicalId('averageoutdoortemp');
             $averageoutdoortemp->save();
-            
+
             // Conso gaz chauffage jour m3 (info).
             $heatingdaym3 = $this->getCmd(null, 'heatingdaym3');
             if (!is_object($heatingdaym3)) {
@@ -466,7 +461,7 @@ class elmtouch extends eqLogic {
             $totaldaym3->setSubType('numeric');
             $totaldaym3->setLogicalId('totaldaym3');
             $totaldaym3->save();
-            
+
             // Conso gaz chauffage jour euro (info).
             $heatingdayeuro = $this->getCmd(null, 'heatingdayeuro');
             if (!is_object($heatingdayeuro)) {
@@ -517,7 +512,7 @@ class elmtouch extends eqLogic {
             $totaldayeuro->setSubType('numeric');
             $totaldayeuro->setLogicalId('totaldayeuro');
             $totaldayeuro->save();
-            
+
             // Boiler Indicator.
             $boilerindicator = $this->getCmd(null, 'boilerindicator');
             if (!is_object($boilerindicator)) {
@@ -531,7 +526,7 @@ class elmtouch extends eqLogic {
             $boilerindicator->setSubType('string');
             $boilerindicator->setLogicalId('boilerindicator');
             $boilerindicator->save();
-            
+
             // Eau chaude active.
             $hotwateractive = $this->getCmd(null, 'hotwateractive');
             if (!is_object($hotwateractive)) {
@@ -549,7 +544,7 @@ class elmtouch extends eqLogic {
             $hotwateractive->setSubType('binary');
             $hotwateractive->setLogicalId('hotwateractive');
             $hotwateractive->save();
-            
+
             $actif = $this->getCmd(null, 'actif');
 			if (!is_object($actif)) {
 				$actif = new elmtouchCmd();
@@ -604,6 +599,13 @@ class elmtouch extends eqLogic {
      */
 
     /*     * **********************Getteur Setteur*************************** */
+    /*
+     * Fonction pour permettre de relancer la récupération de tout l'historique.
+     */
+    public function resetHistory() {
+        cache::set('elmtouch::lastgaspage::'.$this->getId(), 0, 0);
+    }
+
     public function getThermostatStatus() {
         // log::add('elmtouch', 'debug', 'Running getThermostatStatus');
         $url = 'http://127.0.0.1:3000/api/status';
@@ -824,7 +826,7 @@ class elmtouch extends eqLogic {
             $this->getGasPage($page);
         }
     }
-    
+
     public function runtimeByDay($_startDate = null, $_endDate = null) {
 		$actifCmd = $this->getCmd(null, 'actif');
 		if (!is_object($actifCmd)) {

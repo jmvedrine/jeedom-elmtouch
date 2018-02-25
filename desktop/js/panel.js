@@ -93,7 +93,7 @@ function graphThermostat(_eqLogic_id) {
             jeedom.history.chart['div_graph' + _eqLogic_id] = null;
             var foundPower = false;
             for (var i  in cmds) {
-             if (cmds[i].logicalId == 'power') {
+             if (cmds[i].logicalId == 'heatingsupplytemp') {
                 jeedom.history.drawChart({
                     cmd_id: cmds[i].id,
                     el: 'div_graph' + _eqLogic_id,
@@ -104,7 +104,7 @@ function graphThermostat(_eqLogic_id) {
                         derive : 0,
                         graphStep: 1,
                         graphScale : 1,
-                        graphType : 'area',
+                  /*      graphType : 'area',  */
                         graphZindex :1
                     }
                 });

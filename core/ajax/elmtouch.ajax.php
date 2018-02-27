@@ -63,40 +63,6 @@ try {
         ajax::success($return);
     }
 
-    if (init('action') == 'getLinkCalendar') {
-        if (!isConnect('admin')) {
-            throw new Exception(__('401 - Accès non autorisé', __FILE__));
-        }
-        $elmtouch = elmtouch::byId(init('id'));
-        if (!is_object($elmtouch)) {
-            throw new Exception(__('Thermostat non trouvé : ', __FILE__) . init('id'));
-        }
-        try {
-            $plugin = plugin::byId('calendar');
-            if (!is_object($plugin) || $plugin->isActive() != 1) {
-                ajax::success(array());
-            }
-        } catch (Exception $e) {
-            ajax::success(array());
-        }
-        if (!class_exists('calendar_event')) {
-            ajax::success(array());
-        }
-        $return = array();
-        foreach ($elmtouch->getCmd(null, 'modeAction', null, true) as $mode) {
-            foreach (calendar_event::searchByCmd($mode->getId()) as $event) {
-                $return[$event->getId()] = $event;
-            }
-        }
-        $elmtouch_cmd = $elmtouch->getCmd(null, 'thermostat');
-        if (is_object($elmtouch_cmd)) {
-            foreach (calendar_event::searchByCmd($elmtouch_cmd->getId()) as $event) {
-                $return[$event->getId()] = $event;
-            }
-        }
-        ajax::success(utils::o2a($return));
-    }
-
     throw new Exception(__('Aucune methode correspondante à : ', __FILE__) . init('action'));
 } catch (Exception $e) {
     ajax::error(displayExeption($e), $e->getCode());

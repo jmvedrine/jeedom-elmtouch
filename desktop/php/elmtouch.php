@@ -185,7 +185,7 @@ foreach (object::all() as $object) {
   $('#md_modal_elmtouch').dialog({
     autoOpen: false,
     buttons: {
-      "{{Continue}}": function() {
+      "{{Continuer}}": function() {
         $( this ).dialog( "close" );
         $.ajax({// fonction permettant de faire de l'ajax
             type: "POST", // methode de transmission des données au fichier php
@@ -207,7 +207,7 @@ foreach (object::all() as $object) {
             }
         });
       },
-      Cancel: function() {
+      "{{Annuler}}": function() {
         $( this ).dialog( "close" );
       }
     }

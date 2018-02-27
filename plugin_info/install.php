@@ -35,19 +35,14 @@ function elmtouch_install() {
 function elmtouch_update() {
     foreach (eqLogic::byType('elmtouch') as $elmtouch) {
         $elmtouch->save();
-        $cache = cache::byKey('elmtouch::lastgaspage::'.$elmtouch->getId());
-        $page = $cache->getValue();
-        if ($page != 8400) {
-            // Si le cache vaut 8400 la récupération des consommation a déjà été faite.
-            cache::set('elmtouch::lastgaspage::'.$elmtouch->getId(), 0, 0);;
-        }
+
         // Correction du bug des unités.
         $averageoutdoortemp = $this->getCmd(null, 'averageoutdoortemp');
         if (is_object($averageoutdoortemp)) {
             $averageoutdoortemp->setUnite('°C');
         }
     }
-    
+
     // Cron de récupération des consommations de gaz (obsolète).
     /* $cron = cron::byClassAndFunction('elmtouch', 'getGasDaily');
     if (!is_object($cron)) {

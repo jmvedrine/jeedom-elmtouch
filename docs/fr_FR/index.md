@@ -89,6 +89,18 @@ En dessous vous retrouvez la liste des commandes :
 
 -   Tester : permet de tester la commande
 
+Les commandes disponibles
+===
+Le plugin est très jeune et cette liste est ammenée à s'enrichir.
+Changer certains noms provoque des dysfonctionnements.
+
+Nom de la commande | Type | Sous Type | Rôle
+--- | --- | ---
+**Consigne** | info | numeric | Donne la température de consigne. Associée à la commande action **Thermostat** n'est normalement pas affichée
+**Thermostat** | action | slider | Permet de fixer la température de consigne en °C de 5°C à 30°C
+**Température extérieure**| info | numeric | Donne la température extérieure en °C mesurée par la sonde de la chaudière s'il y en a une sinon récupérée sur Internet par le thermostat
+
+
 FAQ 
 ===
 

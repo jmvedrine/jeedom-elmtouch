@@ -287,22 +287,27 @@ class elmtouch extends eqLogic {
             $temperature->setDisplay('generic_type', 'THERMOSTAT_TEMPERATURE');
             $temperature->save();
 
-            // User mode.
-            $clockmode = $this->getCmd(null, 'clockmode');
+            // User mode (deprecated), use string info command mode.
+            /* $clockmode = $this->getCmd(null, 'clockmode');
             if (!is_object($clockmode)) {
                 $clockmode = new elmtouchCmd();
                 $clockmode->setTemplate('dashboard', 'clockmode');
                 $clockmode->setTemplate('mobile', 'clockmode');
                 $clockmode->setName(__('Mode programme', __FILE__));
-                $clockmode->setIsVisible(1);
-                $clockmode->setIsHistorized(1);
+                $clockmode->setIsVisible(0);
+                $clockmode->setIsHistorized(0);
             }
             $clockmode->setEqLogic_id($this->getId());
             $clockmode->setType('info');
             $clockmode->setSubType('binary');
             $clockmode->setLogicalId('clockmode');
             $clockmode->setDisplay('generic_type', 'DONT');
-            $clockmode->save();
+            $clockmode->save(); */
+            
+            $clockmode = $this->getCmd(null, 'clockmode');
+            if (is_object($clockmode)) {
+                $clockmode->remove();
+            }
 
             // Température extérieure.
             $temperature_outdoor = $this->getCmd(null, 'temperature_outdoor');
@@ -319,9 +324,6 @@ class elmtouch extends eqLogic {
             $temperature_outdoor->setSubType('numeric');
             $temperature_outdoor->setLogicalId('temperature_outdoor');
             $temperature_outdoor->setUnite('°C');
-
-            // TODO Retrouver la valeur
-            // $temperature_outdoor->setValue($value);
             $temperature_outdoor->setDisplay('generic_type', 'THERMOSTAT_TEMPERATURE_OUTDOOR');
             $temperature_outdoor->save();
 
@@ -513,7 +515,8 @@ class elmtouch extends eqLogic {
             $totaldayeuro->setLogicalId('totaldayeuro');
             $totaldayeuro->save();
 
-            // Boiler Indicator.
+            // Boiler Indicator (info)
+            // Prend les valeurs 'Chauffage', 'Eau chaude', 'Arrêt'.
             $boilerindicator = $this->getCmd(null, 'boilerindicator');
             if (!is_object($boilerindicator)) {
                 $boilerindicator = new elmtouchCmd();
@@ -527,11 +530,11 @@ class elmtouch extends eqLogic {
             $boilerindicator->setLogicalId('boilerindicator');
             $boilerindicator->save();
 
-            // Eau chaude active.
+            // Eau chaude active (info).
             $hotwateractive = $this->getCmd(null, 'hotwateractive');
             if (!is_object($hotwateractive)) {
                 $hotwateractive = new elmtouchCmd();
-                $hotwateractive->setIsVisible(1);
+                $hotwateractive->setIsVisible(0);
                 $hotwateractive->setName(__('Eau chaude', __FILE__));
                 $hotwateractive->setConfiguration('historizeMode', 'none');
                 $hotwateractive->setIsHistorized(1);
@@ -546,18 +549,176 @@ class elmtouch extends eqLogic {
             $hotwateractive->save();
 
             $actif = $this->getCmd(null, 'actif');
-			if (!is_object($actif)) {
-				$actif = new elmtouchCmd();
-				$actif->setName(__('Chauffage actif', __FILE__));
-				$actif->setIsVisible(0);
-				$actif->setIsHistorized(1);
-			}
-			$actif->setDisplay('generic_type', 'THERMOSTAT_STATE');
-			$actif->setEqLogic_id($this->getId());
-			$actif->setType('info');
-			$actif->setSubType('binary');
-			$actif->setLogicalId('actif');
-			$actif->save();
+            if (!is_object($actif)) {
+                $actif = new elmtouchCmd();
+                $actif->setName(__('Chauffage actif', __FILE__));
+                $actif->setIsVisible(0);
+                $actif->setIsHistorized(1);
+            }
+            $actif->setDisplay('generic_type', 'DONT');
+            $actif->setEqLogic_id($this->getId());
+            $actif->setType('info');
+            $actif->setSubType('binary');
+            $actif->setLogicalId('actif');
+            $actif->save();
+
+            // Action eau chaude arrêt.
+            $hotwater_Off = $this->getCmd(null, 'hotwater_Off');
+            if (!is_object($hotwater_Off)) {
+                $hotwater_Off = new elmtouchCmd();
+                $hotwater_Off->setTemplate('dashboard', 'hotwater');
+                $hotwater_Off->setTemplate('mobile', 'hotwater');
+                $hotwater_Off->setName('hotwater_Off');
+            }
+            $hotwater_Off->setEqLogic_id($this->getId());
+            $hotwater_Off->setType('action');
+            $hotwater_Off->setSubType('other');
+            $hotwater_Off->setLogicalId('hotwater_Off');
+            $hotwater_Off->setIsVisible(1);
+            $hotwater_Off->setValue($hotwateractive->getId());
+            $hotwater_Off->save();
+
+            // Action eau chaude marche.
+            $hotwater_On = $this->getCmd(null, 'hotwater_On');
+            if (!is_object($hotwater_On)) {
+                $hotwater_On = new elmtouchCmd();
+                $hotwater_On->setTemplate('dashboard', 'hotwater');
+                $hotwater_On->setTemplate('mobile', 'hotwater');
+                $hotwater_On->setName('hotwater_On');
+            }
+            $hotwater_On->setEqLogic_id($this->getId());
+            $hotwater_On->setType('action');
+            $hotwater_On->setSubType('other');
+            $hotwater_On->setLogicalId('hotwater_On');
+            $hotwater_On->setIsVisible(1);
+            $hotwater_On->setValue($hotwateractive->getId());
+            $hotwater_On->save();
+            
+            // Info verrouillage.
+            $lockState = $this->getCmd(null, 'lock_state');
+            if (!is_object($lockState)) {
+                $lockState = new elmtouchCmd();
+                $lockState->setTemplate('dashboard', 'lock');
+                $lockState->setTemplate('mobile', 'lock');
+                $lockState->setName(__('Verrouillage', __FILE__));
+                $lockState->setIsVisible(0);
+            }
+            $lockState->setDisplay('generic_type', 'THERMOSTAT_LOCK');
+            $lockState->setEqLogic_id($this->getId());
+            $lockState->setType('info');
+            $lockState->setSubType('binary');
+            $lockState->setLogicalId('lock_state');
+            $lockState->save();
+
+            // Action verrouillage.
+            $lock = $this->getCmd(null, 'lock');
+            if (!is_object($lock)) {
+                $lock = new elmtouchCmd();
+                $lock->setTemplate('dashboard', 'lock');
+                $lock->setTemplate('mobile', 'lock');
+                $lock->setName('lock');
+            }
+            $lock->setDisplay('generic_type', 'THERMOSTAT_SET_LOCK');
+            $lock->setEqLogic_id($this->getId());
+            $lock->setType('action');
+            $lock->setSubType('other');
+            $lock->setLogicalId('lock');
+            $lock->setIsVisible(1);
+            $lock->setValue($lockState->getId());
+            $lock->save();
+
+            // Action déverrouillage.
+            $unlock = $this->getCmd(null, 'unlock');
+            if (!is_object($unlock)) {
+                $unlock = new elmtouchCmd();
+                $unlock->setTemplate('dashboard', 'lock');
+                $unlock->setTemplate('mobile', 'lock');
+                $unlock->setName('unlock');
+            }
+            $unlock->setDisplay('generic_type', 'THERMOSTAT_SET_UNLOCK');
+            $unlock->setEqLogic_id($this->getId());
+            $unlock->setType('action');
+            $unlock->setSubType('other');
+            $unlock->setLogicalId('unlock');
+            $unlock->setIsVisible(1);
+            $unlock->setValue($lockState->getId());
+            $unlock->save();
+
+            // Commande info associée aux deux modes
+            // Prend pour valeur le Name du mode actif (Mode programme et Mode manuel)
+            $mode = $this->getCmd(null, 'mode');
+            if (!is_object($mode)) {
+                $mode = new elmtouchCmd();
+                $mode->setName(__('Mode', __FILE__));
+                $mode->setIsVisible(0);
+            }
+            $mode->setDisplay('generic_type', 'THERMOSTAT_MODE');
+            $mode->setEqLogic_id($this->getId());
+            $mode->setType('info');
+            $mode->setSubType('string');
+            $mode->setLogicalId('mode');
+            $mode->save();
+
+            // Etat binaire du bruleur pour mobile et homebridge
+            // 0 = éteint, 1 = allumé.
+            $heatstatus = $this->getCmd(null, 'heatstatus');
+            if (!is_object($heatstatus)) {
+                $heatstatus = new elmtouchCmd();
+                $heatstatus->setName(__('Etat bruleur', __FILE__));
+                $heatstatus->setIsVisible(1);
+                $heatstatus->setIsHistorized(1);
+            }
+            $heatstatus->setEqLogic_id($this->getId());
+            $heatstatus->setLogicalId('heatstatus');
+            $heatstatus->setType('info');
+            $heatstatus->setSubType('binary');
+            $heatstatus->setDisplay('generic_type', 'THERMOSTAT_STATE');
+            $heatstatus->save();
+
+            // Etat du bruleur pour mobile et homebridge
+            // Prend 2 valeurs 'Chauffage' et 'Arrêté'.
+            $status = $this->getCmd(null, 'status');
+            if (!is_object($status)) {
+                $status = new elmtouchCmd();
+                $status->setIsVisible(1);
+                $status->setName(__('Nom etat bruleur', __FILE__));
+            }
+            $status->setDisplay('generic_type', 'THERMOSTAT_STATE_NAME');
+            $status->setEqLogic_id($this->getId());
+            $status->setType('info');
+            $status->setSubType('string');
+            $status->setLogicalId('status');
+            $status->save();
+
+            // Commande action mode programme
+            $clock = $this->getCmd(null, 'clock');
+            if (!is_object($clock)) {
+                $clock = new elmtouchCmd();
+                $clock->setLogicalId('clock');
+                $clock->setIsVisible(1);
+                $clock->setName(__('Mode horloge', __FILE__));
+            }
+            $clock->setType('action');
+            $clock->setSubType('other');
+            $clock->setOrder(1);
+            $clock->setDisplay('generic_type', 'THERMOSTAT_SET_MODE');
+            $clock->setEqLogic_id($this->getId());
+            $clock->save();
+
+            // Commande action mode manuel.
+            $manual = $this->getCmd(null, 'manual');
+            if (!is_object($manual)) {
+                $manual = new elmtouchCmd();
+                $manual->setLogicalId('manual');
+                $manual->setIsVisible(1);
+                $manual->setName(__('Mode manuel', __FILE__));
+            }
+            $manual->setType('action');
+            $manual->setSubType('other');
+            $manual->setOrder(1);
+            $manual->setDisplay('generic_type', 'THERMOSTAT_SET_MODE');
+            $manual->setEqLogic_id($this->getId());
+            $manual->save();
         } else {
             // TODO supprimer crons et listeners
         }
@@ -634,33 +795,44 @@ class elmtouch extends eqLogic {
         } else {
             log::add('elmtouch', 'debug', 'tempsetpoint incorrecte ' . $tempsetpoint);
         }
-        $clockmode = $parsed_json['user mode'];
-        log::add('elmtouch', 'info', 'user mode ' . $clockmode);
-        if ($clockmode =='clock') {
+        $currentUserMode = $parsed_json['user mode'];
+        log::add('elmtouch', 'info', 'user mode ' . $currentUserMode);
+        
+        // New string command mode.
+        $this->getCmd(null, 'mode')->event($currentUserMode);
+        
+        /* Deprecated info binay command clockmode
+        if ($currentUserMode =='clock') {
             $this->checkAndUpdateCmd('clockmode', true);
         } else {
             $this->checkAndUpdateCmd('clockmode', false);
-        }
+        } */
+
         $boilerindicator = $parsed_json['boiler indicator'];
         log::add('elmtouch', 'info', 'boiler indicator ' . $boilerindicator);
         switch ($boilerindicator) {
             case 'central heating' :
                 $this->checkAndUpdateCmd('boilerindicator', __('Chauffage', __FILE__));
+                $this->getCmd(null, 'heatstatus')->event(1);
+                $this->getCmd(null, 'status')->event(__('Chauffage', __FILE__));
                 if (!$this->getCmd(null,'actif')->execCmd()) {
                     $this->getCmd(null, 'actif')->event(1);
                 }
                 break;
             case 'hot water' :
                 $this->checkAndUpdateCmd('boilerindicator', __('Eau chaude', __FILE__));
+                $this->getCmd(null, 'heatstatus')->event(1);
+                $this->getCmd(null, 'status')->event(__('Chauffage', __FILE__));
                 break;
             case 'off' :
                 $this->checkAndUpdateCmd('boilerindicator', __('Arrêt', __FILE__));
+                $this->getCmd(null, 'heatstatus')->event(0);
+                $this->getCmd(null, 'status')->event(__('Arrêté', __FILE__));
                 if ($this->getCmd(null,'actif')->execCmd()) {
                     $this->getCmd(null, 'actif')->event(0);
                 }
                 break;
             default :
-                $this->checkAndUpdateCmd('boilerindicator', __('Inconnu', __FILE__));
                 log::add('elmtouch', 'debug', 'Boiler indicator inconnu : ' . $boilerindicator);
                 break;
         }
@@ -827,45 +999,74 @@ class elmtouch extends eqLogic {
         }
     }
 
+    public function setHotWaterState($state) {
+        // Actualisation du status au cas où il ait changé sur le thermostat depuis le dernier cron.
+        log::add('elmtouch', 'debug', 'debut de sethotwaterstate state = ' . $state);
+        $this->getThermostatStatus();
+        $currentStatus = $this->getCmd(null, 'mode')->execCmd();
+        log::add('elmtouch', 'debug', 'Currentstatus = ' . $currentStatus);
+        $value = ($state) ? 'on' : 'off';
+        if ($currentStatus == 'clock') {
+            log::add('elmtouch', 'debug', 'On met à jour /dhwCircuits/dhwA/dhwOperationClockMode avec ' . $value);
+            $this->writeThermostatData('/dhwCircuits/dhwA/dhwOperationClockMode', '{ "value" : "' .$value . '" }');
+        } else {
+            log::add('elmtouch', 'debug', 'On met à jour /dhwCircuits/dhwA/dhwOperationManualMode avec ' . $value);
+            $this->writeThermostatData('/dhwCircuits/dhwA/dhwOperationManualMode', '{ "value" : "' .$value . '" }');
+        }
+        $this->getCmd(null, 'hotwateractive')->event($state);
+    }
+
+    public function executeMode($_name) {
+        log::add('elmtouch', 'debug', 'début de executeMode name = '. $_name);
+        $existingModes = array('manual' => __('Mode manuel', __FILE__), 'clock' => __('Mode horloge', __FILE__));
+        foreach ($existingModes as $modeId => $modeName) {
+            if ($_name == $modeName) {
+                 log::add('elmtouch', 'debug', 'ecriture dans le thermostat value = '.$modeId);
+                $this->writeThermostatData('/heatingCircuits/hc1/usermode', '{ "value" : "' .$modeId . '" }');
+            }
+        }
+        $this->getCmd(null, 'mode')->event($_name);
+    }
+
     public function runtimeByDay($_startDate = null, $_endDate = null) {
-		$actifCmd = $this->getCmd(null, 'actif');
-		if (!is_object($actifCmd)) {
-			return array();
-		}
-		$return = array();
-		$prevValue = 0;
-		$prevDatetime = 0;
-		$day = null;
-		$day = strtotime($_startDate . ' 00:00:00 UTC');
-		$endDatetime = strtotime($_endDate . ' 00:00:00 UTC');
-		while ($day <= $endDatetime) {
-			$return[date('Y-m-d', $day)] = array($day * 1000, 0);
-			$day = $day + 3600 * 24;
-		}
-		foreach ($actifCmd->getHistory($_startDate, $_endDate) as $history) {
-			if (date('Y-m-d', strtotime($history->getDatetime())) != $day && $prevValue == 1 && $day != null) {
-				if (strtotime($day . ' 23:59:59') > $prevDatetime) {
-					$return[$day][1] += (strtotime($day . ' 23:59:59') - $prevDatetime) / 60;
-				}
-				$prevDatetime = strtotime(date('Y-m-d 00:00:00', strtotime($history->getDatetime())));
-			}
-			$day = date('Y-m-d', strtotime($history->getDatetime()));
-			if (!isset($return[$day])) {
-				$return[$day] = array(strtotime($day . ' 00:00:00 UTC') * 1000, 0);
-			}
-			if ($history->getValue() == 1 && $prevValue == 0) {
-				$prevDatetime = strtotime($history->getDatetime());
-				$prevValue = 1;
-			}
-			if ($history->getValue() == 0 && $prevValue == 1) {
-				if ($prevDatetime > 0 && strtotime($history->getDatetime()) > $prevDatetime) {
-					$return[$day][1] += (strtotime($history->getDatetime()) - $prevDatetime) / 60;
-				}
-				$prevValue = 0;
-			}
-		}
-		return $return;
-	}
+        $actifCmd = $this->getCmd(null, 'actif');
+        if (!is_object($actifCmd)) {
+            return array();
+        }
+        $return = array();
+        $prevValue = 0;
+        $prevDatetime = 0;
+        $day = null;
+        $day = strtotime($_startDate . ' 00:00:00 UTC');
+        $endDatetime = strtotime($_endDate . ' 00:00:00 UTC');
+        while ($day <= $endDatetime) {
+            $return[date('Y-m-d', $day)] = array($day * 1000, 0);
+            $day = $day + 3600 * 24;
+        }
+        foreach ($actifCmd->getHistory($_startDate, $_endDate) as $history) {
+            if (date('Y-m-d', strtotime($history->getDatetime())) != $day && $prevValue == 1 && $day != null) {
+                if (strtotime($day . ' 23:59:59') > $prevDatetime) {
+                    $return[$day][1] += (strtotime($day . ' 23:59:59') - $prevDatetime) / 60;
+                }
+                $prevDatetime = strtotime(date('Y-m-d 00:00:00', strtotime($history->getDatetime())));
+            }
+            $day = date('Y-m-d', strtotime($history->getDatetime()));
+            if (!isset($return[$day])) {
+                $return[$day] = array(strtotime($day . ' 00:00:00 UTC') * 1000, 0);
+            }
+            if ($history->getValue() == 1 && $prevValue == 0) {
+                $prevDatetime = strtotime($history->getDatetime());
+                $prevValue = 1;
+            }
+            if ($history->getValue() == 0 && $prevValue == 1) {
+                if ($prevDatetime > 0 && strtotime($history->getDatetime()) > $prevDatetime) {
+                    $return[$day][1] += (strtotime($history->getDatetime()) - $prevDatetime) / 60;
+                }
+                $prevValue = 0;
+            }
+        }
+        return $return;
+    }
 }
 
 class elmtouchCmd extends cmd {
@@ -882,34 +1083,7 @@ class elmtouchCmd extends cmd {
      * @return boolean
      */
     public function dontRemoveCmd() {
-        if ($this->getLogicalId() == 'order') {
-            return true;
-        }
-        if ($this->getLogicalId() == 'thermostat') {
-            return true;
-        }
-        if ($this->getLogicalId() == 'temperature') {
-            return true;
-        }
-        if ($this->getLogicalId() == 'clockmode') {
-            return true;
-        }
-        if ($this->getLogicalId() == 'temperature_outdoor') {
-            return true;
-        }
-        if ($this->getLogicalId() == 'heatingsupplytemp') {
-            return true;
-        }
-        if ($this->getLogicalId() == 'heatingdaykwh') {
-            return true;
-        }
-        if ($this->getLogicalId() == 'hotwaterdaykwh') {
-            return true;
-        }
-        if ($this->getLogicalId() == 'totaldaykwh') {
-            return true;
-        }
-        return false;
+        return true;
     }
 
 
@@ -919,7 +1093,18 @@ class elmtouchCmd extends cmd {
         }
         $eqLogic = $this->getEqlogic();
         $action= $this->getLogicalId();
-        if ($action == 'thermostat') {
+        $lockState = $eqLogic->getCmd(null, 'lock_state');
+        if ($action == 'lock') {
+            $lockState->event(1);
+            return true;
+        } else if ($action == 'unlock') {
+            $lockState->event(0);
+            return true;
+        } else if ($action == 'clock' || $action =='manual') {
+            log::add('elmtouch', 'debug', 'action set mode ' . $action);
+            $eqLogic->executeMode($this->getName());
+            return true;
+        } else if ($action == 'thermostat') {
             log::add('elmtouch', 'debug', 'action thermostat');
             log::add('elmtouch', 'debug', print_r($_options, true));
             if (!isset($_options['slider']) || $_options['slider'] == '' || !is_numeric(intval($_options['slider']))) {
@@ -935,6 +1120,14 @@ class elmtouchCmd extends cmd {
 
             $eqLogic->setTemperature(floatval($_options['slider']));
             return true;
+        } else if ($action == 'hotwater_Off' || $action == 'hotwater_On') {
+            log::add('elmtouch', 'debug', 'action set hotwater ' . $action);
+            $value = $this->getName() == 'hotwater_On';
+            $eqLogic->setHotWaterState($value);
+        }
+        if (!is_object($lockState) || $lockState->execCmd() == 1) {
+            $eqLogic->refreshWidget();
+            return;
         }
     }
 

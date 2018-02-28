@@ -65,9 +65,21 @@ foreach ($eqLogics as $eqLogic) {
     <li role="presentation"><a href="#" class="eqLogicAction" aria-controls="home" role="tab" data-toggle="tab" data-action="returnToThumbnailDisplay"><i class="fa fa-arrow-circle-left"></i></a></li>
     <li role="presentation" class="active"><a href="#eqlogictab" aria-controls="home" role="tab" data-toggle="tab"><i class="fa fa-tachometer"></i> {{Equipement}}</a></li>
     <li role="presentation"><a href="#commandtab" aria-controls="profile" role="tab" data-toggle="tab"><i class="fa fa-list-alt"></i> {{Commandes}}</a></li>
+<?php
+try {
+	$plugin = plugin::byId('calendar');
+	if (is_object($plugin)) {
+?>
+    <li  role="presentation"><a href="#configureSchedule" aria-controls="profile" data-toggle="tab"><i class="fa fa-clock-o"></i> {{Programmation}}</a></li>
+<?php
+}
+} catch (Exception $e) {
+
+}
+?>
   </ul>
   <div class="tab-content" style="height:calc(100% - 50px);overflow:auto;overflow-x: hidden;">
-    <div role="tabpanel" class="tab-pane active" id="eqlogictab">
+<div role="tabpanel" class="tab-pane active" id="eqlogictab">
       <br/>
     <form class="form-horizontal">
         <fieldset>
@@ -114,7 +126,7 @@ foreach (object::all() as $object) {
         <label class="col-sm-3 control-label">{{Coefficient de conversion}}
             <sup>
                 <i class="fa fa-question-circle tooltips" title="{{Un m3 de gaz possède un pouvoir calorifique variable. GRDF calcule un coefficient de conversion m3 -> kWh suivant la ville et la période. L'application Bosch utilise 8.125.}}"></i>
-			</sup>
+            </sup>
         </label>
         <div class="col-sm-3">
             <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="convkwhm3" placeholder="{{Facteur de conversion kWh / m3}}"/>
@@ -124,7 +136,7 @@ foreach (object::all() as $object) {
         <label class="col-sm-3 control-label">{{Prix du gaz par kWh}}
             <sup>
                 <i class="fa fa-question-circle tooltips" title="{{Le gaz en France est facturé par kWh même si le compeur affiche des m3, consultez votre facture pour connaître ce prix.}}"></i>
-			</sup>
+            </sup>
         </label>
         <div class="col-sm-3">
             <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="prixgazkwh" placeholder="{{Prix en € par kWh}}"/>
@@ -151,7 +163,8 @@ foreach (object::all() as $object) {
 </fieldset>
 </form>
 </div>
-      <div role="tabpanel" class="tab-pane" id="commandtab">
+
+<div role="tabpanel" class="tab-pane" id="commandtab">
 <a class="btn btn-success btn-sm cmdAction pull-right" data-action="add" style="margin-top:5px;"><i class="fa fa-plus-circle"></i> {{Commandes}}</a><br/><br/>
 <table id="table_cmd" class="table table-bordered table-condensed">
     <thead>
@@ -167,6 +180,16 @@ foreach (object::all() as $object) {
     </tbody>
 </table>
 </div>
+
+<div role="tabpanel" class="tab-pane" id="configureSchedule">
+    <form class="form-horizontal">
+        <fieldset>
+            <br/>
+            <div id="div_schedule"></div>
+        </fieldset>
+    </form>
+</div>
+
 </div>
 
 </div>
@@ -192,7 +215,7 @@ foreach (object::all() as $object) {
             url: "plugins/elmtouch/core/ajax/elmtouch.ajax.php", // url du fichier php
             data: {
                 action: "resetConso",
-                
+
             },
             dataType: 'json',
             error: function (request, status, error) {

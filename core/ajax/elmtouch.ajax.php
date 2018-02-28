@@ -63,6 +63,44 @@ try {
         ajax::success($return);
     }
 
+    if (init('action') == 'getLinkCalendar') {
+        if (!isConnect('admin')) {
+            throw new Exception(__('401 - Accès non autorisé', __FILE__));
+        }
+        $elmtouch = elmtouch::byId(init('id'));
+        if (!is_object($elmtouch)) {
+            throw new Exception(__('Equipement Elm touch non trouvé : ', __FILE__) . init('id'));
+        }
+        try {
+            $plugin = plugin::byId('elmtouch');
+            if (!is_object($plugin) || $plugin->isActive() != 1) {
+                ajax::success(array());
+            }
+        } catch (Exception $e) {
+            ajax::success(array());
+        }
+        if (!class_exists('calendar_event')) {
+            ajax::success(array());
+        }
+        $return = array();
+		$programmablecmds = array('hotwater_On', 'hotwater_Off');
+		foreach ($programmablecmds as $name) {
+            $thermostat_cmd = $elmtouch->getCmd(null, $name);
+            if (is_object($thermostat_cmd)) {
+			    foreach (calendar_event::searchByCmd($thermostat_cmd->getId()) as $event) {
+                    $return[$event->getId()] = $event;
+                }
+			}
+		}
+        $thermostat_cmd = $elmtouch->getCmd(null, 'thermostat');
+        if (is_object($thermostat_cmd)) {
+            foreach (calendar_event::searchByCmd($thermostat_cmd->getId()) as $event) {
+                $return[$event->getId()] = $event;
+            }
+        }
+        ajax::success(utils::o2a($return));
+    }
+
     throw new Exception(__('Aucune methode correspondante à : ', __FILE__) . init('action'));
 } catch (Exception $e) {
     ajax::error(displayExeption($e), $e->getCode());

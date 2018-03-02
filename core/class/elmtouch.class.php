@@ -122,6 +122,7 @@ class elmtouch extends eqLogic {
                             $elmtouch->getThermostatStatus();
                             // $elmtouch->getOutdoorTemp();  plus nécesaire récupérée par getThermostatStatus().
                             $elmtouch->getActualSupplyTemp();
+                            $elmtouch->getYearlyTotalGas();
                             $elmtouch->refreshWidget();
                         } catch (Exception $exc) {
                             log::add('elmtouch', 'error', __('Error in ', __FILE__) . $elmtouch->getHumanName() . ' : ' . $exc->getMessage());
@@ -151,21 +152,21 @@ class elmtouch extends eqLogic {
                 log::add('elmtouch', 'debug', 'lastPage = ' . $lastPage);
                 if ($page > $lastPage) {
                     // Job terminé.
-                    log::add('elmtouch', 'debug', 'Pas de page de conso à récupérer');
+                    // log::add('elmtouch', 'debug', 'Pas de page de conso à récupérer');
                     // cache::set('elmtouch::lastgaspage::'.$elmtouch->getId(), 8400, 0);
                 } else {
-                    log::add('elmtouch', 'debug', 'On récupère la page ' . $page);
+                    // log::add('elmtouch', 'debug', 'On récupère la page ' . $page);
                     $result = $elmtouch->getGasPage($page);
                     if ($result > 0) {
                         // On incrémente la valeur en cache si on a récupéré au moins un jour.
                         cache::set('elmtouch::lastgaspage::'.$elmtouch->getId(), $page, 0);
-                        log::add('elmtouch', 'debug', 'Nouvelle valeur en cache : ' . $page);
+                        // log::add('elmtouch', 'debug', 'Nouvelle valeur en cache : ' . $page);
                     }
                 }
             }
 
             // Récupération de la consommation totale.
-            $elmtouch->getYearlyTotalGas();
+            // $elmtouch->getYearlyTotalGas();
             // Récupération de la pression.
             $elmtouch->getSystemPressure();
         }
@@ -320,6 +321,7 @@ class elmtouch extends eqLogic {
                 $temperature_outdoor->setTemplate('mobile', 'line');
                 $temperature_outdoor->setIsVisible(1);
                 $temperature_outdoor->setIsHistorized(1);
+                $temperature_outdoor->setConfiguration('historizeMode', 'none');
                 $temperature_outdoor->setName(__('Température extérieure', __FILE__));
             }
             $temperature_outdoor->setEqLogic_id($this->getId());
@@ -338,6 +340,7 @@ class elmtouch extends eqLogic {
                 $heatingsupplytemp->setTemplate('mobile', 'line');
                 $heatingsupplytemp->setIsVisible(1);
                 $heatingsupplytemp->setIsHistorized(1);
+                $heatingsupplytemp->setConfiguration('historizeMode', 'none');
                 $heatingsupplytemp->setName(__('Température eau de chauffage', __FILE__));
             }
             $heatingsupplytemp->setEqLogic_id($this->getId());
@@ -527,14 +530,34 @@ class elmtouch extends eqLogic {
                 $totalyearkwh->setName(__('Consommation annuelle', __FILE__));
                 $totalyearkwh->setTemplate('dashboard', 'line');
                 $totalyearkwh->setTemplate('mobile', 'line');
-                $totalyearkwh->setIsHistorized(0);
             }
+            // Pas de lissage pour le calcul de la puissance correct
+            $totalyearkwh->setIsHistorized(1);
+            $totalyearkwh->setConfiguration('historizeMode', 'none');
             $totalyearkwh->setDisplay('generic_type', 'DONT');
             $totalyearkwh->setEqLogic_id($this->getId());
             $totalyearkwh->setType('info');
             $totalyearkwh->setSubType('numeric');
             $totalyearkwh->setLogicalId('totalyearkwh');
             $totalyearkwh->save();
+            
+            // Puissance en W (info).
+            $boilerpower = $this->getCmd(null, 'boilerpower');
+            if (!is_object($boilerpower)) {
+                $boilerpower = new elmtouchCmd();
+                $boilerpower->setIsVisible(1);
+                $boilerpower->setUnite('W');
+                $boilerpower->setName(__('Puissance', __FILE__));
+                $boilerpower->setTemplate('dashboard', 'line');
+                $boilerpower->setTemplate('mobile', 'line');
+                $boilerpower->setIsHistorized(0);
+            }
+            $boilerpower->setDisplay('generic_type', 'DONT');
+            $boilerpower->setEqLogic_id($this->getId());
+            $boilerpower->setType('info');
+            $boilerpower->setSubType('numeric');
+            $boilerpower->setLogicalId('boilerpower');
+            $boilerpower->save();
 
             // Pression en bar (info).
             $systempressure = $this->getCmd(null, 'systempressure');
@@ -823,7 +846,7 @@ class elmtouch extends eqLogic {
             return;
         }
         $parsed_json = json_decode($json_string, true);
-        log::add('elmtouch', 'debug', 'getThermostatStatus : ' . print_r($json_string, true));
+        // log::add('elmtouch', 'debug', 'getThermostatStatus : ' . print_r($json_string, true));
 
         $inhousetemp = floatval($parsed_json['in house temp']);
         if ( $inhousetemp >= 5 && $inhousetemp <= 30) {
@@ -835,7 +858,7 @@ class elmtouch extends eqLogic {
 
         $outdoortemp = floatval($parsed_json['outdoor temp']);
         if ( $outdoortemp >= -40 && $outdoortemp <= 50) {
-            log::add('elmtouch', 'info', 'Température extérieure dans status : ' . $outdoortemp);
+            log::add('elmtouch', 'info', 'Température extérieure : ' . $outdoortemp);
             $this->checkAndUpdateCmd('temperature_outdoor', $outdoortemp);
         } else {
             log::add('elmtouch', 'debug', 'temp extérieure incorrecte ' . $outdoortemp);
@@ -855,7 +878,7 @@ class elmtouch extends eqLogic {
         $existingModes = array('manual' => __('Mode manuel', __FILE__), 'clock' => __('Mode horloge', __FILE__));
         foreach ($existingModes as $modeId => $modeName) {
             if ($currentUserMode == $modeId) {
-                log::add('elmtouch', 'debug', 'evenement mode value = '.$modeName);
+                //log::add('elmtouch', 'debug', 'evenement mode value = '.$modeName);
                 $this->getCmd(null, 'mode')->event($modeName);
             }
         }
@@ -954,6 +977,8 @@ class elmtouch extends eqLogic {
 
     public function getYearlyTotalGas() {
         // log::add('elmtouch', 'debug', 'Running getYearlyTotalGas');
+        $yearlyConsoCmd = $this->getCmd(null, 'totalyearkwh');
+        $powerCmd =  $this->getCmd(null, 'boilerpower');
         $url = 'http://127.0.0.1:3000/bridge/ecus/rrc/recordings/yearTotal';
         $request_http = new com_http($url);
         $request_http->setNoReportError(true);
@@ -967,10 +992,58 @@ class elmtouch extends eqLogic {
         $totalyearkwh = floatval($parsed_json['value']);
         if ( $totalyearkwh >= 0 && $totalyearkwh <= 429496729.5) {
             log::add('elmtouch', 'info', 'Consommation depuis le 1 janvier : ' . $totalyearkwh);
-            $this->checkAndUpdateCmd('totalyearkwh', $totalyearkwh);
+            $now = strtotime('now');
+           // $this->checkAndUpdateCmd('totalyearkwh', $totalyearkwh);
         } else {
             log::add('elmtouch', 'debug', 'Conso annuelle incorrecte ' . $totalyearkwh);
+            return;
         }
+
+        
+        // Calcul de la puissance
+        // Si pas de consommation pendant 1 heure on considère que la chaudière est arrétée.
+        $startdate = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' - 1 hour'));
+        $enddate = date('Y-m-d H:i:s');
+        log::add('elmtouch', 'debug', "Dates pour calcul de puissance $startdate et $enddate");
+        
+        $histories = $yearlyConsoCmd->getHistory($startdate, $enddate);
+        log::add ('elmtouch', 'debug', 'count = ' . count($histories));
+        $counter = count($histories);
+        if ($counter) {
+            foreach ($histories as $key => $history) {
+                log::add ('elmtouch', 'debug', 'key = ' . $key);
+                log::add ('elmtouch', 'debug', 'datetime = ' . $history->getDatetime());
+                log::add ('elmtouch', 'debug', 'value = ' . $history->getValue());
+            }
+            $i = $counter -1;
+            while($i >= 0 && $histories[$i]->getValue() == $totalyearkwh) {
+                $i--;
+            }
+            if ($i < 0) {
+                $power = 0;
+            } else {
+                $datetime = strtotime($histories[$i]->getDatetime());
+                log::add ('elmtouch', 'debug', 'time = ' . $datetime);
+                log::add ('elmtouch', 'debug', 'now = ' . $now);
+                $duration = $now - $datetime;
+                log::add ('elmtouch', 'debug', 'duration = ' . $duration);
+                $power = round(3600 * 1000 * ($totalyearkwh - $histories[$i]->getValue()) /($now - $datetime));
+            }
+        } else {
+            $power = 0;
+        }
+        log::add ('elmtouch', 'debug', 'power = ' . $power);
+        $this->getCmd(null, 'boilerpower')->event($power);
+        
+        // Auttre méthode de calcul de la puissance sur un intervalle d'une heure.
+        /* $startdate = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' - 1 hour'));
+        $enddate = date('Y-m-d H:i:s');
+        // log::add('elmtouch', 'debug', "Dates pour calcul de puissance $startdate et $enddate");
+        $consostats = $yearlyConsoCmd->getStatistique($startdate,$enddate);
+        $puissance = ($consostats['max'] - $consostats['min']) * 1000;
+        log::add ('elmtouch', 'debug', 'Puissance méthode 2 = ' . $puissance); */
+
+
          //   $this->toHtml('mobile');
          //   $this->toHtml('dashboard');
     }
@@ -1026,9 +1099,14 @@ class elmtouch extends eqLogic {
         $this->writeThermostatData('/heatingCircuits/hc1/manualTempOverride/temperature', '{ "value" : ' . $value . ' }');
     }
 
-    public function getGasLastPage() {
+     public function getGasPointer() {
         $json_string = $this->readThermostatData('/ecus/rrc/recordings/gasusagePointer');
         $pointer = intval(json_decode($json_string, true)['value']);
+        return $pointer;
+    }
+
+    public function getGasLastPage() {
+        $pointer = $this->getGasPointer();
         $page = (int)($pointer / 32) + 1;
         return $page;
     }
@@ -1106,27 +1184,27 @@ class elmtouch extends eqLogic {
 
     public function setHotWaterState($state) {
         // Actualisation du status au cas où il ait changé sur le thermostat depuis le dernier cron.
-        log::add('elmtouch', 'debug', 'debut de sethotwaterstate state = ' . $state);
+        // log::add('elmtouch', 'debug', 'debut de sethotwaterstate state = ' . $state);
         $this->getThermostatStatus();
         $currentStatus = $this->getCmd(null, 'mode')->execCmd();
-        log::add('elmtouch', 'debug', 'Currentstatus = ' . $currentStatus);
+        // log::add('elmtouch', 'debug', 'Currentstatus = ' . $currentStatus);
         $value = ($state) ? 'on' : 'off';
         if ($currentStatus == 'clock') {
-            log::add('elmtouch', 'debug', 'On met à jour /dhwCircuits/dhwA/dhwOperationClockMode avec ' . $value);
+            // log::add('elmtouch', 'debug', 'On met à jour /dhwCircuits/dhwA/dhwOperationClockMode avec ' . $value);
             $this->writeThermostatData('/dhwCircuits/dhwA/dhwOperationClockMode', '{ "value" : "' .$value . '" }');
         } else {
-            log::add('elmtouch', 'debug', 'On met à jour /dhwCircuits/dhwA/dhwOperationManualMode avec ' . $value);
+            // log::add('elmtouch', 'debug', 'On met à jour /dhwCircuits/dhwA/dhwOperationManualMode avec ' . $value);
             $this->writeThermostatData('/dhwCircuits/dhwA/dhwOperationManualMode', '{ "value" : "' .$value . '" }');
         }
         $this->getCmd(null, 'hotwateractive')->event($state);
     }
 
     public function executeMode($_name) {
-        log::add('elmtouch', 'debug', 'début de executeMode name = '. $_name);
+        // log::add('elmtouch', 'debug', 'début de executeMode name = '. $_name);
         $existingModes = array('manual' => __('Mode manuel', __FILE__), 'clock' => __('Mode horloge', __FILE__));
         foreach ($existingModes as $modeId => $modeName) {
             if ($_name == $modeName) {
-                 log::add('elmtouch', 'debug', 'ecriture dans le thermostat value = '.$modeId);
+                // log::add('elmtouch', 'debug', 'ecriture dans le thermostat value = '.$modeId);
                 $this->writeThermostatData('/heatingCircuits/hc1/usermode', '{ "value" : "' .$modeId . '" }');
             }
         }
@@ -1210,8 +1288,8 @@ class elmtouchCmd extends cmd {
             $eqLogic->executeMode($this->getName());
             return true;
         } else if ($action == 'thermostat') {
-            log::add('elmtouch', 'debug', 'action thermostat');
-            log::add('elmtouch', 'debug', print_r($_options, true));
+            // log::add('elmtouch', 'debug', 'action thermostat');
+            // log::add('elmtouch', 'debug', print_r($_options, true));
             if (!isset($_options['slider']) || $_options['slider'] == '' || !is_numeric(intval($_options['slider']))) {
                 log::add('elmtouch', 'debug', 'mauvaise valeur du slider dans execute thermostat');
             }

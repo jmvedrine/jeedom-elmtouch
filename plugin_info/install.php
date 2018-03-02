@@ -41,6 +41,26 @@ function elmtouch_update() {
         if (is_object($averageoutdoortemp)) {
             $averageoutdoortemp->setUnite('°C');
         }
+        // Prise en compte du template
+        $clock = $this->getCmd(null, 'clock');
+        if (is_object($clock)) {
+                $clock->setTemplate('dashboard', 'usermode');
+                $clock->setTemplate('mobile', 'usermode');
+        }
+        
+        $manual = $this->getCmd(null, 'manual');
+        if (is_object($manual)) {
+                $manual->setTemplate('dashboard', 'usermode');
+                $manual->setTemplate('mobile', 'usermode');
+        }
+        
+        // Amélioration de la précision du calcul de la puissance
+        $totalyearkwh = $this->getCmd(null, 'totalyearkwh');
+        if (!is_object($totalyearkwh)) {
+            // Pas de lissage pour le calcul de la puissance correct
+            $totalyearkwh->setIsHistorized(1);
+            $totalyearkwh->setConfiguration('historizeMode', 'none');
+        }
     }
 
     $cron = cron::byClassAndFunction('elmtouch', 'getGasDaily');

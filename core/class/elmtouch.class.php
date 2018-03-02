@@ -978,7 +978,7 @@ class elmtouch extends eqLogic {
     public function getYearlyTotalGas() {
         // log::add('elmtouch', 'debug', 'Running getYearlyTotalGas');
         $yearlyConsoCmd = $this->getCmd(null, 'totalyearkwh');
-        $powerCmd =  $this->getCmd(null, 'boilerpower');
+        
         $url = 'http://127.0.0.1:3000/bridge/ecus/rrc/recordings/yearTotal';
         $request_http = new com_http($url);
         $request_http->setNoReportError(true);
@@ -993,7 +993,7 @@ class elmtouch extends eqLogic {
         if ( $totalyearkwh >= 0 && $totalyearkwh <= 429496729.5) {
             log::add('elmtouch', 'info', 'Consommation depuis le 1 janvier : ' . $totalyearkwh);
             $now = strtotime('now');
-           // $this->checkAndUpdateCmd('totalyearkwh', $totalyearkwh);
+           // 
         } else {
             log::add('elmtouch', 'debug', 'Conso annuelle incorrecte ' . $totalyearkwh);
             return;
@@ -1004,45 +1004,34 @@ class elmtouch extends eqLogic {
         // Si pas de consommation pendant 1 heure on considère que la chaudière est arrétée.
         $startdate = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' - 1 hour'));
         $enddate = date('Y-m-d H:i:s');
-        log::add('elmtouch', 'debug', "Dates pour calcul de puissance $startdate et $enddate");
+        // log::add('elmtouch', 'debug', "Dates pour calcul de puissance $startdate et $enddate");
         
         $histories = $yearlyConsoCmd->getHistory($startdate, $enddate);
-        log::add ('elmtouch', 'debug', 'count = ' . count($histories));
         $counter = count($histories);
+        log::add ('elmtouch', 'debug', 'Nb évenements conso dans l\'heure : ' . $counter);
+
         if ($counter) {
-            foreach ($histories as $key => $history) {
+            /* foreach ($histories as $key => $history) {
                 log::add ('elmtouch', 'debug', 'key = ' . $key);
                 log::add ('elmtouch', 'debug', 'datetime = ' . $history->getDatetime());
                 log::add ('elmtouch', 'debug', 'value = ' . $history->getValue());
-            }
-            $i = $counter -1;
-            while($i >= 0 && $histories[$i]->getValue() == $totalyearkwh) {
-                $i--;
-            }
-            if ($i < 0) {
-                $power = 0;
-            } else {
-                $datetime = strtotime($histories[$i]->getDatetime());
-                log::add ('elmtouch', 'debug', 'time = ' . $datetime);
-                log::add ('elmtouch', 'debug', 'now = ' . $now);
-                $duration = $now - $datetime;
-                log::add ('elmtouch', 'debug', 'duration = ' . $duration);
-                $power = round(3600 * 1000 * ($totalyearkwh - $histories[$i]->getValue()) /($now - $datetime));
-            }
+            } */
+
+            $oldConsommation = $histories[$counter - 1]->getValue();
+            $oldDatetime = strtotime($histories[$counter - 1]->getDatetime());
+            log::add ('elmtouch', 'debug', 'Ancienne consommation = ' . $oldConsommation);
+            log::add ('elmtouch', 'debug', 'Ancienne date = ' . $histories[$counter - 1]->getDatetime());
+            $duration = $now - $oldDatetime;
+            log::add ('elmtouch', 'debug', 'Durée en s = ' . $duration);
+            $power = round(3600 * 100 * ($totalyearkwh - $oldConsommation) / $duration) *10;
         } else {
             $power = 0;
         }
         log::add ('elmtouch', 'debug', 'power = ' . $power);
         $this->getCmd(null, 'boilerpower')->event($power);
-        
-        // Auttre méthode de calcul de la puissance sur un intervalle d'une heure.
-        /* $startdate = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' - 1 hour'));
-        $enddate = date('Y-m-d H:i:s');
-        // log::add('elmtouch', 'debug', "Dates pour calcul de puissance $startdate et $enddate");
-        $consostats = $yearlyConsoCmd->getStatistique($startdate,$enddate);
-        $puissance = ($consostats['max'] - $consostats['min']) * 1000;
-        log::add ('elmtouch', 'debug', 'Puissance méthode 2 = ' . $puissance); */
-
+        // On enregistre la consommation seulement après
+        $yearlyConsoCmd->event($totalyearkwh);
+        // $this->checkAndUpdateCmd('totalyearkwh', $totalyearkwh);
 
          //   $this->toHtml('mobile');
          //   $this->toHtml('dashboard');

@@ -98,13 +98,16 @@ Les commandes disponibles
 
 Le plugin est très jeune et cette liste est ammenée à s'enrichir.
 
-Changer certains noms provoque des dysfonctionnements.
+Changer certains noms de commandes peut provoquer des dysfonctionnements.
 
-| Nom     | Type                | Sous type  |Rôle               |
-| :--:    | :---:               | :---:      | :---:             |
+| Nom                        | Type    | Sous type  | Rôle                                                                                                                                                               |
+| :--:                       | :---:   | :---:      | :---:                                                                                                                                                              |
+| **Consigne**               | info    | numeric    | Donne la température de consigne. Associée à la commande action **Thermostat** n'est normalement pas affichée                                                      |
+| **Thermostat**             | action  | slider     | Permet de fixer la température de consigne en °C de 5 à 30°C                                                                                                       |
+| **Température**            | info    | numeric    | Donne la température ambiante mesurée par le thermostat en °C de 5 à 30°C                                                                                          |
+| **Température extérieure** |  info   | numeric    | Donne la température extérieure en °C de -40 à +50°C mesurée par la sonde de la chaudière s'il y en a une, sinon récupérée sur Internet par le thermostat          |
 
-
--   **Consigne** Type : info Sous-type : numeric Rôle : Donne la température de consigne. Associée à la commande action **Thermostat** n'est normalement pas affichée
+-   **Consigne** Type : info Sous-type : numeric   Rôle : Donne la température de consigne. Associée à la commande action **Thermostat** n'est normalement pas affichée
 -   **Thermostat** Type : action Sous type : slider Rôle : Permet de fixer la température de consigne en °C de 5 à 30°C
 -   **Température** Type : info Sous-type : numeric Rôle : Donne la température ambiante mesurée par le thermostat en °C de 5 à 30°C
 -   **Température extérieure** Type : info Sous-type : numeric Rôle : Donne la température extérieure en °C de -40 à +50°C mesurée par la sonde de la chaudière s'il y en a une, sinon récupérée sur Internet par le thermostat
@@ -127,7 +130,7 @@ Cette importation est faite en utilisant deux nombres entrés dans la configurat
 
 -   **Coefficient de conversion** est utilisé pour la conversion des kWh en m<sup>3</sup>. En effet contrairement à la consommation
 d'électricité qui est mesurée et facturée en kWh, la consommation de gaz est mesurée en m<sup>3</sup> et facturée en kWh.
-Pour cette conversion votre fornisseur d'énergie utilise un **coefficient thermique** calculé par le responsable du réseau de distribution
+Pour cette conversion votre fournisseur d'énergie utilise un **coefficient thermique** calculé par le responsable du réseau de distribution
 (GRDF en France) et qui varie suivant la ville et le moment. En effet un m<sup>3</sup> de gaz suivant l'altitude, la provenance, la température, ... n'a pas le même pouvoir calorifique
 et donc un coefficient variable est nécessaire. Le thermostat ELM Touch utilise en interne un coefficient de 8.125 kWh par m<sup>3</sup> qui est celui qui est utilisé par défaut
 par le plugin. Mais vous pouvez le changer, normalement cette information doit figurer sur votre facture ou votre fournisseur doit pouvoir vous la fournir.

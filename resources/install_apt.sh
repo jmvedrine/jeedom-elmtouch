@@ -31,19 +31,15 @@ else
   echo "Suppression du Nodejs existant et installation du paquet recommandé"
   type npm &>/dev/null
   if [ $? -eq 0 ]; then
-    sudo npm rm -g homebridge-camera-ffmpeg --save
-    sudo npm rm -g homebridge-jeedom --save
-    sudo npm rm -g homebridge --save
-    sudo npm rm -g request --save
-    sudo npm rm -g node-gyp --save
+    sudo npm rm -g nefit-easy-http-server --save
     cd `npm root -g`;
     sudo npm rebuild
     npmPrefix=`npm prefix -g`
   else
     npmPrefix="/usr"
   fi
-  sudo rm -f /usr/bin/homebridge &>/dev/null
-  sudo rm -f /usr/local/bin/homebridge &>/dev/null
+  sudo rm -f /usr/bin/esay-server &>/dev/null
+  sudo rm -f /usr/local/bin/easy-server &>/dev/null
   
   sudo apt-get -y --purge autoremove nodejs npm
   echo 30 > ${PROGRESS_FILE}

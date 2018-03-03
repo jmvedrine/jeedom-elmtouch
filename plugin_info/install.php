@@ -47,13 +47,21 @@ function elmtouch_update() {
                 $clock->setTemplate('dashboard', 'usermode');
                 $clock->setTemplate('mobile', 'usermode');
         }
-        
+
         $manual = $this->getCmd(null, 'manual');
         if (is_object($manual)) {
                 $manual->setTemplate('dashboard', 'usermode');
                 $manual->setTemplate('mobile', 'usermode');
         }
-        
+
+        $heatstatus = $this->getCmd(null, 'heatstatus');
+        if (is_object($heatstatus)) {
+                $heatstatus->setTemplate('dashboard', 'burner');
+                $heatstatus->setTemplate('mobile', 'burner');
+        }
+
+
+
         // Amélioration de la précision du calcul de la puissance
         $totalyearkwh = $this->getCmd(null, 'totalyearkwh');
         if (!is_object($totalyearkwh)) {

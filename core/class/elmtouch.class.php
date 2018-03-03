@@ -540,7 +540,7 @@ class elmtouch extends eqLogic {
             $totalyearkwh->setSubType('numeric');
             $totalyearkwh->setLogicalId('totalyearkwh');
             $totalyearkwh->save();
-            
+
             // Puissance en W (info).
             $boilerpower = $this->getCmd(null, 'boilerpower');
             if (!is_object($boilerpower)) {
@@ -727,6 +727,8 @@ class elmtouch extends eqLogic {
             if (!is_object($heatstatus)) {
                 $heatstatus = new elmtouchCmd();
                 $heatstatus->setName(__('Etat bruleur', __FILE__));
+                $heatstatus->setTemplate('dashboard', 'burner');
+                $heatstatus->setTemplate('mobile', 'burner');
                 $heatstatus->setIsVisible(1);
                 $heatstatus->setIsHistorized(1);
             }
@@ -974,11 +976,36 @@ class elmtouch extends eqLogic {
          //   $this->toHtml('mobile');
          //   $this->toHtml('dashboard');
     }
+    
+    // Calcul de la pente par la méthode des moindres carrés
+    // On ne peut pas utiliser history::getTendance qui ne tient pas compte des abscisses.
+    public function slope($histories) {
+        if (count($histories) == 0) {
+			return 0;
+		}
+		foreach ($histories as $history) {
+            $xvalues[] = strtotime($history->getDatetime());
+			$yvalues[] = $history->getValue();
+		}
+		$x_mean = array_sum($xvalues) / count($xvalues);
+        $y_mean = array_sum($yvalues) / count($yvalues);
+
+		$base = 0.0;
+		$divisor = 0.0;
+		foreach ($yvalues as $key => $yvalue) {
+			$base += ($xvalues[$key] - $x_mean) * ($yvalue - $y_mean);
+			$divisor += ($xvalues[$key] - $x_mean) * ($xvalues[$key] - $x_mean);
+		}
+		if ($divisor == 0) {
+			return 0;
+		}
+		return ($base / $divisor);
+	}
 
     public function getYearlyTotalGas() {
         // log::add('elmtouch', 'debug', 'Running getYearlyTotalGas');
         $yearlyConsoCmd = $this->getCmd(null, 'totalyearkwh');
-        
+
         $url = 'http://127.0.0.1:3000/bridge/ecus/rrc/recordings/yearTotal';
         $request_http = new com_http($url);
         $request_http->setNoReportError(true);
@@ -990,32 +1017,35 @@ class elmtouch extends eqLogic {
         $parsed_json = json_decode($json_string, true);
         // log::add('elmtouch', 'debug', 'Réponse serveur getYearlyTotalGas : ' . print_r($json_string, true));
         $totalyearkwh = floatval($parsed_json['value']);
-        if ( $totalyearkwh >= 0 && $totalyearkwh <= 429496729.5) {
+        // Filtrage des valeurs nulles qui sont certainement incorrectes.
+        if ( $totalyearkwh > 0 && $totalyearkwh <= 429496729.5) {
             log::add('elmtouch', 'info', 'Consommation depuis le 1 janvier : ' . $totalyearkwh);
+            $yearlyConsoCmd->event($totalyearkwh);
             $now = strtotime('now');
-           // 
+           //
         } else {
             log::add('elmtouch', 'debug', 'Conso annuelle incorrecte ' . $totalyearkwh);
             return;
         }
 
-        
+
         // Calcul de la puissance
-        // Si pas de consommation pendant 1 heure on considère que la chaudière est arrétée.
-        $startdate = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' - 1 hour'));
+        // Si pas de consommation pendant 5 minutes on considère que la chaudière est arrétée.
+        $startdate = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' - 5 minutes'));
         $enddate = date('Y-m-d H:i:s');
         // log::add('elmtouch', 'debug', "Dates pour calcul de puissance $startdate et $enddate");
-        
+
         $histories = $yearlyConsoCmd->getHistory($startdate, $enddate);
         $counter = count($histories);
-        log::add ('elmtouch', 'debug', 'Nb évenements conso dans l\'heure : ' . $counter);
+        log::add ('elmtouch', 'debug', 'Nb évenements conso en 5 minutes : ' . $counter);
 
-        if ($counter) {
-            /* foreach ($histories as $key => $history) {
+        /* if ($counter) {
+            foreach ($histories as $key => $history) {
                 log::add ('elmtouch', 'debug', 'key = ' . $key);
                 log::add ('elmtouch', 'debug', 'datetime = ' . $history->getDatetime());
+                log::add ('elmtouch', 'debug', 'time = ' . strtotime($history->getDatetime()));
                 log::add ('elmtouch', 'debug', 'value = ' . $history->getValue());
-            } */
+            }
 
             $oldConsommation = $histories[$counter - 1]->getValue();
             $oldDatetime = strtotime($histories[$counter - 1]->getDatetime());
@@ -1025,13 +1055,17 @@ class elmtouch extends eqLogic {
             log::add ('elmtouch', 'debug', 'Durée en s = ' . $duration);
             $power = round(3600 * 100 * ($totalyearkwh - $oldConsommation) / $duration) *10;
         } else {
+             log::add ('elmtouch', 'debug', 'Pas de conso dans les 5 minutes');
             $power = 0;
         }
         log::add ('elmtouch', 'debug', 'power = ' . $power);
-        $this->getCmd(null, 'boilerpower')->event($power);
-        // On enregistre la consommation seulement après
-        $yearlyConsoCmd->event($totalyearkwh);
-        // $this->checkAndUpdateCmd('totalyearkwh', $totalyearkwh);
+        $this->getCmd(null, 'boilerpower')->event($power); */
+
+
+        // Puissance arrondie à 100 W
+        $pente = round($this->slope($histories) * 3600 * 10) * 100;
+        log::add ('elmtouch', 'debug', 'pente = ' . $pente);
+        $this->getCmd(null, 'boilerpower')->event($pente);
 
          //   $this->toHtml('mobile');
          //   $this->toHtml('dashboard');
@@ -1257,7 +1291,6 @@ class elmtouchCmd extends cmd {
     public function dontRemoveCmd() {
         return true;
     }
-
 
     public function execute($_options = array()) {
         if ($this->getType() == '') {

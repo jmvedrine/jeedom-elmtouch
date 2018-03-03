@@ -100,6 +100,10 @@ Le plugin est très jeune et cette liste est ammenée à s'enrichir.
 
 Changer certains noms provoque des dysfonctionnements.
 
+| Nom     | Type                | Sous type  |Rôle               |
+| :--:    | :---:               | :---:      | :---:             |
+
+
 -   **Consigne** Type : info Sous-type : numeric Rôle : Donne la température de consigne. Associée à la commande action **Thermostat** n'est normalement pas affichée
 -   **Thermostat** Type : action Sous type : slider Rôle : Permet de fixer la température de consigne en °C de 5 à 30°C
 -   **Température** Type : info Sous-type : numeric Rôle : Donne la température ambiante mesurée par le thermostat en °C de 5 à 30°C
@@ -121,11 +125,11 @@ Par la suite tous les jours les valeurs de la veille sont importées pendant la 
 
 Cette importation est faite en utilisant deux nombres entrés dans la configuration de l'équipement pour convertir les valeurs stockées qui sont en kWh en mètres-cubes et en euros.
 
--   **Coefficient de conversion** est utilisé pour la conversion des kWh en m3. En effet contrairement à la consommation
-d'électricité qui est mesurée et facturée en kWh, la consommation de gaz est mesurée en m3 et facturée en kWh.
+-   **Coefficient de conversion** est utilisé pour la conversion des kWh en m<sup>3</sup>. En effet contrairement à la consommation
+d'électricité qui est mesurée et facturée en kWh, la consommation de gaz est mesurée en m<sup>3</sup> et facturée en kWh.
 Pour cette conversion votre fornisseur d'énergie utilise un **coefficient thermique** calculé par le responsable du réseau de distribution
-(GRDF en France) et qui varie suivant la ville et le moment. En effet un m3 de gaz suivant l'altitude, la provenance, la température, ... n'a pas le même pouvoir calorifique
-et donc un coefficient variable est nécessaire. Le thermostat ELM Touch utilise en interne un coefficient de 8.125 kWh par m3 qui est celui qui est utilisé par défaut
+(GRDF en France) et qui varie suivant la ville et le moment. En effet un m<sup>3</sup> de gaz suivant l'altitude, la provenance, la température, ... n'a pas le même pouvoir calorifique
+et donc un coefficient variable est nécessaire. Le thermostat ELM Touch utilise en interne un coefficient de 8.125 kWh par m<sup>3</sup> qui est celui qui est utilisé par défaut
 par le plugin. Mais vous pouvez le changer, normalement cette information doit figurer sur votre facture ou votre fournisseur doit pouvoir vous la fournir.
 
 -   **Prix du gaz par kWh**  figure obligatoirement sur votre facture. Le plugin prend 5 centimes par kWh par défaut, ce qui ne correspond sans doute pas à votre cas.
@@ -135,9 +139,9 @@ Une fois l'importation terminée vous disposez des commandes info historisées s
 -   **Consommation jour chauffage** : Consommation journalière pour le chauffage central en kWh
 -   **Consommation jour eau chaude** : Consommation journalière pour l'eau chaude domestique en kWh
 -   **Consommation jour totale** : Consommation journalière totale en kWh
--   **Consommation chauffage en m3** : Consommation journalière pour le chauffage central en m3
--   **Consommation eau chaude en m3** : Consommation journalière pour l'eau chaude domestique en m3
--   **Consommation jour en m3** : Consommation journalière totale en m3
+-   **Consommation chauffage en m<sup>3</sup>** : Consommation journalière pour le chauffage central en m<sup>3</sup>
+-   **Consommation eau chaude en m<sup>3</sup>** : Consommation journalière pour l'eau chaude domestique en m<sup>3</sup>
+-   **Consommation jour en m<sup>3</sup>** : Consommation journalière totale en m<sup>3</sup>
 -   **Consommation chauffage en euro** : Consommation journalière pour le chauffage central en euros
 -   **Consommation eau chaude en euro** : Consommation journalière pour l'eau chaude domestique en euros
 -   **Consommation jour en euro** : Consommation journalière totale en euros

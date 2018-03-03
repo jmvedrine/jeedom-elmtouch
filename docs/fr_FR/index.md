@@ -68,14 +68,37 @@ Lors de la création en plus des champs habituels pour tout plugin Jeedom
 
 -   **Visible** : le rend visible sur le dashboard
 
--   **Auto-actualisation (cron)** Expression cron pour le rafraichissement des informations (Par défaut '*/5 * * * *'
-    soit toutes les 5 minutes).
+-   **Coefficient de conversion** est utilisé pour la conversion des kWh en m<sup>3</sup>. En effet contrairement à la consommation
+d'électricité qui est mesurée et facturée en kWh, la consommation de gaz est mesurée en m<sup>3</sup> et facturée en kWh.
+Pour cette conversion votre fournisseur d'énergie utilise un **coefficient thermique** calculé par le responsable du réseau de distribution
+(GRDF en France) et qui varie suivant la ville et le moment. En effet un m<sup>3</sup> de gaz suivant l'altitude, la provenance, la température, ... n'a pas le même pouvoir calorifique
+et donc un coefficient variable est nécessaire. Le thermostat ELM Touch utilise en interne un coefficient de 8.125 kWh par m<sup>3</sup> qui est celui qui est utilisé par défaut
+par le plugin. Mais vous pouvez le changer, normalement cette information doit figurer sur votre facture ou votre fournisseur doit pouvoir vous la fournir.
 
-Si vous ne connaissez pas la syntaxe des expressions cron, utilisez l'assistant.
+-   **Prix du gaz par kWh**  figure obligatoirement sur votre facture. Le plugin prend 5 centimes par kWh par défaut, ce qui ne correspond sans doute pas à votre cas.
+
+-   **Auto-actualisation (cron)** Expression cron pour le rafraichissement des informations (Par défaut '*/5 * * * *'
+    soit toutes les 5 minutes). Si vous ne connaissez pas la syntaxe des expressions cron, utilisez l'assistant.
 
 Cliquez ensuite sur Sauvegarder, l'équipement est créé avec les commandes correspondantes.
 
-En cliquant sur l'équipement, vous retrouvez tous les détails.
+Lors de la première sauvegarde de l'équipement, le plugin lance l'importattion toutes les consommations journalières enregistrées dans le thermostat
+(ou la chaudière ?). Cette opération est faite à raison de 32 jours toutes les 15 minutes et peut donc durer un certain temps si 
+votre thermostat est installé depuis longtemps.
+
+Ces commandes étant historisées cela permet de disposer de courbes très intéressantes pour optimiser son chauffage.
+Par la suite tous les jours les valeurs de la veille sont importées pendant la nuit par une tâche planifiée.
+
+Cette importation est faite en utilisant deux nombres entrés dans la configuration de l'équipement pour convertir les valeurs stockées qui sont en kWh en mètres-cubes et en euros.
+
+Elles sont importées par le plugin dès qu'elles sont disponibles dans le thermostat pendant la nuit. Je ne connais pas l'heure précises mais ce n'est pas à minuit pile,
+c'est plus tard.
+
+Si à un moment donné vous voulez relancer l'import de ces consommations, cliquez sur le bouton **Ré-importer les consommations** cela relance l'import
+toujours à raison de 32 jours toutes les 15 minutes. Assurez vous que vos 2 coefficients sont corrects avant de relancer l'import.
+
+Les commandes disponibles
+===
 
 En cliquant sur l'onglet commande vous accédez aux commandes disponibles
 
@@ -93,82 +116,56 @@ En cliquant sur l'onglet commande vous accédez aux commandes disponibles
 
 -   Tester : permet de tester la commande
 
-Les commandes disponibles
-===
-
 Le plugin est très jeune et cette liste est ammenée à s'enrichir.
 
 Changer certains noms de commandes peut provoquer des dysfonctionnements.
 
-| Nom                        | Type    | Sous type  | Rôle                                                                                                                                                               |
-| :--:                       | :---:   | :---:      | :---:                                                                                                                                                              |
-| **Consigne**               | info    | numeric    | Donne la température de consigne. Associée à la commande action **Thermostat** n'est normalement pas affichée                                                      |
-| **Thermostat**             | action  | slider     | Permet de fixer la température de consigne en °C de 5 à 30°C                                                                                                       |
-| **Température**            | info    | numeric    | Donne la température ambiante mesurée par le thermostat en °C de 5 à 30°C                                                                                          |
-| **Température extérieure** |  info   | numeric    | Donne la température extérieure en °C de -40 à +50°C mesurée par la sonde de la chaudière s'il y en a une, sinon récupérée sur Internet par le thermostat          |
+| Nom                                  | Type    | Sous type  | Rôle                                                                                                                                                               |
+| :--:                                 | :---:   | :---:      | :---:                                                                                                                                                              |
+| **Consigne**                         | info    | numeric    | Donne la température de consigne. Associée à la commande action **Thermostat** . Normalement non affichée                                                          |
+| **Thermostat**                       | action  | slider     | Permet de fixer la température de consigne en °C de 5 à 30°C                                                                                                       |
+| **Température**                      | info    | numeric    | Donne la température ambiante mesurée par le thermostat en °C de 5 à 30°C                                                                                          |
+| **Température extérieure**           | info    | numeric    | Donne la température extérieure en °C de -40 à +50°C mesurée par la sonde de la chaudière s'il y en a une, sinon récupérée sur Internet par le thermostat          |
+| **Température eau de chauffage**     | info    | numeric    | Donne la température de l'eau dans le circuit de chauffage central en sortie de chaudière                                                                          |
+| **Pression**                         | info    | numeric    | Donne la pression en bar dans le circuit de chauffage central entre 0 et 25 bars. Ne fonctionne pas avec toutes les chaudières                                     |
+| **Eau chaude**                       | info    | binary     | Vaut 1 si l'eau chaude sanitaire est active et 0 sinon. Associée aux deux commandes action **hotwater_Off** et **hotwater_On**. Normalement non affichée           |
+| **hotwater_Off**                     | action  | other      | Arrête la production d'eau chaude sanitaire pour le mode courant ("Mode horloge" ou "Mode manuel")                                                                 |
+| **hotwater_On**                      | action  | other      | Met en marche la production d'eau chaude sanitaire pour le mode courant ("Mode horloge" ou "Mode manuel")                                                          |
+| **Verrouillage**                     | action  | binary     | Renvoie 1 si la chaudière est verrouillée et 0 sinon. Associée aux deux commandes action **lock** et **unlock**. Normalement non affichée                          |
+| **lock**                             | action  | other      | Verrouille la chaudière                                                                                                                                            |
+| **unlock**                           | action  | other      | Déverrouille la chaudière                                                                                                                                          |
+| **Mode**                             | info    | string     | Nom du mode actif (Mode manuel ou Mode horloge) associée aux deux commandes action **Mode manuel** et **Mode horloge**. Normalement non affichée                   |
+| **Mode manuel**                      | action  | other      | Fait passer le thermostat en mode manuel (la main)                                                                                                                 |
+| **Mode horloge**                     | action  | other      | Fait passer le thermostat en mode programme (l'horloge)                                                                                                            |
+| **Chauffage actif**                  | info    | binary     | Vaut 1 si la chaudière est en fonctionnement pour le chauffage central (pas pour l'ECS). Utilisée par les plugins mobile et Homebridge                             |
+| **Consommation annuelle**            | info    | numeric    | Donne la consommation de la chaudière en kWh depuis le 1er janvier de l'année en cours                                                                             |
+| **Puissance**                        | info    | numeric    | Donne la puissance en W calculée sur la consommation dans les dernières minutes                                                                                    |
+| **Consommation chauffage en kWh**    | info    | numeric    | Consommation journalière pour le chauffage central en kWh  . Disponibble le matin pour la veille seulement, pas pour le jour en cours                              |
+| **Consommation chauffage en m3**     | info    | numeric    | Consommation journalière pour le chauffage central en m<sup>3</sup>  . Disponibble le matin pour la veille seulement, pas pour le jour en cours                    |
+| **Consommation chauffage en euro**   | info    | numeric    | Consommation journalière pour le chauffage central en euros. Disponibble le matin pour la veille seulement, pas pour le jour en cours                              |
+| **Consommation eau chaude en kWhh**  | info    | numeric    | Consommation journalière pour l'eau chaude sanitaire en kWh  . Disponibble le matin pour la veille seulement, pas pour le jour en cours                            |
+| **Consommation eau chaude en m3**    | info    | numeric    | Consommation journalière pour l'eau chaude sanitaire en m<sup>3</sup>  . Disponibble le matin pour la veille seulement, pas pour le jour en cours                  |
+| **Consommation eau chaude en euro**  | info    | numeric    | Consommation journalière pour l'eau chaude sanitaire en euros. Disponibble le matin pour la veille seulement, pas pour le jour en cours                            |
+| **Consommation jour en kWh**         | info    | numeric    | Consommation journalière totale (chauffage + ECS) en kWh  . Disponibble le matin pour la veille seulement, pas pour le jour en cours                               |
+| **Consommation jour en m3**          | info    | numeric    | Consommation journalière totale (chauffage + ECS) en  m<sup>3</sup>  . Disponibble le matin pour la veille seulement, pas pour le jour en cours                    |
+| **Consommation jour en euro**        | info    | numeric    | Consommation journalière totale (chauffage + ECS) en  euros. Disponibble le matin pour la veille seulement, pas pour le jour en cours                              |
+| **Température extérieure moyenne**   | info    | numeric    | Température extérieure moyenne journalière (sonde ou Internet)                                                                                                     |
+| **Etat bruleur**                     | info    | binary     | Vaut 1 si le brûleur est allumé (pour le chauffage ou l'eau chaude sanitaire), 0 sinon                                                                             |
+| **Nom etat bruleur**                 | info    | string     | Traduit **Etat bruleur** en chaine de caractères 0 = Arrêté et 1 = Chauffage. Utilisé par les plugin mobile et Hombridge                                           |
+| **Etat chaudière**                   | info    | string     | Vaut "Chauffage", "Eau chaude" ou "Arrêt" suivant l'état de la chaudière                                                                                           |
 
--   **Consigne** Type : info Sous-type : numeric   Rôle : Donne la température de consigne. Associée à la commande action **Thermostat** n'est normalement pas affichée
--   **Thermostat** Type : action Sous type : slider Rôle : Permet de fixer la température de consigne en °C de 5 à 30°C
--   **Température** Type : info Sous-type : numeric Rôle : Donne la température ambiante mesurée par le thermostat en °C de 5 à 30°C
--   **Température extérieure** Type : info Sous-type : numeric Rôle : Donne la température extérieure en °C de -40 à +50°C mesurée par la sonde de la chaudière s'il y en a une, sinon récupérée sur Internet par le thermostat
--   **Température eau de chauffage** Type : info Sous-type : numeric Rôle : Donne la température de l'eau dans le circuit de chauffage central en sortie de chaudière
--   **Eau chaude** Type : info Sous-type : binaire Rôle : vaut 1 si l'eau chaude est active et 0 sinon. Associée aux deux commandes action **hotwater_Off** et **hotwater_On**
--   **hotwater_Off** Type : action Sous type :other Rôle : arrête la production d'eau chaude pour le mode courant ("Mode horloge" ou "Mode manuel")
--   **hotwater_On** Type : action Sous type :other Rôle : met en marche la production d'eau chaude pour le mode courant ("Mode horloge" ou "Mode manuel")
--   **Verrouillage** Type : action Sous-type : binaire Rôle : Renvoie 1 si la chaudière est verrouillée et 0 sinon. Associée aux deux commandes action **lock** et **unlock**
--   **lock** Type : action Sous-type : other Rôle : verrouille la chaudière
--   **unlock** Type : action Sous-type : other Rôle : déverrouille la chaudière
-
-Lors de l'enregistrement de l'équipement, le plugin importe toutes les consommations journalières enregistrées dans le thermostat
-(ou la chaudière ?). Cette opération est faite à raison de 32 jours toutes les 15 minutes et peut donc durer un certain temps si 
-votre thermostat est installé depuis longtemps.
-
-Ces commandes étant historisées cela permet de disposer de courbes très intéressantes pour optimiser son chauffage.
-Par la suite tous les jours les valeurs de la veille sont importées pendant la nuit.
-
-Cette importation est faite en utilisant deux nombres entrés dans la configuration de l'équipement pour convertir les valeurs stockées qui sont en kWh en mètres-cubes et en euros.
-
--   **Coefficient de conversion** est utilisé pour la conversion des kWh en m<sup>3</sup>. En effet contrairement à la consommation
-d'électricité qui est mesurée et facturée en kWh, la consommation de gaz est mesurée en m<sup>3</sup> et facturée en kWh.
-Pour cette conversion votre fournisseur d'énergie utilise un **coefficient thermique** calculé par le responsable du réseau de distribution
-(GRDF en France) et qui varie suivant la ville et le moment. En effet un m<sup>3</sup> de gaz suivant l'altitude, la provenance, la température, ... n'a pas le même pouvoir calorifique
-et donc un coefficient variable est nécessaire. Le thermostat ELM Touch utilise en interne un coefficient de 8.125 kWh par m<sup>3</sup> qui est celui qui est utilisé par défaut
-par le plugin. Mais vous pouvez le changer, normalement cette information doit figurer sur votre facture ou votre fournisseur doit pouvoir vous la fournir.
-
--   **Prix du gaz par kWh**  figure obligatoirement sur votre facture. Le plugin prend 5 centimes par kWh par défaut, ce qui ne correspond sans doute pas à votre cas.
-
-Une fois l'importation terminée vous disposez des commandes info historisées suivantes
-
--   **Consommation jour chauffage** : Consommation journalière pour le chauffage central en kWh
--   **Consommation jour eau chaude** : Consommation journalière pour l'eau chaude domestique en kWh
--   **Consommation jour totale** : Consommation journalière totale en kWh
--   **Consommation chauffage en m<sup>3</sup>** : Consommation journalière pour le chauffage central en m<sup>3</sup>
--   **Consommation eau chaude en m<sup>3</sup>** : Consommation journalière pour l'eau chaude domestique en m<sup>3</sup>
--   **Consommation jour en m<sup>3</sup>** : Consommation journalière totale en m<sup>3</sup>
--   **Consommation chauffage en euro** : Consommation journalière pour le chauffage central en euros
--   **Consommation eau chaude en euro** : Consommation journalière pour l'eau chaude domestique en euros
--   **Consommation jour en euro** : Consommation journalière totale en euros
--   **Température extérieure moyenne** : Moyenne des températures extérieures relevées sur la sonde si votre chaudière en a une sinon sur Internet
-
-Attention si vous affichez les valeurs courantes sur le desktop, ne perdez pas de vue que ces valeurs concernent **la veille** et pas aujourd'hui ! 
-
-Elles sont importées par le plugin dès qu'elles sont disponibles dans le thermostat pendant la nuit. Je ne connais pas l'heure précises mais ce n'est pas à minuit pile,
-c'est plus tard.
 
 Panel desktop
 ===
 
-
 Le plugin dispose d'un panel desktop dans le menu Accueil.
-
-
 
 FAQ 
 ===
 
 Quelle est la fréquence de rafraichissement ?
 
-Par défaut le plugin recupère les informations toutes les 5 min.
+Par défaut le plugin recupère les informations toutes les minutes.
 
 Je voudrais récupérer les informations avec une fréquence plus grande est-ce possible ?
 

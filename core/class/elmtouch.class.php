@@ -1063,9 +1063,12 @@ class elmtouch extends eqLogic {
 
 
         // Puissance arrondie à 100 W
-        $pente = round($this->slope($histories) * 3600 * 10) * 100;
-        log::add ('elmtouch', 'debug', 'pente = ' . $pente);
-        $this->getCmd(null, 'boilerpower')->event($pente);
+        $power = round($this->slope($histories) * 3600 * 10) * 100;
+        log::add ('elmtouch', 'debug', 'Puissance = ' . $power);
+        // Limites contre les résultats aberrants (à voir pour le max)
+        if ($power >= 0 && $power <= 50000) {
+            $this->getCmd(null, 'boilerpower')->event($power);
+        }
 
          //   $this->toHtml('mobile');
          //   $this->toHtml('dashboard');

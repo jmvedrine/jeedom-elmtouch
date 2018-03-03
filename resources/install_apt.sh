@@ -17,17 +17,13 @@ sudo apt-get update
 
 echo 5 > ${PROGRESS_FILE}
 echo "--5%"
-type nodejs &>/dev/null
-if [ $? -eq 0 ]; then actual=`nodejs -v`; fi
-echo "Version actuelle : ${actual}"
-arch=`arch`;
-
-#if [[ $actual == *"4."* || $actual == *"5."*  || $actual == *"6."* || $actual == *"8."* || $actual == *"10."* ]]
-minVer='v5'
+installVer='6'
+minVer='v6'
 testVer=`php -r "echo version_compare('${actual}','${minVer}','>=');"`
 if [[ $testVer == "1" ]]
 then
   echo "Ok, version suffisante";
+  new=$actual
 else
   echo 20 > ${PROGRESS_FILE}
   echo "--20%"
@@ -35,9 +31,16 @@ else
   echo "Suppression du Nodejs existant et installation du paquet recommandé"
   type npm &>/dev/null
   if [ $? -eq 0 ]; then
-    sudo npm rm -g nefit-easy-http-server --save
+    sudo npm rm -g homebridge-camera-ffmpeg --save
+    sudo npm rm -g homebridge-jeedom --save
+    sudo npm rm -g homebridge --save
+    sudo npm rm -g request --save
+    sudo npm rm -g node-gyp --save
     cd `npm root -g`;
     sudo npm rebuild
+    npmPrefix=`npm prefix -g`
+  else
+    npmPrefix="/usr"
   fi
   sudo rm -f /usr/bin/homebridge &>/dev/null
   sudo rm -f /usr/local/bin/homebridge &>/dev/null
@@ -48,46 +51,23 @@ else
   
   if [[ $arch == "armv6l" ]]
   then
-    echo "Raspberry 1 détecté, utilisation du paquet pour armv6l"
-    sudo rm -f /etc/apt/sources.list.d/nodesource.list &>/dev/null
-    wget http://node-arm.herokuapp.com/node_latest_armhf.deb
-    sudo dpkg -i node_latest_armhf.deb
-    sudo ln -s /usr/local/bin/node /usr/local/bin/nodejs
-    rm node_latest_armhf.deb
-    
-    #echo "Raspberry zéro détecté, utilisation du paquet pour armv6l"
-    #wget https://nodejs.org/dist/v5.12.0/node-v5.12.0-linux-armv6l.tar.gz
-    #tar -xvf node-v5.12.0-linux-armv6l.tar.gz
-    #cd node-v5.12.0-linux-armv6l
-    #sudo cp -R * /usr/local/
-    #cd ..
-    #rm -fR node-v5.12.0-linux-armv6l/
-    #rm -f node-v5.12.0-linux-armv6l.tar.gz
+    echo "Raspberry 1 ou zéro détecté, utilisation du paquet pour ${arch}"
+    wget https://nodejs.org/download/release/v6.9.5/node-v6.9.5-linux-${arch}.tar.gz
+    tar -xvf node-v6.9.5-linux-${arch}.tar.gz
+    cd node-v6.9.5-linux-${arch}
+    sudo cp -R * /usr/local/
+    cd ..
+    rm -fR node-v6.9.5-linux-${arch}*
     #upgrade to recent npm
-    #sudo npm install -g npm
-  fi
-  
-  if [[ $arch == "aarch64" ]]
-  then
-    echo "Utilisation du dépot exotique car paquet officiel non existant en V5"
-    sudo rm -f /etc/apt/sources.list.d/nodesource.list &>/dev/null
-    wget http://dietpi.com/downloads/binaries/c2/nodejs_5-1_arm64.deb
-    sudo dpkg -i nodejs_5-1_arm64.deb
-    sudo ln -s /usr/local/bin/node /usr/local/bin/nodejs &>/dev/null
-    rm nodejs_5-1_arm64.deb
-  fi
-  
-  if [[ $arch != "aarch64" && $arch != "armv6l" ]]
-  then
+    sudo npm install -g npm
+  else
     echo "Utilisation du dépot officiel"
-    curl -sL https://deb.nodesource.com/setup_5.x | sudo -E bash -
+    curl -sL https://deb.nodesource.com/setup_${installVer}.x | sudo -E bash -
     sudo apt-key update
     sudo apt-get install -y nodejs  
   fi
-#  echo "Utilisation du dépot officiel"
-#  curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
-#  sudo apt-key update
-#  sudo apt-get install -y nodejs  
+  
+  npm config set prefix ${npmPrefix}
 
   new=`nodejs -v`;
   echo "Version actuelle : ${new}"

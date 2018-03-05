@@ -30,6 +30,12 @@ Configuration du plugin
 ===
 
 Vérifier que l'installation des dépendances et le statut du démon sont bien OK.
+Si le statut du démon est "NOK", il faut résoudre le problème avant de continuer car cela signifie
+que le plugin ne peut pas communiquer avec le serveur Bosch et donc rien ne fonctionnera. Pour 
+comprendre le problème
+- Si le statut des dépendances est NOK, consultez le log "Elmtouch_update" et résolvez le problème puis
+relancez l'installation des dépendances
+- Si le statut des dépendances est OK mais que le statut du démon est NOK, passez le niveau de log en "De
 
 Les dépendances installent le module nodejs nefit-easy http server de Robert Klep  
 (https://github.com/robertklep/nefit-easy-http-server).

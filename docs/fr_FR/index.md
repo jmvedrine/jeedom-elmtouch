@@ -29,20 +29,6 @@ et il faut que le thermostat fonctionne.
 Configuration du plugin 
 ===
 
-Vérifier que l'installation des dépendances et le statut du démon sont bien OK.
-Si le statut du démon est "NOK", il faut résoudre le problème avant de continuer car cela signifie
-que le plugin ne peut pas communiquer avec le serveur Bosch et donc rien ne fonctionnera. Pour 
-comprendre le problème
-- Si le statut des dépendances est NOK, consultez le log "Elmtouch_update" et résolvez le problème puis
-relancez l'installation des dépendances
-- Si le statut des dépendances est OK mais que le statut du démon est NOK, passez le niveau de log en "De
-
-Les dépendances installent le module nodejs nefit-easy http server de Robert Klep  
-(https://github.com/robertklep/nefit-easy-http-server).
-
-Le démon se charge de le démarrer et de l'arrêter. Il faut que le numéro de série, le
-code d'accès et le mot de passe soient corrects pour que le démon puisse fonctionner.
-
 Il faut entrer :
 
 -   **Numéro de série** : le numéro de série à 9 chiffres (Serial) qui figure sur la notice et au dos du thermostat
@@ -52,6 +38,27 @@ Il faut entrer :
 -   **Mot de passe** : Le mot de passe que vous avez choisi lors de la création du compte sur le serveur de Bosch.
 
 Et ne pas oublier de cliquer sur **Sauvegarder**.
+
+Vérifier que l'installation des dépendances et le statut du démon sont bien OK.
+Si le statut du démon est "NOK", il faut résoudre le problème avant de continuer car cela signifie
+que le plugin ne peut pas communiquer avec le serveur Bosch et donc rien ne fonctionnera. 
+
+Pour comprendre le problème :
+
+- Si le statut des dépendances est NOK, consultez le log "Elmtouch_update" et résolvez le problème puis
+relancez l'installation des dépendances
+
+- Si le statut des dépendances est OK mais que le statut du démon est NOK, passez le niveau de log en "Debug"
+puis relancez manuellement le démon. Si le démon est toujours "NOK", consultez le log "Elmtouch" pour comprendre le problème.
+Vérifiez aussi vos numéro de série, code d'accès et mot de passe.
+
+Vous pouvez demander de l'aide sur le forum https://www.jeedom.com/forum/viewtopic.php?f=143&t=34491
+
+Les dépendances installent le module nodejs nefit-easy http server de Robert Klep  
+(https://github.com/robertklep/nefit-easy-http-server).
+
+Le démon se charge de le démarrer et de l'arrêter. Il faut que le numéro de série, le
+code d'accès et le mot de passe soient corrects pour que le démon puisse fonctionner.
 
 Création des équipement
 ===

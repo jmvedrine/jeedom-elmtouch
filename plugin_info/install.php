@@ -18,9 +18,79 @@
 
 require_once dirname(__FILE__) . '/../../../core/php/core.inc.php';
 
+function elmtouch_install() {
+    // Cron de récupération des consommations de gaz.
+    $cron = cron::byClassAndFunction('elmtouch', 'getGasDaily');
+    if (!is_object($cron)) {
+        $cron = new cron();
+        $cron->setClass('elmtouch');
+        $cron->setFunction('getGasDaily');
+        $cron->setEnable(1);
+        $cron->setDeamon(0);
+        $cron->setSchedule(rand(10, 59) . ' 0' . rand(1, 5) . ' * * *');
+        $cron->save();
+    }
+}
+
 function elmtouch_update() {
     foreach (eqLogic::byType('elmtouch') as $elmtouch) {
-		$elmtouch->save();
+        $elmtouch->save();
+
+        // Correction du bug des unités.
+        $averageoutdoortemp = $this->getCmd(null, 'averageoutdoortemp');
+        if (is_object($averageoutdoortemp)) {
+            $averageoutdoortemp->setUnite('°C');
+        }
+        // Prise en compte du template
+        $clock = $this->getCmd(null, 'clock');
+        if (is_object($clock)) {
+                $clock->setTemplate('dashboard', 'usermode');
+                $clock->setTemplate('mobile', 'usermode');
+        }
+
+        $manual = $this->getCmd(null, 'manual');
+        if (is_object($manual)) {
+                $manual->setTemplate('dashboard', 'usermode');
+                $manual->setTemplate('mobile', 'usermode');
+        }
+
+        $heatstatus = $this->getCmd(null, 'heatstatus');
+        if (is_object($heatstatus)) {
+                $heatstatus->setTemplate('dashboard', 'burner');
+                $heatstatus->setTemplate('mobile', 'burner');
+        }
+
+
+
+        // Amélioration de la précision du calcul de la puissance
+        $totalyearkwh = $this->getCmd(null, 'totalyearkwh');
+        if (!is_object($totalyearkwh)) {
+            // Pas de lissage pour le calcul de la puissance correct
+            $totalyearkwh->setIsHistorized(1);
+            $totalyearkwh->setConfiguration('historizeMode', 'none');
+        }
+    }
+
+    $cron = cron::byClassAndFunction('elmtouch', 'getGasDaily');
+    if (!is_object($cron)) {
+        $cron = new cron();
+        $cron->setClass('elmtouch');
+        $cron->setFunction('getGasDaily');
+        $cron->setEnable(1);
+        $cron->setDeamon(0);
+        $cron->setSchedule(rand(10, 59) . ' 0' . rand(1, 5) . ' * * *');
+        $cron->save();
+    }
+    $cron->setSchedule(rand(10, 59) . ' 0' . rand(1, 5) . ' * * *');
+    $cron->save();
+}
+
+
+function elmtouch_remove() {
+    $cron = cron::byClassAndFunction('elmtouch', 'getGasDaily');
+    if (is_object($cron)) {
+        $cron->stop();
+        $cron->remove();
     }
 }
 ?>

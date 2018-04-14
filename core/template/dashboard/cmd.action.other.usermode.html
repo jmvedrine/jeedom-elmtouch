@@ -1,0 +1,34 @@
+<div style="width:90px; min-height:80px;" class="cmd tooltips cmd-widget cursor" data-type="action" data-subtype="other" data-cmd_id="#id#" data-cmd_uid="#uid#">
+	<center>
+		<span class="cmdName" style="font-weight: bold;font-size : 12px;#hideCmdName#">#valueName#</span><br>
+		<span style="font-size: 2.5em; font-weight: bold; margin-top: 5px;" class="imgCmd"></span>
+	</center>
+	<script>
+	if('#name#' == 'Mode horloge'){
+		$('.cmd[data-cmd_uid=#uid#] .imgCmd').append('<img src="plugins/elmtouch/core/template/images/manualmode.png" width="40px">');
+	}else{
+		$('.cmd[data-cmd_uid=#uid#] .imgCmd').append('<img src="plugins/elmtouch/core/template/images/clockmode.png" width="40px">');
+	}
+	  
+	jeedom.cmd.update['#id#'] = function(_options){
+		if('#name#' == 'Mode horloge'){
+		  if(_options.display_value == 'Mode manuel' ) {
+			  $('.cmd[data-cmd_uid=#uid#]').show();
+		  }else{
+			  $('.cmd[data-cmd_uid=#uid#]').hide();
+		  }
+		}else{
+		  if(_options.display_value == 'Mode horloge' ) {
+				$('.cmd[data-cmd_uid=#uid#]').show();
+			}else{
+				$('.cmd[data-cmd_uid=#uid#]').hide();
+			}
+		}
+	}
+	jeedom.cmd.update['#id#']({display_value:'#state#'});
+	
+	$('.cmd[data-cmd_uid=#uid#] .imgCmd').on('click', function () {
+		jeedom.cmd.execute({id: '#id#'});
+	});
+	</script>
+</div>

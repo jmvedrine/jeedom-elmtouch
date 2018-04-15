@@ -9,7 +9,7 @@
     "hasDependency" : 1,
     "hasOwnDeamon" : 1,
     "display" : "panel",
-    "changelog" : "https://jeedom.github.io/plugin-elmtouch/#language#/changelog",
-    "documentation" : "https://jeedom.github.io/plugin-elmtouch/#language#/",
+    "changelog" : "https://jmvedrine.github.io/jeedom-elmtouch/#language#/changelog",
+    "documentation" : "https://jmvedrine.github.io/jeedom-elmtouch",
     "_version" : "1.0.1"
 }

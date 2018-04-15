@@ -1,15 +1,15 @@
 {
     "id" : "elmtouch",
     "name" : "ELM Touch",
-    "description" : "Plugin pour la régulation de chaudière ELM Touch",
+    "description" : "Plugin pour la régulation de chaudière gaz Elm Leblanc avec le thermostat connecté ELM Touch",
     "licence" : "AGPL",
     "author" : "JMVedrine",
     "require" : "3.0",
     "category" : "wellness",
-    "hasDependency" : 1,
-    "hasOwnDeamon" : 1,
+    "hasDependency" : true,
+    "hasOwnDeamon" : true,
     "display" : "panel",
     "changelog" : "https://jmvedrine.github.io/jeedom-elmtouch/#language#/changelog",
-    "documentation" : "https://jmvedrine.github.io/jeedom-elmtouch",
-    "_version" : "1.0.1"
+    "documentation" : "https://jmvedrine.github.io/jeedom-elmtouch/#language#/",
+    "_version" : "1.1.0"
 }

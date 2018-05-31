@@ -38,31 +38,40 @@ else
   if [ $? -eq 0 ]; then
     sudo npm rm -g nefit-easy-http-server --save
     cd `npm root -g`;
-    sudo npm rebuild
+    sudo npm rebuild &>/dev/null
+    npmPrefix=`npm prefix -g`
+  else
+    npmPrefix="/usr"
   fi
   sudo rm -f /usr/bin/esay-server &>/dev/null
   sudo rm -f /usr/local/bin/easy-server &>/dev/null
-  
-  sudo apt-get -y --purge autoremove nodejs npm
+  sudo DEBIAN_FRONTEND=noninteractive apt-get -y --purge autoremove nodejs npm
+
   echo 30 > ${PROGRESS_FILE}
   echo "--30%"
-  
-   if [[ $arch == "armv6l" ]]
+
+  if [[ $arch == "armv6l" ]]
   then
-    echo "Raspberry 1 détecté, utilisation du paquet pour armv6l"
-    sudo rm -f /etc/apt/sources.list.d/nodesource.list &>/dev/null
-    wget http://node-arm.herokuapp.com/node_latest_armhf.deb
-    sudo dpkg -i node_latest_armhf.deb
-    sudo ln -s /usr/local/bin/node /usr/local/bin/nodejs
-    rm node_latest_armhf.deb
-    
+    echo "Raspberry 1, 2 ou zéro détecté, utilisation du paquet v${installVer} pour ${arch}"
+    wget https://nodejs.org/download/release/latest-v${installVer}.x/node-*-linux-${arch}.tar.gz
+    tar -xvf node-*-linux-${arch}.tar.gz
+    cd node-*-linux-${arch}
+    sudo cp -R * /usr/local/
+    cd ..
+    rm -fR node-*-linux-${arch}*
+    #upgrade to recent npm
+    sudo npm install -g npm
   else
-    echo "Utilisation du dépot officiel"
-    curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
-    sudo apt-key update
-    sudo apt-get install -y nodejs  
+    if [ -f /media/boot/multiboot/meson64_odroidc2.dtb.linux ]; then
+      sudo DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs
+    else
+      echo "Utilisation du dépot officiel"
+      curl -sL https://deb.nodesource.com/setup_${installVer}.x | sudo -E bash -
+      sudo DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs  
+    fi
   fi
 
+  npm config set prefix ${npmPrefix}
   new=`nodejs -v`;
   echo "Version actuelle : ${new}"
 fi
@@ -71,7 +80,8 @@ echo 70 > ${PROGRESS_FILE}
 echo "--70%"
 echo "Installation de Nefit Easy HTTP Server"
 sudo npm install -g nefit-easy-http-server
-
+serverversion=`easy-server -v`;
+echo "Nefit Easy HTTP Server version ${serverversion} installé."
 echo 100 > ${PROGRESS_FILE}
 echo "--100%"
 echo "********************************************************"

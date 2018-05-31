@@ -5,13 +5,12 @@
     </center>
     <script>
         jeedom.cmd.update['#id#'] = function(_options){
-            $('.cmd[data-cmd_id=#id#]').attr('title','Valeur du '+_options.valueDate+', collectée le '+_options.collectDate)
+            $('.cmd[data-cmd_id=#id#]').attr('title','Valeur du '+_options.valueDate+', collectée le '+_options.collectDate);
             if (_options.display_value == '1') {
                 $('.cmd[data-cmd_id=#id#] .iconCmd').empty().append('<img src="plugins/elmtouch/core/template/images/hotwater_White_On.png" width="40px">');
             } else {
                 $('.cmd[data-cmd_id=#id#] .iconCmd').empty().append('<img src="plugins/elmtouch/core/template/images/hotwater_White_Off.png" width="40px">');
             }
-            $('.cmd[data-cmd_id=#id#]').attr('title','Valeur du '+_options.valueDate+', collectée le '+_options.collectDate);
         }
         jeedom.cmd.update['#id#']({display_value:'#state#',valueDate:'#valueDate#',collectDate:'#collectDate#',alertLevel:'#alertLevel#'});
     </script>

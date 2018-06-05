@@ -845,6 +845,8 @@ class elmtouch extends eqLogic {
         $json_string = $request_http->exec(30);
         if ($json_string === false) {
             log::add('elmtouch', 'debug', 'Problème de lecture status');
+            $request_http->setNoReportError(false);
+            $json_string = $request_http->exec(30,1);
             return;
         }
         $parsed_json = json_decode($json_string, true);
@@ -939,6 +941,8 @@ class elmtouch extends eqLogic {
         $json_string = $request_http->exec(30);
         if ($json_string === false) {
             log::add('elmtouch', 'debug', 'Problème de lecture outdoortemp');
+            $request_http->setNoReportError(false);
+            $json_string = $request_http->exec(30,1);
             return;
         }
         $parsed_json = json_decode($json_string, true);
@@ -962,6 +966,8 @@ class elmtouch extends eqLogic {
         $json_string = $request_http->exec(30);
         if ($json_string === false) {
             log::add('elmtouch', 'debug', 'Problème de lecture actualSupplyTemp');
+            $request_http->setNoReportError(false);
+            $json_string = $request_http->exec(30,1);
             return;
         }
         $parsed_json = json_decode($json_string, true);
@@ -1011,7 +1017,9 @@ class elmtouch extends eqLogic {
         $request_http->setNoReportError(true);
         $json_string = $request_http->exec(30);
         if ($json_string === false) {
-            log::add('elmtouch', 'debug', 'Problème de lecture getYearlyTotalGas');
+            log::add('elmtouch', 'debug', 'Problème de lecture YearlyTotalGas');
+            $request_http->setNoReportError(false);
+            $json_string = $request_http->exec(30,1);
             return;
         }
         $parsed_json = json_decode($json_string, true);
@@ -1081,7 +1089,9 @@ class elmtouch extends eqLogic {
         $request_http->setNoReportError(true);
         $json_string = $request_http->exec(30);
         if ($json_string === false) {
-            log::add('elmtouch', 'debug', 'Problème de lecture getPressure');
+            log::add('elmtouch', 'debug', 'Problème de lecture Pressure');
+            $request_http->setNoReportError(false);
+            $json_string = $request_http->exec(30,1);
             return;
         }
         $parsed_json = json_decode($json_string, true);

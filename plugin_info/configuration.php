@@ -43,5 +43,5 @@ if (!isConnect()) {
             <input id="elmtouchpassword" type="password" class="configKey form-control" data-l1key="password" style="margin-top:-5px" placeholder="{{Mot de passe choisi sur le smartphone}}"/>
         </div>
     </div>
-    </fieldset> 
+    </fieldset>
 </form>

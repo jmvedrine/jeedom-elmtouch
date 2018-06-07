@@ -92,7 +92,7 @@ else
     sudo npm rebuild &>/dev/null
   fi
   sudo DEBIAN_FRONTEND=noninteractive apt-get -y --purge autoremove nodejs npm
-  
+
   echo 45 > ${PROGRESS_FILE}
   echo "--45%"
 
@@ -113,7 +113,7 @@ else
     else
       echo "Utilisation du dépot officiel"
       curl -sL https://deb.nodesource.com/setup_${installVer}.x | sudo -E bash -
-      sudo DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs  
+      sudo DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs
     fi
   fi
 

@@ -1,4 +1,4 @@
-Description 
+Description
 ===
 
 Plugin permettant de contrôler les thermostats Elm touch vendu par ELM Leblanc.
@@ -26,7 +26,7 @@ ou si Bosch restreignait la connexion, il resterait cette solution.
 Avant d'activer le plugin il faut que votre compte sur le serveur de Bosch soit créé avec un mot de passe
 et il faut que le thermostat fonctionne.
 
-Configuration du plugin 
+Configuration du plugin
 ===
 
 Il faut entrer :
@@ -41,7 +41,7 @@ Et ne pas oublier de cliquer sur **Sauvegarder**.
 
 Vérifier que l'installation des dépendances et le statut du démon sont bien OK.
 Si le statut du démon est "NOK", il faut résoudre le problème avant de continuer car cela signifie
-que le plugin ne peut pas communiquer avec le serveur Bosch et donc rien ne fonctionnera. 
+que le plugin ne peut pas communiquer avec le serveur Bosch et donc rien ne fonctionnera.
 
 Pour comprendre le problème :
 
@@ -54,7 +54,7 @@ Vérifiez aussi vos numéro de série, code d'accès et mot de passe.
 
 Vous pouvez demander de l'aide sur le forum https://www.jeedom.com/forum/viewtopic.php?f=143&t=34491
 
-Les dépendances installent le module nodejs nefit-easy http server de Robert Klep  
+Les dépendances installent le module nodejs nefit-easy http server de Robert Klep
 (https://github.com/robertklep/nefit-easy-http-server).
 
 Le démon se charge de le démarrer et de l'arrêter. Il faut que le numéro de série, le
@@ -63,7 +63,7 @@ code d'accès et le mot de passe soient corrects pour que le démon puisse fonct
 Création des équipement
 ===
 
-Attention, pour le moment ce plugin ne peut gérer qu'un seul thermostat Elm Touch. 
+Attention, pour le moment ce plugin ne peut gérer qu'un seul thermostat Elm Touch.
 
 Je pense qu'il serait sans doute
 possible de gérer plusieurs thermostats en leur donnant à chacun un port différent pour le serveur. Mais je n'ai pas codé cela
@@ -96,7 +96,7 @@ par le plugin. Mais vous pouvez le changer, normalement cette information doit f
 Cliquez ensuite sur Sauvegarder, l'équipement est créé avec les commandes correspondantes.
 
 Lors de la première sauvegarde de l'équipement, le plugin lance l'importattion toutes les consommations journalières enregistrées dans le thermostat
-(ou la chaudière ?). Cette opération est faite à raison de 32 jours toutes les 15 minutes et peut donc durer un certain temps si 
+(ou la chaudière ?). Cette opération est faite à raison de 32 jours toutes les 15 minutes et peut donc durer un certain temps si
 votre thermostat est installé depuis longtemps.
 
 Ces commandes étant historisées cela permet de disposer de courbes très intéressantes pour optimiser son chauffage.
@@ -173,7 +173,7 @@ Panel desktop
 
 Le plugin dispose d'un panel desktop dans le menu Accueil.
 
-FAQ 
+FAQ
 ===
 
 Quelle est la fréquence de rafraichissement ?

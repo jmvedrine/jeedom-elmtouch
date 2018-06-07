@@ -86,9 +86,6 @@ else
     sudo npm rm -g nefit-easy-http-server --save
     cd `npm root -g`;
     sudo npm rebuild &>/dev/null
-    npmPrefix=`npm prefix -g`
-  else
-    npmPrefix="/usr"
   fi
   sudo DEBIAN_FRONTEND=noninteractive apt-get -y --purge autoremove nodejs npm
   
@@ -116,7 +113,6 @@ else
     fi
   fi
 
-  npm config set prefix ${npmPrefix}
   new=`nodejs -v`;
   echo "Version actuelle : ${new}"
 fi

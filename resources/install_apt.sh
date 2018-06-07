@@ -126,7 +126,7 @@ echo "--70%"
 # Remove old globals
 sudo rm -f /usr/bin/easy-server &>/dev/null
 sudo rm -f /usr/local/bin/easy-server &>/dev/null
-sudo npm rm -g easy-server --save &>/dev/null
+sudo npm rm -g nefit-easy-http-server --save &>/dev/null
 cd `npm root -g`;
 sudo npm rebuild &>/dev/null
 cd ${BASEDIR};

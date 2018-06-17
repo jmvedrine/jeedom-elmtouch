@@ -982,7 +982,7 @@ class elmtouch extends eqLogic {
          //   $this->toHtml('mobile');
          //   $this->toHtml('dashboard');
     }
-    
+
     // Calcul de la pente par la méthode des moindres carrés
     // On ne peut pas utiliser history::getTendance qui ne tient pas compte des abscisses.
     public function slope($histories) {
@@ -1174,24 +1174,37 @@ class elmtouch extends eqLogic {
                     if ($server_date !== false) {
                         $count++;
                         $jeedom_event_date = $server_date->format("Y-m-d");
+                        // Consommations chauffage.
                         $heatingday_kwh = floatval($dailyconso['ch']);
-                        $cmdheatingdaykwh->event($heatingday_kwh, $jeedom_event_date);
-                        $heatingday_m3 = round($heatingday_kwh / floatval($this->getConfiguration('convkwhm3', '8.125')), 1);
-                        $cmdheatingdaym3->event($heatingday_m3, $jeedom_event_date);
-                        $heatingday_euro = round($heatingday_kwh * floatval($this->getConfiguration('prixgazkwh', '0.05')), 2);
-                        $cmdheatingdayeuro->event($heatingday_euro, $jeedom_event_date);
+                        // On convertit en m3 avec le coefficient pris par Bosch.
+                        $heatingday_m3 = $heatingday_kwh / 8.125;
+                        // Et on reconvertit en kWh avec le coefficient de la configuration.
+                        $heatingday_kwh = $heatingday_m3 * floatval($this->getConfiguration('convkwhm3', '8.125'));
+                        // On calcule le prix en euros.
+                        $heatingday_euro = $heatingday_kwh * floatval($this->getConfiguration('prixgazkwh', '0.05'));
+                        // Et maintenant on stocke les valeurs arrondies.
+                        $cmdheatingdaykwh->event(round($heatingday_kwh, 1), $jeedom_event_date);
+                        $cmdheatingdayeuro->event(round($heatingday_eur, 2), $jeedom_event_date);
+                        $cmdheatingdaym3->event(round($heatingday_m3, 1), $jeedom_event_date);
+                        // Consommations eau chaude sanitaire.
                         $hotwaterday_kwh = floatval($dailyconso['hw']);
-                        $cmdhotwaterdaykwh->event($hotwaterday_kwh, $jeedom_event_date);
-                        $hotwaterday_m3 = round($hotwaterday_kwh / floatval($this->getConfiguration('convkwhm3', '8.125')), 1);
-                        $cmdhotwaterdaym3->event($hotwaterday_m3, $jeedom_event_date);
-                        $hotwaterday_euro = round($hotwaterday_kwh * floatval($this->getConfiguration('prixgazkwh', '0.05')), 2);
-                        $cmdhotwaterdayeuro->event($hotwaterday_euro, $jeedom_event_date);
+                        // On convertit en m3 avec le coefficient pris par Bosch.
+                        $hotwaterday_m3 = $hotwaterday_kwh / 8.125;
+                        // Et on reconvertit en kWh avec le coefficient de la configuration.
+                        $hotwaterday_kwh = $hotwaterday_m3 * floatval($this->getConfiguration('convkwhm3', '8.125'));
+                        // On calcule le prix en euros.
+                        $hotwaterday_euro = $hotwaterday_kwh * floatval($this->getConfiguration('prixgazkwh', '0.05'));
+                        $cmdhotwaterdaykwh->event(round($hotwaterday_kwh, 1), $jeedom_event_date);
+                        $cmdhotwaterdaym3->event(round($hotwaterday_m3, 1), $jeedom_event_date);
+                        $cmdhotwaterdayeuro->event(round($hotwaterday_euro, 2), $jeedom_event_date);
+                        // Consommations totales.
                         $totalday_kwh = $heatingday_kwh + $hotwaterday_kwh;
                         $cmdtotaldaykwh->event($totalday_kwh, $jeedom_event_date);
                         $totalday_m3 = $heatingday_m3 + $hotwaterday_m3;
                         $cmdtotaldaym3->event($totalday_m3, $jeedom_event_date);
                         $totalday_euro = $heatingday_euro + $hotwaterday_euro;
                         $cmdtotaldayeuro->event($totalday_euro, $jeedom_event_date);
+                        // Température extérieure moyenne.
                         $outdoortemp_value = floatval($dailyconso['T']) / 10;
                         $cmdaverageoutdoortemp->event($outdoortemp_value, $jeedom_event_date);
                     }

@@ -1184,7 +1184,7 @@ class elmtouch extends eqLogic {
                         $heatingday_euro = $heatingday_kwh * floatval($this->getConfiguration('prixgazkwh', '0.05'));
                         // Et maintenant on stocke les valeurs arrondies.
                         $cmdheatingdaykwh->event(round($heatingday_kwh, 1), $jeedom_event_date);
-                        $cmdheatingdayeuro->event(round($heatingday_eur, 2), $jeedom_event_date);
+                        $cmdheatingdayeuro->event(round($heatingday_euro, 2), $jeedom_event_date);
                         $cmdheatingdaym3->event(round($heatingday_m3, 1), $jeedom_event_date);
                         // Consommations eau chaude sanitaire.
                         $hotwaterday_kwh = floatval($dailyconso['hw']);

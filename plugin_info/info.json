@@ -9,6 +9,8 @@
     "hasDependency" : true,
     "hasOwnDeamon" : true,
     "display" : "panel",
+    "language" : ["fr_FR","en_US"],
+    "compatibility" : ["miniplus","smart","rpi","docker","diy","mobile"],
     "changelog" : "https://jmvedrine.github.io/jeedom-elmtouch/#language#/changelog",
     "documentation" : "https://jmvedrine.github.io/jeedom-elmtouch/#language#/",
     "_version" : "1.1.0"

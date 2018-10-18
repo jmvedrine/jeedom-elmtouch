@@ -1,5 +1,7 @@
 #!/bin/bash
 PROGRESS_FILE=/tmp/dependancy_elmtouch_in_progress
+installVer='8' 	#NodeJS major version to be installed
+minVer='8'	#min NodeJS major version to be accepted
 
 touch ${PROGRESS_FILE}
 echo 0 > ${PROGRESS_FILE}
@@ -73,9 +75,11 @@ if [ $? -eq 0 ]; then actual=`nodejs -v`; fi
 echo "Version actuelle : ${actual}"
 arch=`arch`;
 
-if [[ $actual == "v8."* || $actual == "v9."* || $actual == "v10."* ]]
+testVer=`php -r "echo version_compare('${actual}','v${minVer}','>=');"`
+if [[ $testVer == "1" ]]
 then
   echo "Ok, version suffisante";
+  new=$actual
 else
   echo 40 > ${PROGRESS_FILE}
   echo "--40%"

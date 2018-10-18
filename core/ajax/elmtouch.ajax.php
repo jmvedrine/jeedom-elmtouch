@@ -103,5 +103,5 @@ try {
 
     throw new Exception(__('Aucune methode correspondante à : ', __FILE__) . init('action'));
 } catch (Exception $e) {
-    ajax::error(displayExeption($e), $e->getCode());
+    ajax::error(displayException($e), $e->getCode()); 
 }

@@ -30,7 +30,7 @@
 
     "plugins\/elmtouch\/core\/ajax\/elmtouch.ajax.php": {
         "Aucune méthode correspondante à : ": "Aucune méthode correspondante à : ",
-        "401 - Accès non autorisé": "401 - Accès non autorisé",
+        "401 - Accès non autorisé": "401 - Accès non autorisé"
     },
 
     "plugins\/elmtouch\/core\/class\/elmtouch.class.php": {

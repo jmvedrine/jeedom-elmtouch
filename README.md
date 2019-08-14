@@ -2,9 +2,9 @@
 
 <img src="plugin_info/elmtouch_icon.png" align="right">
 
-This is a plugin for the Jeedom (https://www.jeedom.com) open source (https://github.com/jeedom) domotic system.
+This is a plugin for the Jeedom (https://www.jeedom.com) open source (https://github.com/jeedom) home automation system.
 
-It will permit to control the ELM Touch smart boiler controller from your Jeedom.
+It allow to control the ELM Touch smart boiler controller from your Jeedom system.
 
 The ELM Touch controller is made by Bosch and sold in different countries under various names :
 
@@ -18,5 +18,3 @@ The ELM Touch controller is made by Bosch and sold in different countries under 
 This plugin use the nefit-easy-http-server library made by Robert Klep https://github.com/robertklep/nefit-easy-http-server to communicate with Bosch servers.
 
 ELm touch, ELM Leblanc, Nefit Easy, Junkers, Buderus, Worcester Wave and Bosch are trade marks of the Bosch group.
-
-BIG WARNING : This is a work in progress and not finished. I just committed it to Github to keep a state of my project do not use until further notice. You have been warned.

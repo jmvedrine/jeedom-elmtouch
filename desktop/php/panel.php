@@ -8,12 +8,12 @@ $date = array(
 );
 
 if (init('object_id') == '') {
-	$object = object::byId($_SESSION['user']->getOptions('defaultDashboardObject'));
+	$object = jeeObject::byId($_SESSION['user']->getOptions('defaultDashboardObject'));
 } else {
-	$object = object::byId(init('object_id'));
+	$object = jeeObject::byId(init('object_id'));
 }
 if (!is_object($object)) {
-	$object = object::rootObject();
+	$object = jeeObject::rootObject();
 }
 if (is_object($object)) {
 	$_GET['object_id'] = $object->getId();
@@ -29,7 +29,7 @@ sendVarToJs('object_id', init('object_id'));
                 <li class="nav-header">{{Liste objets}}</li>
                 <li class="filter" style="margin-bottom: 5px;"><input class="filter form-control input-sm" placeholder="{{Rechercher}}" style="width: 100%"/></li>
                 <?php
-$allObject = object::buildTree();
+$allObject = jeeObject::buildTree();
 foreach ($allObject as $object_li) {
 	if ($object_li->getIsVisible() == 1 && count($object_li->getEqLogic(true, false, 'elmtouch')) > 0) {
 		$margin = 15 * $object_li->parentNumber();

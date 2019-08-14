@@ -4,7 +4,7 @@
     "description" : "Plugin pour la régulation de chaudière gaz Elm Leblanc avec le thermostat connecté ELM Touch",
     "licence" : "AGPL",
     "author" : "JMVedrine",
-    "require" : "3.0",
+    "require" : "3.3",
     "category" : "wellness",
     "hasDependency" : true,
     "hasOwnDeamon" : true,

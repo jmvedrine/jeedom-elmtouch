@@ -24,6 +24,7 @@ try {
         throw new Exception(__('401 - Accès non autorisé', __FILE__));
     }
 
+    ajax::init();
     if (init('action') == 'resetConso') {
         $eqLogics = eqLogic::byType('elmtouch');
         foreach ($eqLogics as $eqLogic) {
@@ -42,6 +43,15 @@ try {
         }
         if (!is_object($object)) {
             throw new Exception(__('Aucun objet racine trouvé', __FILE__));
+        }
+        if (count($object->getEqLogic(true, false, 'elmtouch')) == 0) {
+            $allObject = jeeObject::buildTree();
+            foreach ($allObject as $object_sel) {
+                if (count($object_sel->getEqLogic(true, false, 'elmtouch')) > 0) {
+                    $object = $object_sel;
+                    break;
+                }
+            }
         }
         $return = array('object' => utils::o2a($object));
 
@@ -72,7 +82,7 @@ try {
             throw new Exception(__('Equipement Elm touch non trouvé : ', __FILE__) . init('id'));
         }
         try {
-            $plugin = plugin::byId('elmtouch');
+            $plugin = plugin::byId('calendar');
             if (!is_object($plugin) || $plugin->isActive() != 1) {
                 ajax::success(array());
             }
@@ -83,15 +93,15 @@ try {
             ajax::success(array());
         }
         $return = array();
-		$programmablecmds = array('hotwater_On', 'hotwater_Off');
-		foreach ($programmablecmds as $name) {
+        $programmablecmds = array('hotwater_On', 'hotwater_Off', 'lock', 'unlock', 'clock', 'manual');
+        foreach ($programmablecmds as $name) {
             $thermostat_cmd = $elmtouch->getCmd(null, $name);
             if (is_object($thermostat_cmd)) {
-			    foreach (calendar_event::searchByCmd($thermostat_cmd->getId()) as $event) {
+                foreach (calendar_event::searchByCmd($thermostat_cmd->getId()) as $event) {
                     $return[$event->getId()] = $event;
                 }
-			}
-		}
+            }
+        }
         $thermostat_cmd = $elmtouch->getCmd(null, 'thermostat');
         if (is_object($thermostat_cmd)) {
             foreach (calendar_event::searchByCmd($thermostat_cmd->getId()) as $event) {
@@ -103,5 +113,5 @@ try {
 
     throw new Exception(__('Aucune methode correspondante à : ', __FILE__) . init('action'));
 } catch (Exception $e) {
-    ajax::error(displayException($e), $e->getCode()); 
+    ajax::error(displayExeption($e), $e->getCode());
 }

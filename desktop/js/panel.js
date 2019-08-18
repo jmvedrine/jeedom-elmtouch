@@ -77,7 +77,7 @@
             positionEqLogic();
             $('#div_displayEquipement').packery({
                 itemSelector: ".eqLogic-widget",
-                gutter : 2,
+            gutter : 0,
             });
         }
     });
@@ -169,7 +169,9 @@ function graphThermostat(_eqLogic_id) {
                 });
             }
         }
-
+        setTimeout(function(){
+            jeedom.history.chart['div_graph' + _eqLogic_id].chart.xAxis[0].setExtremes(jeedom.history.chart['div_graph' + _eqLogic_id].chart.navigator.xAxis.min,jeedom.history.chart['div_graph' + _eqLogic_id].chart.navigator.xAxis.max)
+        }, 1000);
     }
 });
 }
@@ -179,11 +181,15 @@ function drawSimpleGraph(_el, _serie) {
         chart: {
             zoomType: 'x',
             renderTo: _el,
-            height: 220,
+            height: 180,
             spacingTop: 0,
             spacingLeft: 0,
             spacingRight: 0,
             spacingBottom: 0
+        },
+        credits: {
+          text: '',
+          href: '',
         },
         navigator: {
             enabled: false

@@ -1,7 +1,7 @@
 #!/bin/bash
 PROGRESS_FILE=/tmp/dependancy_elmtouch_in_progress
-installVer='8' 	#NodeJS major version to be installed
-minVer='8'	#min NodeJS major version to be accepted
+installVer='12'  #NodeJS major version to be installed
+minVer='12'      #min NodeJS major version to be accepted
 
 touch ${PROGRESS_FILE}
 echo 0 > ${PROGRESS_FILE}
@@ -91,13 +91,14 @@ else
     cd `npm root -g`;
     sudo npm rebuild &>/dev/null
   fi
-  sudo DEBIAN_FRONTEND=noninteractive apt-get -y --purge autoremove nodejs npm
+  sudo DEBIAN_FRONTEND=noninteractive apt-get -y build-essential --purge autoremove nodejs npm
 
   echo 45 > ${PROGRESS_FILE}
   echo "--45%"
 
   if [[ $arch == "armv6l" ]]
   then
+    installVer='10'
     echo "Raspberry 1, 2 ou zéro détecté, utilisation du paquet v${installVer} pour ${arch}"
     wget https://nodejs.org/download/release/latest-v${installVer}.x/node-*-linux-${arch}.tar.gz
     tar -xvf node-*-linux-${arch}.tar.gz
@@ -119,6 +120,12 @@ else
 
   new=`nodejs -v`;
   echo "Version actuelle : ${new}"
+fi
+
+type npm &>/dev/null
+if [ $? -ne 0 ]; then
+  sudo DEBIAN_FRONTEND=noninteractive apt-get install -y npm  
+  sudo npm install -g npm
 fi
 
 echo 70 > ${PROGRESS_FILE}

@@ -91,7 +91,7 @@ else
     cd `npm root -g`;
     sudo npm rebuild &>/dev/null
   fi
-  sudo DEBIAN_FRONTEND=noninteractive apt-get -y build-essential --purge autoremove nodejs npm
+  sudo DEBIAN_FRONTEND=noninteractive apt-get -y --purge autoremove nodejs npm
 
   echo 45 > ${PROGRESS_FILE}
   echo "--45%"
@@ -100,7 +100,8 @@ else
   then
     installVer='10'
     echo "Raspberry 1, 2 ou zéro détecté, utilisation du paquet v${installVer} pour ${arch}"
-    wget https://nodejs.org/download/release/latest-v${installVer}.x/node-*-linux-${arch}.tar.gz
+    #wget https://nodejs.org/download/release/latest-v${installVer}.x/node-*-linux-${arch}.tar.gz
+    wget -nd -nH -nc -np -e robots=off -r -l1 --no-parent -A"node-*-linux-${arch}.tar.gz" https://nodejs.org/download/release/latest-v${installVer}.x/
     tar -xvf node-*-linux-${arch}.tar.gz
     cd node-*-linux-${arch}
     sudo cp -R * /usr/local/

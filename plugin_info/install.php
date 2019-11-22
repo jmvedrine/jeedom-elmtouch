@@ -34,41 +34,15 @@ function elmtouch_install() {
 
 function elmtouch_update() {
     foreach (eqLogic::byType('elmtouch') as $elmtouch) {
-        $elmtouch->save();
-
-        // Correction du bug des unités.
-        $averageoutdoortemp = $this->getCmd(null, 'averageoutdoortemp');
-        if (is_object($averageoutdoortemp)) {
-            $averageoutdoortemp->setUnite('°C');
-        }
-        // Prise en compte du template
-        $clock = $this->getCmd(null, 'clock');
-        if (is_object($clock)) {
-                $clock->setTemplate('dashboard', 'usermode');
-                $clock->setTemplate('mobile', 'usermode');
-        }
-
-        $manual = $this->getCmd(null, 'manual');
-        if (is_object($manual)) {
-                $manual->setTemplate('dashboard', 'usermode');
-                $manual->setTemplate('mobile', 'usermode');
-        }
-
-        $heatstatus = $this->getCmd(null, 'heatstatus');
-        if (is_object($heatstatus)) {
-                $heatstatus->setTemplate('dashboard', 'burner');
-                $heatstatus->setTemplate('mobile', 'burner');
-        }
-
-
-
         // Amélioration de la précision du calcul de la puissance
-        $totalyearkwh = $this->getCmd(null, 'totalyearkwh');
+        $totalyearkwh = $elmtouch->getCmd(null, 'totalyearkwh');
         if (!is_object($totalyearkwh)) {
             // Pas de lissage pour le calcul de la puissance correct
             $totalyearkwh->setIsHistorized(1);
             $totalyearkwh->setConfiguration('historizeMode', 'none');
+            $totalyearkwh->save();
         }
+        $elmtouch->save();
     }
 
     $cron = cron::byClassAndFunction('elmtouch', 'getGasDaily');

@@ -90,12 +90,12 @@ par le plugin. Mais vous pouvez le changer, normalement cette information doit f
 
 -   **Prix du gaz par kWh**  figure obligatoirement sur votre facture. Le plugin prend 5 centimes par kWh par défaut, ce qui ne correspond sans doute pas à votre cas.
 
--   **Auto-actualisation (cron)** Expression cron pour le rafraichissement des informations (Par défaut '*/5 * * * *'
+-   **Auto-actualisation (cron)** Expression cron pour le rafraîchissement des informations (Par défaut '*/5 * * * *'
     soit toutes les 5 minutes). Si vous ne connaissez pas la syntaxe des expressions cron, utilisez l'assistant.
 
 Cliquez ensuite sur Sauvegarder, l'équipement est créé avec les commandes correspondantes.
 
-Lors de la première sauvegarde de l'équipement, le plugin lance l'importattion toutes les consommations journalières enregistrées dans le thermostat
+Lors de la première sauvegarde de l'équipement, le plugin lance l’importation toutes les consommations journalières enregistrées dans le thermostat
 (ou la chaudière ?). Cette opération est faite à raison de 32 jours toutes les 15 minutes et peut donc durer un certain temps si
 votre thermostat est installé depuis longtemps.
 
@@ -121,7 +121,7 @@ En cliquant sur l'onglet commande vous accédez aux commandes disponibles
 
 -   historiser : permet d’historiser la donnée
 
--   Afficher pemret de l'afficher ou non sur le Dashboard.
+-   Afficher permet de l'afficher ou non sur le Dashboard.
 
 -   configuration avancée (petites roues crantées) : permet d’afficher
     la configuration avancée de la commande (méthode
@@ -129,7 +129,7 @@ En cliquant sur l'onglet commande vous accédez aux commandes disponibles
 
 -   Tester : permet de tester la commande
 
-Le plugin est très jeune et cette liste est ammenée à s'enrichir.
+Le plugin est très jeune et cette liste est amenée à s'enrichir.
 
 Changer certains noms de commandes peut provoquer des dysfonctionnements.
 
@@ -153,15 +153,15 @@ Changer certains noms de commandes peut provoquer des dysfonctionnements.
 | **Chauffage actif**                  | info    | binary     | Vaut 1 si la chaudière est en fonctionnement pour le chauffage central (pas pour l'ECS). Utilisée par les plugins mobile et Homebridge                             |
 | **Consommation annuelle**            | info    | numeric    | Donne la consommation de la chaudière en kWh depuis le 1er janvier de l'année en cours                                                                             |
 | **Puissance**                        | info    | numeric    | Donne la puissance en W calculée sur la consommation dans les dernières minutes                                                                                    |
-| **Consommation chauffage en kWh**    | info    | numeric    | Consommation journalière pour le chauffage central en kWh  . Disponibble le matin pour la veille seulement, pas pour le jour en cours                              |
-| **Consommation chauffage en m3**     | info    | numeric    | Consommation journalière pour le chauffage central en m<sup>3</sup>  . Disponibble le matin pour la veille seulement, pas pour le jour en cours                    |
-| **Consommation chauffage en euro**   | info    | numeric    | Consommation journalière pour le chauffage central en euros. Disponibble le matin pour la veille seulement, pas pour le jour en cours                              |
-| **Consommation eau chaude en kWhh**  | info    | numeric    | Consommation journalière pour l'eau chaude sanitaire en kWh  . Disponibble le matin pour la veille seulement, pas pour le jour en cours                            |
-| **Consommation eau chaude en m3**    | info    | numeric    | Consommation journalière pour l'eau chaude sanitaire en m<sup>3</sup>  . Disponibble le matin pour la veille seulement, pas pour le jour en cours                  |
-| **Consommation eau chaude en euro**  | info    | numeric    | Consommation journalière pour l'eau chaude sanitaire en euros. Disponibble le matin pour la veille seulement, pas pour le jour en cours                            |
-| **Consommation jour en kWh**         | info    | numeric    | Consommation journalière totale (chauffage + ECS) en kWh  . Disponibble le matin pour la veille seulement, pas pour le jour en cours                               |
-| **Consommation jour en m3**          | info    | numeric    | Consommation journalière totale (chauffage + ECS) en  m<sup>3</sup>  . Disponibble le matin pour la veille seulement, pas pour le jour en cours                    |
-| **Consommation jour en euro**        | info    | numeric    | Consommation journalière totale (chauffage + ECS) en  euros. Disponibble le matin pour la veille seulement, pas pour le jour en cours                              |
+| **Consommation chauffage en kWh**    | info    | numeric    | Consommation journalière pour le chauffage central en kWh  . Disponible le matin pour la veille seulement, pas pour le jour en cours                              |
+| **Consommation chauffage en m3**     | info    | numeric    | Consommation journalière pour le chauffage central en m<sup>3</sup>  . Disponible le matin pour la veille seulement, pas pour le jour en cours                    |
+| **Consommation chauffage en euro**   | info    | numeric    | Consommation journalière pour le chauffage central en euros. Disponible le matin pour la veille seulement, pas pour le jour en cours                              |
+| **Consommation eau chaude en kWhh**  | info    | numeric    | Consommation journalière pour l'eau chaude sanitaire en kWh  . Disponible le matin pour la veille seulement, pas pour le jour en cours                            |
+| **Consommation eau chaude en m3**    | info    | numeric    | Consommation journalière pour l'eau chaude sanitaire en m<sup>3</sup>  . Disponible le matin pour la veille seulement, pas pour le jour en cours                  |
+| **Consommation eau chaude en euro**  | info    | numeric    | Consommation journalière pour l'eau chaude sanitaire en euros. Disponible le matin pour la veille seulement, pas pour le jour en cours                            |
+| **Consommation jour en kWh**         | info    | numeric    | Consommation journalière totale (chauffage + ECS) en kWh  . Disponible le matin pour la veille seulement, pas pour le jour en cours                               |
+| **Consommation jour en m3**          | info    | numeric    | Consommation journalière totale (chauffage + ECS) en  m<sup>3</sup>  . Disponible le matin pour la veille seulement, pas pour le jour en cours                    |
+| **Consommation jour en euro**        | info    | numeric    | Consommation journalière totale (chauffage + ECS) en  euros. Disponible le matin pour la veille seulement, pas pour le jour en cours                              |
 | **Température extérieure moyenne**   | info    | numeric    | Température extérieure moyenne journalière (sonde ou Internet)                                                                                                     |
 | **Etat bruleur**                     | info    | binary     | Vaut 1 si le brûleur est allumé (pour le chauffage ou l'eau chaude sanitaire), 0 sinon                                                                             |
 | **Nom etat bruleur**                 | info    | string     | Traduit **Etat bruleur** en chaine de caractères 0 = Arrêté et 1 = Chauffage. Utilisé par les plugin mobile et Hombridge                                           |
@@ -173,12 +173,29 @@ Panel desktop
 
 Le plugin dispose d'un panel desktop dans le menu Accueil.
 
+Problème avec les distribution Linux récentes
+===
+
+Si vous avez des problèmes et que le plugin ne fonctionne pas et qu'en consultant les logs en debug vous trouvez des messages d'erreurs "Connexion refused" 
+et que vous utilisez une version récente de Linux (Linux Debian 10 alias Buster ou Raspbian Buster sur raspberry), des utilisateurs ont signalé le problème suivant
+avec la librairie nodejs nefit-easy http server de Robert Klep que le plugin utilise pour se connecter au serveur Bosch
+
+Les valeurs par défaut de OpenSSL ont changé pour demander une version TLS minimum et un cryptage par défaut. Ces valeurs font que le client n'est plus capable de se connecter au serveur Bosch.
+
+La solution est d'éditer le fichier /etc/ssl/openssl.cnf et de changer les valeurs des clés suivantes:
+
+`MinProtocol = None`
+
+`CipherString = DEFAULT`
+
+Si vous voulez en savoir plus vous pouvez consulter cette page (en anglais) : https://www.debian.org/releases/stable/amd64/release-notes/ch-information.en.html#openssl-defaults .
+
 FAQ
 ===
 
-Quelle est la fréquence de rafraichissement ?
+Quelle est la fréquence de rafraîchissement ?
 
-Par défaut le plugin recupère les informations toutes les minutes.
+Par défaut le plugin récupère les informations toutes les minutes.
 
 Je voudrais récupérer les informations avec une fréquence plus grande est-ce possible ?
 
@@ -188,7 +205,7 @@ Si vous ne connaissez pas la syntaxe des expressions cron, utilisez l'assistant.
 Il faut noter que le plugin émet deux requêtes vers le serveur Bosch à chaque
 récupération. En cas d'abus il est à craindre que le compte ne soit bloqué.
 
-De plus accroitre la fréquence de récupération accroit aussi les chances d'une collision
+De plus accroître la fréquence de récupération accroît aussi les chances d'une collision
 lors de l'emploi simultané du plugin et de l'application sur mobile.
 
 Enfin vu l'inertie, les températures extérieurs et intérieures ne sont pas des grandeurs à variation rapide !

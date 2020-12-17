@@ -18,3 +18,7 @@
 # 04/11/2019
 
 - Tag "v4" pour le market
+
+# 17/12/2020
+
+- Note dans les docs sur le problème avec Debian  et raspbian 10 Buster et méthode pour le résoudre.

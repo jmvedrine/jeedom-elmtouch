@@ -187,7 +187,14 @@ class elmtouch extends eqLogic {
     }
 
     public static function dependancy_install() {
+        if (file_exists(jeedom::getTmpFolder('elmtouch') . '/dependance')) {
+            return;
+        }
         log::remove(__CLASS__ . '_update');
+        $update=update::byTypeAndLogicalId('plugin','elmtouch');
+        $ver=$update->getLocalVersion();
+        $conf=$update->getConfiguration();
+        shell_exec('echo "'."== Jeedom ".jeedom::version()." sur ".trim(shell_exec("lsb_release -d -s")).'/'.trim(shell_exec('dpkg --print-architecture')).'/'.trim(shell_exec('arch')).'/'.trim(shell_exec('getconf LONG_BIT'))."bits aka '".jeedom::getHardwareName()."' avec nodeJS ".trim(shell_exec('nodejs -v'))." et jsonrpc:".config::byKey('api::core::jsonrpc::mode', 'core', 'enable')." et elmtouch (".$conf['version'].") ".$ver.'" >> '.log::getPathToLog(__CLASS__ . '_update'));
         return array('script' => dirname(__FILE__) . '/../../resources/install_#stype#.sh ' . jeedom::getTmpFolder('elmtouch') . '/dependance', 'log' => log::getPathToLog(__CLASS__ . '_update'));
     }
 
@@ -987,26 +994,26 @@ class elmtouch extends eqLogic {
     // On ne peut pas utiliser history::getTendance qui ne tient pas compte des abscisses.
     public function slope($histories) {
         if (count($histories) == 0) {
-			return 0;
-		}
-		foreach ($histories as $history) {
+            return 0;
+        }
+        foreach ($histories as $history) {
             $xvalues[] = strtotime($history->getDatetime());
-			$yvalues[] = $history->getValue();
-		}
-		$x_mean = array_sum($xvalues) / count($xvalues);
+            $yvalues[] = $history->getValue();
+        }
+        $x_mean = array_sum($xvalues) / count($xvalues);
         $y_mean = array_sum($yvalues) / count($yvalues);
 
-		$base = 0.0;
-		$divisor = 0.0;
-		foreach ($yvalues as $key => $yvalue) {
-			$base += ($xvalues[$key] - $x_mean) * ($yvalue - $y_mean);
-			$divisor += ($xvalues[$key] - $x_mean) * ($xvalues[$key] - $x_mean);
-		}
-		if ($divisor == 0) {
-			return 0;
-		}
-		return ($base / $divisor);
-	}
+        $base = 0.0;
+        $divisor = 0.0;
+        foreach ($yvalues as $key => $yvalue) {
+            $base += ($xvalues[$key] - $x_mean) * ($yvalue - $y_mean);
+            $divisor += ($xvalues[$key] - $x_mean) * ($xvalues[$key] - $x_mean);
+        }
+        if ($divisor == 0) {
+            return 0;
+        }
+        return ($base / $divisor);
+    }
 
     public function getYearlyTotalGas() {
         // log::add('elmtouch', 'debug', 'Running getYearlyTotalGas');

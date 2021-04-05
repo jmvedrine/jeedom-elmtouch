@@ -26,10 +26,10 @@ try sudo DEBIAN_FRONTEND=noninteractive apt-get install -y lsb-release
 . ${BASEDIR}/install_nodejs.sh ${installVer}
 
 step 60 "Nettoyage anciens modules"
-sudo npm ls -g --depth 0 2>/dev/null | grep "homebridge@" >/dev/null 
+sudo npm ls -g --depth 0 2>/dev/null | grep "nefit-easy-http-server@" >/dev/null 
 if [ $? -ne 1 ]; then
   echo "[Suppression easy global"
-  silent sudo npm rm -g homebridge
+  silent sudo npm rm -g nefit-easy-http-server
 fi
 cd ${BASEDIR};
 #remove old local modules

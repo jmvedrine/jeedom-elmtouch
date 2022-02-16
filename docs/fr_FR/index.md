@@ -2,7 +2,6 @@ Description
 ===
 
 Plugin permettant de contrôler les thermostats Elm touch vendu par ELM Leblanc.
-
 Ce thermostat est fabriqué par Bosch et vendu suivant les pays sous divers noms :
 
 -   Nefit Easy (Pays Bas)
@@ -14,6 +13,8 @@ Ce thermostat est fabriqué par Bosch et vendu suivant les pays sous divers noms
 
 Comme le matériel est le même et le serveur Bosch commun à tous les pays,
 ce plugin peut également être utilisé dans tous les pays
+
+ATTENTION ! Ce plugin n'est pas compatible avec les modèles CT100.2 ou CT200.
 
 Note : le plugin ne communique pas directement avec le thermostat,
 il interroge le serveur Bosch qui à son tour interroge le thermostat.

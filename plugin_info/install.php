@@ -33,17 +33,7 @@ function elmtouch_install() {
 }
 
 function elmtouch_update() {
-    foreach (eqLogic::byType('elmtouch') as $elmtouch) {
-        // Amélioration de la précision du calcul de la puissance
-        $totalyearkwh = $elmtouch->getCmd(null, 'totalyearkwh');
-        if (!is_object($totalyearkwh)) {
-            // Pas de lissage pour le calcul de la puissance correct
-            $totalyearkwh->setIsHistorized(1);
-            $totalyearkwh->setConfiguration('historizeMode', 'none');
-            $totalyearkwh->save();
-        }
-        $elmtouch->save();
-    }
+    message::add('elmtouch', 'Attention avec la nouvelle version de février 2022 il est impératif de relancer les dépendances');
 
     $cron = cron::byClassAndFunction('elmtouch', 'getGasDaily');
     if (!is_object($cron)) {
@@ -55,8 +45,6 @@ function elmtouch_update() {
         $cron->setSchedule(rand(10, 59) . ' 0' . rand(1, 5) . ' * * *');
         $cron->save();
     }
-    $cron->setSchedule(rand(10, 59) . ' 0' . rand(1, 5) . ' * * *');
-    $cron->save();
 }
 
 

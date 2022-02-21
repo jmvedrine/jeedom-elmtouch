@@ -22,3 +22,7 @@
 # 17/12/2020
 
 - Note dans les docs sur le problème avec Debian  et raspbian 10 Buster et méthode pour le résoudre.
+
+# 16/02/2022
+
+- Passage de la librairie Nefit easy HTTP Server à la librairie plus récente Bosch XMPP.

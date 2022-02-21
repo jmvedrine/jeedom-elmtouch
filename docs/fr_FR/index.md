@@ -2,7 +2,6 @@ Description
 ===
 
 Plugin permettant de contrôler les thermostats Elm touch vendu par ELM Leblanc.
-
 Ce thermostat est fabriqué par Bosch et vendu suivant les pays sous divers noms :
 
 -   Nefit Easy (Pays Bas)
@@ -14,6 +13,8 @@ Ce thermostat est fabriqué par Bosch et vendu suivant les pays sous divers noms
 
 Comme le matériel est le même et le serveur Bosch commun à tous les pays,
 ce plugin peut également être utilisé dans tous les pays
+
+ATTENTION ! Ce plugin n'est pas compatible avec les modèles CT100.2 ou CT200.
 
 Note : le plugin ne communique pas directement avec le thermostat,
 il interroge le serveur Bosch qui à son tour interroge le thermostat.
@@ -54,8 +55,8 @@ Vérifiez aussi vos numéro de série, code d'accès et mot de passe.
 
 Vous pouvez demander de l'aide sur le forum https://www.jeedom.com/forum/viewtopic.php?f=143&t=34491
 
-Les dépendances installent le module nodejs nefit-easy http server de Robert Klep
-(https://github.com/robertklep/nefit-easy-http-server).
+A partir de Février 2022 les dépendances installent la librairie Bosch-XMPP de Robert Klep (https://github.com/robertklep/bosch-xmpp) en remplacement de la librarie nodejs nefit-easy http server de Robert Klep
+(https://github.com/robertklep/nefit-easy-http-server) précédemment utilisée.
 
 Le démon se charge de le démarrer et de l'arrêter. Il faut que le numéro de série, le
 code d'accès et le mot de passe soient corrects pour que le démon puisse fonctionner.

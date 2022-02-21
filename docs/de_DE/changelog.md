@@ -14,3 +14,7 @@
 # 23/09/2019
 
 - Passage à NodeJS v12
+
+# 04/11/2019
+
+- Tag "v4" pour le market

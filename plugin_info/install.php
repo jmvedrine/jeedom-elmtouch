@@ -33,17 +33,28 @@ function elmtouch_install() {
 }
 
 function elmtouch_update() {
-    message::add('elmtouch', 'Attention avec la nouvelle version de février 2022 il est impératif de relancer les dépendances');
-
-    $cron = cron::byClassAndFunction('elmtouch', 'getGasDaily');
+    $pluginId = 'elmtouch';
+    $cron = cron::byClassAndFunction($pluginId, 'getGasDaily');
     if (!is_object($cron)) {
         $cron = new cron();
-        $cron->setClass('elmtouch');
+        $cron->setClass($pluginId);
         $cron->setFunction('getGasDaily');
         $cron->setEnable(1);
         $cron->setDeamon(0);
         $cron->setSchedule(rand(10, 59) . ' 0' . rand(1, 5) . ' * * *');
         $cron->save();
+    }
+
+    $dependencyInfo = elmtouch::dependancy_info();
+    if (!isset($dependencyInfo['state'])) {
+        message::add($pluginId, __('Veuilez vérifier les dépendances', __FILE__));
+    } elseif ($dependencyInfo['state'] == 'nok') {
+        try {
+            $plugin = plugin::byId($pluginId);
+            $plugin->dependancy_install();
+        } catch (\Throwable $th) {
+            message::add($pluginId, __('Cette mise à jour nécessite de réinstaller les dépendances même si elles sont marquées comme OK', __FILE__));
+        }
     }
 }
 

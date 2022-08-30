@@ -15,7 +15,6 @@ The ELM Touch controller is made by Bosch and sold in different countries under 
 * Worcester Wave (UK)
 * Bosch Control CT‑100 (Other)
 
-This plugin was previously using the nefit-easy-http-server library made by Robert Klep https://github.com/robertklep/nefit-easy-http-server to communicate with Bosch servers.
-It now uses the more recent Bosch-XMPP library made by Robert Klep https://github.com/robertklep/bosch-xmpp.
+This plugin uses the nefit-easy-http-server library made by Robert Klep https://github.com/robertklep/nefit-easy-http-server to communicate with Bosch servers.
 
 ELm touch, ELM Leblanc, Nefit Easy, Junkers, Buderus, Worcester Wave and Bosch are trade marks of the Bosch group.

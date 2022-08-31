@@ -30,7 +30,7 @@ class elmtouch extends eqLogic {
         $return['log'] = 'elmtouch';
         $return['state'] = 'nok';
 
-        $result = exec("ps -eo pid,command | grep 'bosch-xmpp' | grep -v grep | awk '{print $1}'");
+        $result = exec("ps -eo pid,command | grep 'easy-server' | grep -v grep | awk '{print $1}'");
         if ($result <> 0) {
             $return['state'] = 'ok';
         }
@@ -52,9 +52,9 @@ class elmtouch extends eqLogic {
         $serial = config::byKey('serialNumber','elmtouch');
         $access = config::byKey('accessKey','elmtouch');
         $password = config::byKey('password','elmtouch');
-        $easyserver = ' bosch-xmpp --serial=' . $serial . ' --access-key=' . $access . ' --password="' . $password . '" nefit bridge';
-        // check bosch-xmpp started, if not, start
-        $cmd = 'if [ $(ps -ef | grep -v grep | grep "bosch-xmpp" | wc -l) -eq 0 ]; then ' . system::getCmdSudo() . $easyserver . ';echo "Démarrage démon Elm Touch";sleep 1; fi';
+        $easyserver = ' easy-server --serial=' . $serial . ' --access-key=' . $access . ' --password="' . $password . '"';
+        // check easy-server started, if not, start
+        $cmd = 'if [ $(ps -ef | grep -v grep | grep "easy-server" | wc -l) -eq 0 ]; then ' . system::getCmdSudo() . $easyserver . ';echo "Démarrage easy-server";sleep 1; fi';
         log::add('elmtouch', 'debug', str_replace($password,'****',$cmd));
         if ($_debug) {
             exec($cmd . ' >> ' . log::getPathToLog('elmtouch') . ' 2>&1 &');
@@ -87,13 +87,14 @@ class elmtouch extends eqLogic {
             return true;
         }
 
-        $pid = exec("ps -eo pid,command | grep 'bosch-xmpp' | grep -v grep | awk '{print $1}'");
+        $pid = exec("ps -eo pid,command | grep 'easy-server' | grep -v grep | awk '{print $1}'");
         // log::add('elmtouch', 'debug', 'pid=' . $pid);
 
         if ($pid) {
             system::kill($pid);
         }
         system::kill('bosch-xmpp');
+        system::kill('easy-server');
         system::fuserk(3000);
 
         $check = self::deamon_info();
@@ -149,7 +150,7 @@ class elmtouch extends eqLogic {
                     return;
                 } */
                 $page++;
-                $lastPage = $elmtouch->getGasLastIndex();
+                $lastPage = $elmtouch->getGasLastPage();
                 log::add('elmtouch', 'debug', 'lastPage = ' . $lastPage);
                 if ($page > $lastPage) {
                     // Job terminé.
@@ -180,7 +181,7 @@ class elmtouch extends eqLogic {
         $return = array();
         $return['log'] = 'elmtouch_update';
         $return['progress_file'] = jeedom::getTmpFolder('elmtouch') . '/dependance';
-        if (shell_exec('ls /usr/bin/bosch-xmpp 2>/dev/null | wc -l') == 1 || shell_exec('ls /usr/local/bin/bosch-xmpp 2>/dev/null | wc -l') == 1) {
+        if (shell_exec('ls /usr/bin/easy-server 2>/dev/null | wc -l') == 1 || shell_exec('ls /usr/local/bin/easy-server 2>/dev/null | wc -l') == 1) {
             $state = 'ok';
         }else{
             $state = 'nok';
@@ -849,21 +850,20 @@ class elmtouch extends eqLogic {
 
     public function getThermostatStatus() {
         // log::add('elmtouch', 'debug', 'Running getThermostatStatus');
-		$url = 'http://127.0.0.1:3000/bridge/ecus/rrc/uiStatus';
+        $url = 'http://127.0.0.1:3000/api/status';
         $request_http = new com_http($url);
         $request_http->setNoReportError(true);
         $json_string = $request_http->exec(30);
         if ($json_string === false) {
-            log::add('elmtouch', 'debug', 'Problème de lecture status avec bridge');
+            log::add('elmtouch', 'debug', 'Problème de lecture status');
             $request_http->setNoReportError(false);
             $json_string = $request_http->exec(30,1);
             return;
         }
-        log::add('elmtouch', 'debug', 'getThermostatStatus : ' . print_r($json_string, true));
         $parsed_json = json_decode($json_string, true);
-		$statusvalue = $parsed_json['value'];
-        log::add('elmtouch', 'debug', 'Status value : ' . print_r($statusvalue, true));
-        $inhousetemp = floatval($statusvalue['IHT']);
+        // log::add('elmtouch', 'debug', 'getThermostatStatus : ' . print_r($json_string, true));
+
+        $inhousetemp = floatval($parsed_json['in house temp']);
         if ( $inhousetemp >= 5 && $inhousetemp <= 30) {
             log::add('elmtouch', 'info', 'Température intérieure : ' . $inhousetemp);
             $this->checkAndUpdateCmd('temperature', $inhousetemp);
@@ -871,14 +871,22 @@ class elmtouch extends eqLogic {
             log::add('elmtouch', 'debug', 'temp incorrecte ' . $inhousetemp);
         }
 
-        $tempsetpoint = floatval($statusvalue['TSP']);
+        $outdoortemp = floatval($parsed_json['outdoor temp']);
+        if ( $outdoortemp >= -40 && $outdoortemp <= 50) {
+            log::add('elmtouch', 'info', 'Température extérieure : ' . $outdoortemp);
+            $this->checkAndUpdateCmd('temperature_outdoor', $outdoortemp);
+        } else {
+            log::add('elmtouch', 'debug', 'temp extérieure incorrecte ' . $outdoortemp);
+        }
+
+        $tempsetpoint = floatval($parsed_json['temp setpoint']);
         if ( $tempsetpoint >= 5 && $tempsetpoint <= 30) {
             log::add('elmtouch', 'info', 'Consigne : ' . $tempsetpoint);
             $this->checkAndUpdateCmd('order', $tempsetpoint);
         } else {
             log::add('elmtouch', 'debug', 'tempsetpoint incorrecte ' . $tempsetpoint);
         }
-        $currentUserMode = $statusvalue['UMD'];
+        $currentUserMode = $parsed_json['user mode'];
         log::add('elmtouch', 'info', 'user mode ' . $currentUserMode);
 
         // New string command mode.
@@ -890,10 +898,17 @@ class elmtouch extends eqLogic {
             }
         }
 
-        $boilerindicator = $statusvalue['BAI'];
+        /* Deprecated info binay command clockmode
+        if ($currentUserMode =='clock') {
+            $this->checkAndUpdateCmd('clockmode', true);
+        } else {
+            $this->checkAndUpdateCmd('clockmode', false);
+        } */
+
+        $boilerindicator = $parsed_json['boiler indicator'];
         log::add('elmtouch', 'info', 'boiler indicator ' . $boilerindicator);
         switch ($boilerindicator) {
-            case 'CH' :
+            case 'central heating' :
                 $this->checkAndUpdateCmd('boilerindicator', __('Chauffage', __FILE__));
                 $this->getCmd(null, 'heatstatus')->event(1);
                 $this->getCmd(null, 'status')->event(__('Chauffage', __FILE__));
@@ -901,12 +916,12 @@ class elmtouch extends eqLogic {
                     $this->getCmd(null, 'actif')->event(1);
                 }
                 break;
-            case 'HW' :
+            case 'hot water' :
                 $this->checkAndUpdateCmd('boilerindicator', __('Eau chaude', __FILE__));
                 $this->getCmd(null, 'heatstatus')->event(1);
                 $this->getCmd(null, 'status')->event(__('Chauffage', __FILE__));
                 break;
-            case 'No' :
+            case 'off' :
                 $this->checkAndUpdateCmd('boilerindicator', __('Arrêt', __FILE__));
                 $this->getCmd(null, 'heatstatus')->event(0);
                 $this->getCmd(null, 'status')->event(__('Arrêté', __FILE__));
@@ -918,9 +933,9 @@ class elmtouch extends eqLogic {
                 log::add('elmtouch', 'debug', 'Boiler indicator inconnu : ' . $boilerindicator);
                 break;
         }
-        $hotwateractive = $statusvalue['DHW'];
+        $hotwateractive = $parsed_json['hot water active'];
         log::add('elmtouch', 'info', 'hot water active ' . $hotwateractive);
-        if ($hotwateractive =='on') {
+        if ($hotwateractive =='true') {
             $this->checkAndUpdateCmd('hotwateractive', true);
         } else {
             $this->checkAndUpdateCmd('hotwateractive', false);
@@ -1109,7 +1124,7 @@ class elmtouch extends eqLogic {
         return $pointer;
     }
 
-    public function getGasLastIndex() {
+    public function getGasLastPage() {
         $pointer = $this->getGasPointer();
         $page = (int)($pointer / 32) + 1;
         return $page;
@@ -1186,13 +1201,13 @@ class elmtouch extends eqLogic {
 
     public function getGasConsommation() {
         // On ne récupère que la dernière page.
-        $lastPage = $this->getGasLastIndex();
+        $lastPage = $this->getGasLastPage();
         log::add('elmtouch', 'debug', 'getGasConsommation page : '. $lastPage);
         $this->getGasPage($lastPage);
     }
 
     public function getGasHistory() {
-        $lastPage = $this->getGasLastIndex();
+        $lastPage = $this->getGasLastPage();
         for ($page = 1; $page <= $lastPage; $page++) {
             log::add('elmtouch', 'debug', 'getGasHistory page : '. $page);
             $this->getGasPage($page);

@@ -58,6 +58,9 @@ Vous pouvez demander de l'aide sur le forum https://www.jeedom.com/forum/viewtop
 A partir de Février 2022 les dépendances installent la librairie Bosch-XMPP de Robert Klep (https://github.com/robertklep/bosch-xmpp) en remplacement de la librarie nodejs nefit-easy http server de Robert Klep
 (https://github.com/robertklep/nefit-easy-http-server) précédemment utilisée.
 
+A partir de Septembre 2022 retour à la librarie nodejs nefit-easy http server de Robert Klep
+(https://github.com/robertklep/nefit-easy-http-server) car les commandes action ne fonctionnaient pas avec la librairie Bosch-XMPP de Robert Klep (https://github.com/robertklep/bosch-xmpp).
+
 Le démon se charge de le démarrer et de l'arrêter. Il faut que le numéro de série, le
 code d'accès et le mot de passe soient corrects pour que le démon puisse fonctionner.
 

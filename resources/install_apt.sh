@@ -32,14 +32,15 @@ cd ${BASEDIR};
 sudo rm -rf node_modules &>/dev/null
 sudo rm -f package-lock.json &>/dev/null
 
-step 70 "Installation de Bosch XMPP, veuillez patienter svp"
+step 70 "Installation de Nefit Easy Server, veuillez patienter svp"
 #need to be sudoed because of recompil
 silent sudo mkdir node_modules
 silent sudo chown -R www-data:www-data .
 
-sudo npm install -g bosch-xmpp
-serverversion=`bosch-xmpp -v`;
-step 80 "Bosch XMPP version ${serverversion} installé."
+sudo npm install -g nefit-easy-http-server
+serverversion=`easy-server -v`;
+step 80 "Nefit Easy HTTP Server version ${serverversion} installé."
+
 
 silent sudo chown -R www-data:www-data .
 

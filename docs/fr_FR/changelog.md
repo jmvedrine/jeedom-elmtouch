@@ -26,3 +26,7 @@
 # 21/02/2022
 
 - Passage de la librairie Nefit easy HTTP Server à la librairie plus récente Bosch XMPP.
+
+# 31/08/2022
+
+- Retour à librairie Nefit easy HTTP Server pour corriger le problème sur les commandes action.

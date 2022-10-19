@@ -8,6 +8,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
 ?>
 
 <div class="row row-overflow">
+	<!-- Page d'accueil du plugin -->
   <div class="col-xs-12 eqLogicThumbnailDisplay">
   <legend>{{Mon ELM Touch}}</legend>
   <legend><i class="fas fa-cog"></i>  {{Gestion}}</legend>
@@ -33,9 +34,12 @@ if (count($eqLogics) == 0) {
 foreach ($eqLogics as $eqLogic) {
     $opacity = ($eqLogic->getIsEnable()) ? '' : 'disableCard';
     echo '<div class="eqLogicDisplayCard cursor '.$opacity.'" data-eqLogic_id="' . $eqLogic->getId() . '">';
-    echo '<img src="' . $plugin->getPathImgIcon() . '"/>';
+				echo '<img src="' . $plugin->getPathImgIcon() . '">';
     echo '<br>';
     echo '<span class="name">' . $eqLogic->getHumanName(true, true) . '</span>';
+				echo '<span class="hiddenAsCard displayTableRight hidden">';
+				echo ($eqLogic->getIsVisible() == 1) ? '<i class="fas fa-eye" title="{{Equipement visible}}"></i>' : '<i class="fas fa-eye-slash" title="{{Equipement non visible}}"></i>';
+				echo '</span>';
     echo '</div>';
 }
 ?>
@@ -81,32 +85,36 @@ try {
                     <select id="sel_object" class="eqLogicAttr form-control" data-l1key="object_id">
                         <option value="">{{Aucun}}</option>
                         <?php
-foreach (jeeObject::all() as $object) {
-    echo '<option value="' . $object->getId() . '">' . $object->getName() . '</option>';
-}
-?>
+										$options = '';
+										foreach ((jeeObject::buildTree(null, false)) as $object) {
+											$options .= '<option value="' . $object->getId() . '">' . str_repeat('&nbsp;&nbsp;', $object->getConfiguration('parentNumber')) . $object->getName() . '</option>';
+										}
+										echo $options;
+										?>
                    </select>
                </div>
            </div>
        <div class="form-group">
-        <label class="col-sm-3 control-label">{{Catégorie}}</label>
-        <div class="col-sm-9">
+								<label class="col-sm-4 control-label">{{Catégorie}}</label>
+								<div class="col-sm-6">
          <?php
             foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value) {
             echo '<label class="checkbox-inline">';
-            echo '<input type="checkbox" class="eqLogicAttr" data-l1key="category" data-l2key="' . $key . '" />' . $value['name'];
+										echo '<input type="checkbox" class="eqLogicAttr" data-l1key="category" data-l2key="' . $key . '" >' . $value['name'];
             echo '</label>';
             }
           ?>
         </div>
         </div>
     <div class="form-group">
-        <label class="col-sm-3 control-label"></label>
-        <div class="col-sm-9">
-            <label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="isEnable" checked/>{{Activer}}</label>
-            <label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="isVisible" checked/>{{Visible}}</label>
+								<label class="col-sm-4 control-label">{{Options}}</label>
+								<div class="col-sm-6">
+									<label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="isEnable" checked>{{Activer}}</label>
+									<label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="isVisible" checked>{{Visible}}</label>
         </div>
     </div>
+
+							<legend><i class="fas fa-cogs"></i> {{Paramètres spécifiques}}</legend>
         <div class="form-group">
         <label class="col-sm-3 control-label">{{Coefficient de conversion}}
             <sup>
@@ -154,11 +162,12 @@ foreach (jeeObject::all() as $object) {
 <table id="table_cmd" class="table table-bordered table-condensed">
     <thead>
         <tr>
-            <th style="width: 50px;">#</th>
-            <th style="width: 200px;">{{Nom}}</th>
-            <th style="width: 200px;">{{Type}}</th>
-            <th style="width: 100px;">{{Paramètres}}</th>
-            <th style="width: 150px;"></th>
+            <th>ID</th>
+            <th>{{Nom}}</th>
+            <th>{{Type}}</th>
+            <th>{{Options}}</th>
+            <th>{{Etat}}</th>
+            <th style="min-width:80px;width:200px;">{{Actions}}</th>
         </tr>
     </thead>
     <tbody>

@@ -30,3 +30,7 @@
 # 31/08/2022
 
 - Retour à librairie Nefit easy HTTP Server pour corriger le problème sur les commandes action.
+
+# 19/10/2022
+
+- Compatibilté avec Jeedom 4.3 onglet commande affichage de l'état.

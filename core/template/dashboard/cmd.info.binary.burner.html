@@ -4,14 +4,14 @@
         <span style="font-size: 2.5em;font-weight: bold;position:relative;top:-6px" class="iconCmd"></span>
     </center>
     <script>
-        jeedom.cmd.update['#id#'] = function(_options){
+        jeedom.cmd.addUpdateFunction('#id#', function(_options){
             $('.cmd[data-cmd_id=#id#]').attr('title','Valeur du '+_options.valueDate+', collectée le '+_options.collectDate);
             if (_options.display_value == '1') {
                 $('.cmd[data-cmd_id=#id#] .iconCmd').empty().append('<img src="plugins/elmtouch/core/template/images/flamme_On.png" width="20px">');
             } else {
                 $('.cmd[data-cmd_id=#id#] .iconCmd').empty().append('<img src="plugins/elmtouch/core/template/images/flamme_Off.png" width="20px">');
             }
-        }
-        jeedom.cmd.update['#id#']({display_value:'#state#',valueDate:'#valueDate#',collectDate:'#collectDate#',alertLevel:'#alertLevel#'});
+        })
+        jeedom.cmd.refreshValue([{cmd_id :'#id#',display_value: '#state#', valueDate: '#valueDate#', collectDate: '#collectDate#', alertLevel: '#alertLevel#', unit: '#unite#'}])
     </script>
 </div>

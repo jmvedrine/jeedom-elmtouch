@@ -10,7 +10,9 @@
 		$('.cmd[data-cmd_uid=#uid#] .imgCmd').append('<img src="plugins/elmtouch/core/template/images/clockmode.png" width="40px">');
 	}
 
-	jeedom.cmd.update['#id#'] = function(_options){
+	
+
+	jeedom.cmd.addUpdateFunction('#id#',function(_options) {
 		if('#name#' == 'Mode horloge'){
 		  if(_options.display_value == 'Mode manuel' ) {
 			  $('.cmd[data-cmd_uid=#uid#]').show();
@@ -24,8 +26,8 @@
 				$('.cmd[data-cmd_uid=#uid#]').hide();
 			}
 		}
-	}
-	jeedom.cmd.update['#id#']({display_value:'#state#'});
+	})
+	jeedom.cmd.refreshValue([{cmd_id :'#id#',display_value: '#state#', valueDate: '#valueDate#', collectDate: '#collectDate#', alertLevel: '#alertLevel#', unit: '#unite#'}])
 
 	$('.cmd[data-cmd_uid=#uid#] .imgCmd').on('click', function () {
 		jeedom.cmd.execute({id: '#id#'});

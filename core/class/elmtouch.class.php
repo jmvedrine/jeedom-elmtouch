@@ -177,7 +177,7 @@ class elmtouch extends eqLogic {
         log::add('elmtouch', 'debug', 'Fin cron15');
     }
 
-    public static function dependancy_info() {
+ /*   public static function dependancy_info() {
         $return = array();
         $return['log'] = 'elmtouch_update';
         $return['progress_file'] = jeedom::getTmpFolder('elmtouch') . '/dependance';
@@ -200,7 +200,7 @@ class elmtouch extends eqLogic {
         $conf=$update->getConfiguration();
         shell_exec('echo "'."== Jeedom ".jeedom::version()." sur ".trim(shell_exec("lsb_release -d -s")).'/'.trim(shell_exec('dpkg --print-architecture')).'/'.trim(shell_exec('arch')).'/'.trim(shell_exec('getconf LONG_BIT'))."bits aka '".jeedom::getHardwareName()."' avec nodeJS ".trim(shell_exec('nodejs -v'))." et jsonrpc:".config::byKey('api::core::jsonrpc::mode', 'core', 'enable')." et elmtouch (".$conf['version'].") ".$ver.'" >> '.log::getPathToLog(__CLASS__ . '_update'));
         return array('script' => dirname(__FILE__) . '/../../resources/install_#stype#.sh ' . jeedom::getTmpFolder('elmtouch') . '/dependance', 'log' => log::getPathToLog(__CLASS__ . '_update'));
-    }
+    } */
 
     public static function getGasDaily() {
         foreach (self::byType('elmtouch') as $elmtouch) {

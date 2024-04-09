@@ -25,6 +25,41 @@ class elmtouch extends eqLogic {
 
 
     /*     * ***********************Methode static*************************** */
+    public static $_widgetPossibility = array('custom' => true);
+
+    public static function templateWidget(){
+        $return = array('info' => array('binary' => array()), 'action' => array('other' => array()));
+        $return['info']['binary']['burner'] = array(
+            'template' => 'tmplimg',
+            'replace' => array('#_img_light_on_#' => '<img src="plugins/elmtouch/core/template/images/flamme_On.png" width="20px">',
+                               '#_img_dark_on_#' => '<img src="plugins/elmtouch/core/template/images/flamme_On.png" width="20px">',
+                               '#_img_light_off_#' => '<img src="plugins/elmtouch/core/template/images/flamme_Off.png" width="20px">',
+                               '#_img_dark_off_#' => '<img src="plugins/elmtouch/core/template/images/flamme_Off.png" width="20px">',)
+        );
+        $return['info']['binary']['hotwateractive'] = array(
+            'template' => 'tmplimg',
+            'replace' => array('#_img_light_on_#' => '<img src="plugins/elmtouch/core/template/images/hotwater_Black_On.png" width="40px">',
+                               '#_img_dark_on_#' => '<img src="plugins/elmtouch/core/template/images/hotwater_White_On.png" width="40px">',
+                               '#_img_light_off_#' => '<img src="plugins/elmtouch/core/template/images/hotwater_Black_Off.png" width="40px">',
+                               '#_img_dark_off_#' => '<img src="plugins/elmtouch/core/template/images/hotwater_White_Off.png" width="40px">',)
+        );
+        $return['action']['other']['hotwater'] = array(
+            'template' => 'tmplimg',
+            'replace' => array('#_img_light_on_#' => '<img src="plugins/elmtouch/core/template/images/hotwater_Black_On.png" width="40px">',
+                               '#_img_dark_on_#' => '<img src="plugins/elmtouch/core/template/images/hotwater_White_On.png" width="40px">',
+                               '#_img_light_off_#' => '<img src="plugins/elmtouch/core/template/images/hotwater_Black_Off.png" width="40px">',
+                               '#_img_dark_off_#' => '<img src="plugins/elmtouch/core/template/images/hotwater_White_Off.png" width="40px">',)
+        );
+        $return['action']['other']['usermode'] = array(
+            'template' => 'tmplimg',
+            'replace' => array('#_img_light_on_#' => '<img src="plugins/elmtouch/core/template/images/clockmode.png" width="40px">',
+                               '#_img_dark_on_#' => '<img src="plugins/elmtouch/core/template/images/clockmode.png" width="40px">',
+                               '#_img_light_off_#' => '<img src="plugins/elmtouch/core/template/images/manualmode.png" width="40px">',
+                               '#_img_dark_off_#' => '<img src="plugins/elmtouch/core/template/images/manualmode.png" width="40px">',)
+        );
+        return $return;
+    }
+
     public static function deamon_info() {
         $return = [];
         $return['log'] = 'elmtouch';
@@ -40,10 +75,10 @@ class elmtouch extends eqLogic {
 
     public static function deamon_start() {
         if(log::getLogLevel('elmtouch')==100) {
-			$_debug=true;
-		} else {
-			$_debug=true;
-		}
+            $_debug=true;
+        } else {
+            $_debug=true;
+        }
         self::deamon_stop();
         $deamon_info = self::deamon_info();
         if ($deamon_info['launchable'] != 'ok') {
@@ -171,36 +206,11 @@ class elmtouch extends eqLogic {
             // $elmtouch->getYearlyTotalGas();
             // Récupération de la pression.
             $elmtouch->getSystemPressure();
-			// Récupération de la température extérieure.
-			$elmtouch->getOutdoorTemp();
+            // Récupération de la température extérieure.
+            $elmtouch->getOutdoorTemp();
         }
         log::add('elmtouch', 'debug', 'Fin cron15');
     }
-
- /*   public static function dependancy_info() {
-        $return = array();
-        $return['log'] = 'elmtouch_update';
-        $return['progress_file'] = jeedom::getTmpFolder('elmtouch') . '/dependance';
-        if (shell_exec('ls /usr/bin/easy-server 2>/dev/null | wc -l') == 1 || shell_exec('ls /usr/local/bin/easy-server 2>/dev/null | wc -l') == 1) {
-            $state = 'ok';
-        }else{
-            $state = 'nok';
-        }
-        $return['state'] = $state;
-        return $return;
-    }
-
-    public static function dependancy_install() {
-        if (file_exists(jeedom::getTmpFolder('elmtouch') . '/dependance')) {
-            return;
-        }
-        log::remove(__CLASS__ . '_update');
-        $update=update::byTypeAndLogicalId('plugin','elmtouch');
-        $ver=$update->getLocalVersion();
-        $conf=$update->getConfiguration();
-        shell_exec('echo "'."== Jeedom ".jeedom::version()." sur ".trim(shell_exec("lsb_release -d -s")).'/'.trim(shell_exec('dpkg --print-architecture')).'/'.trim(shell_exec('arch')).'/'.trim(shell_exec('getconf LONG_BIT'))."bits aka '".jeedom::getHardwareName()."' avec nodeJS ".trim(shell_exec('nodejs -v'))." et jsonrpc:".config::byKey('api::core::jsonrpc::mode', 'core', 'enable')." et elmtouch (".$conf['version'].") ".$ver.'" >> '.log::getPathToLog(__CLASS__ . '_update'));
-        return array('script' => dirname(__FILE__) . '/../../resources/install_#stype#.sh ' . jeedom::getTmpFolder('elmtouch') . '/dependance', 'log' => log::getPathToLog(__CLASS__ . '_update'));
-    } */
 
     public static function getGasDaily() {
         foreach (self::byType('elmtouch') as $elmtouch) {
@@ -301,28 +311,6 @@ class elmtouch extends eqLogic {
             $temperature->setUnite('°C');
             $temperature->setDisplay('generic_type', 'THERMOSTAT_TEMPERATURE');
             $temperature->save();
-
-            // User mode (deprecated), use string info command mode.
-            /* $clockmode = $this->getCmd(null, 'clockmode');
-            if (!is_object($clockmode)) {
-                $clockmode = new elmtouchCmd();
-                $clockmode->setTemplate('dashboard', 'clockmode');
-                $clockmode->setTemplate('mobile', 'clockmode');
-                $clockmode->setName(__('Mode programme', __FILE__));
-                $clockmode->setIsVisible(0);
-                $clockmode->setIsHistorized(0);
-            }
-            $clockmode->setEqLogic_id($this->getId());
-            $clockmode->setType('info');
-            $clockmode->setSubType('binary');
-            $clockmode->setLogicalId('clockmode');
-            $clockmode->setDisplay('generic_type', 'DONT');
-            $clockmode->save(); */
-
-            $clockmode = $this->getCmd(null, 'clockmode');
-            if (is_object($clockmode)) {
-                $clockmode->remove();
-            }
 
             // Température extérieure.
             $temperature_outdoor = $this->getCmd(null, 'temperature_outdoor');
@@ -612,8 +600,8 @@ class elmtouch extends eqLogic {
                 $hotwateractive->setConfiguration('historizeMode', 'none');
                 $hotwateractive->setIsHistorized(1);
             }
-            $hotwateractive->setTemplate('dashboard', 'hotwateractive');
-            $hotwateractive->setTemplate('mobile', 'hotwateractive');
+            $hotwateractive->setTemplate('dashboard', 'elmtouch::hotwateractive');
+            $hotwateractive->setTemplate('mobile', 'elmtouch::hotwateractive');
             $hotwateractive->setDisplay('generic_type', 'DONT');
             $hotwateractive->setEqLogic_id($this->getId());
             $hotwateractive->setType('info');
@@ -639,8 +627,8 @@ class elmtouch extends eqLogic {
             $hotwater_Off = $this->getCmd(null, 'hotwater_Off');
             if (!is_object($hotwater_Off)) {
                 $hotwater_Off = new elmtouchCmd();
-                $hotwater_Off->setTemplate('dashboard', 'hotwater');
-                $hotwater_Off->setTemplate('mobile', 'hotwater');
+                $hotwater_Off->setTemplate('dashboard', 'elmtouch::hotwater');
+                $hotwater_Off->setTemplate('mobile', 'elmtouch::hotwater');
                 $hotwater_Off->setName('hotwater_Off');
             }
             $hotwater_Off->setEqLogic_id($this->getId());
@@ -655,8 +643,8 @@ class elmtouch extends eqLogic {
             $hotwater_On = $this->getCmd(null, 'hotwater_On');
             if (!is_object($hotwater_On)) {
                 $hotwater_On = new elmtouchCmd();
-                $hotwater_On->setTemplate('dashboard', 'hotwater');
-                $hotwater_On->setTemplate('mobile', 'hotwater');
+                $hotwater_On->setTemplate('dashboard', 'elmtouch::hotwater');
+                $hotwater_On->setTemplate('mobile', 'elmtouch::hotwater');
                 $hotwater_On->setName('hotwater_On');
             }
             $hotwater_On->setEqLogic_id($this->getId());
@@ -717,14 +705,14 @@ class elmtouch extends eqLogic {
             $unlock->setValue($lockState->getId());
             $unlock->save();
 
-            // Commande info associée aux deux modes
-            // Prend pour valeur le Name du mode actif (Mode programme et Mode manuel)
+            // Commande info string
+            // Prend pour valeur le Nom du mode actif (Activer programme ou Désactiver programme)
             $mode = $this->getCmd(null, 'mode');
             if (!is_object($mode)) {
                 $mode = new elmtouchCmd();
-                $mode->setName(__('Mode', __FILE__));
-                $mode->setIsVisible(0);
             }
+            $mode->setName(__('Nom du mode', __FILE__));
+            $mode->setIsVisible(0);
             $mode->setDisplay('generic_type', 'THERMOSTAT_MODE');
             $mode->setEqLogic_id($this->getId());
             $mode->setType('info');
@@ -738,8 +726,8 @@ class elmtouch extends eqLogic {
             if (!is_object($heatstatus)) {
                 $heatstatus = new elmtouchCmd();
                 $heatstatus->setName(__('Etat bruleur', __FILE__));
-                $heatstatus->setTemplate('dashboard', 'burner');
-                $heatstatus->setTemplate('mobile', 'burner');
+                $heatstatus->setTemplate('dashboard', 'elmtouch::burner');
+                $heatstatus->setTemplate('mobile', 'elmtouch::burner');
                 $heatstatus->setIsVisible(1);
                 $heatstatus->setIsHistorized(1);
             }
@@ -765,22 +753,37 @@ class elmtouch extends eqLogic {
             $status->setLogicalId('status');
             $status->save();
 
+            // Commande info binaire Mode associée aux 2 commandes action.
+            $clockState = $this->getCmd(null, 'clock_state');
+            if (!is_object($clockState)) {
+                $clockState = new elmtouchCmd();
+                $clockState->setName(__('Mode', __FILE__));
+                $clockState->setIsVisible(0);
+            }
+            $clockState->setEqLogic_id($this->getId());
+            $clockState->setType('info');
+            $clockState->setSubType('binary');
+            $clockState->setLogicalId('clock_state');
+            $clockState->save();
+
             // Commande action mode programme
             $clock = $this->getCmd(null, 'clock');
             if (!is_object($clock)) {
                 $clock = new elmtouchCmd();
                 $clock->setLogicalId('clock');
                 $clock->setIsVisible(1);
-                $clock->setTemplate('dashboard', 'usermode');
-                $clock->setTemplate('mobile', 'usermode');
-                $clock->setName(__('Mode horloge', __FILE__));
+                $clock->setTemplate('dashboard', 'elmtouch::usermode');
+                $clock->setTemplate('mobile', 'elmtouch::usermode');
+                $clock->setName(__('Activer programme', __FILE__));
             }
             $clock->setType('action');
             $clock->setSubType('other');
             $clock->setOrder(1);
             $clock->setDisplay('generic_type', 'THERMOSTAT_SET_MODE');
+            $clock->setDisplay('showNameOndashboard', 0);
+            $clock->setDisplay('showNameOnmobile', 0);
             $clock->setEqLogic_id($this->getId());
-            $clock->setValue($mode->getId());
+            $clock->setValue($clockState->getId());
             $clock->save();
 
             // Commande action mode manuel.
@@ -789,17 +792,20 @@ class elmtouch extends eqLogic {
                 $manual = new elmtouchCmd();
                 $manual->setLogicalId('manual');
                 $manual->setIsVisible(1);
-                $manual->setTemplate('dashboard', 'usermode');
-                $manual->setTemplate('mobile', 'usermode');
-                $manual->setName(__('Mode manuel', __FILE__));
+                $manual->setTemplate('dashboard', 'elmtouch::usermode');
+                $manual->setTemplate('mobile', 'elmtouch::usermode');
+                $manual->setName(__('Désactiver programme', __FILE__));
             }
             $manual->setType('action');
             $manual->setSubType('other');
             $manual->setOrder(1);
             $manual->setDisplay('generic_type', 'THERMOSTAT_SET_MODE');
+            $manual->setDisplay('showNameOndashboard', 0);
+            $manual->setDisplay('showNameOnmobile', 0);
             $manual->setEqLogic_id($this->getId());
-            $manual->setValue($mode->getId());
+            $manual->setValue($clockState->getId());
             $manual->save();
+
         } else {
             // TODO supprimer crons et listeners
         }
@@ -889,21 +895,17 @@ class elmtouch extends eqLogic {
         $currentUserMode = $parsed_json['user mode'];
         log::add('elmtouch', 'info', 'user mode ' . $currentUserMode);
 
-        // New string command mode.
-        $existingModes = array('manual' => __('Mode manuel', __FILE__), 'clock' => __('Mode horloge', __FILE__));
+        $value = ($currentUserMode == 'clock');
+        $this->checkAndUpdateCmd('clock_state', $value);
+        // String command mode.
+        $existingModes = array('manual' => __('Désactiver programme', __FILE__), 'clock' => __('Activer programme', __FILE__));
         foreach ($existingModes as $modeId => $modeName) {
             if ($currentUserMode == $modeId) {
                 //log::add('elmtouch', 'debug', 'evenement mode value = '.$modeName);
                 $this->getCmd(null, 'mode')->event($modeName);
+
             }
         }
-
-        /* Deprecated info binay command clockmode
-        if ($currentUserMode =='clock') {
-            $this->checkAndUpdateCmd('clockmode', true);
-        } else {
-            $this->checkAndUpdateCmd('clockmode', false);
-        } */
 
         $boilerindicator = $parsed_json['boiler indicator'];
         log::add('elmtouch', 'info', 'boiler indicator ' . $boilerindicator);
@@ -1233,7 +1235,7 @@ class elmtouch extends eqLogic {
 
     public function executeMode($_name) {
         // log::add('elmtouch', 'debug', 'début de executeMode name = '. $_name);
-        $existingModes = array('manual' => __('Mode manuel', __FILE__), 'clock' => __('Mode horloge', __FILE__));
+        $existingModes = array('manual' => __('Désactiver programme', __FILE__), 'clock' => __('Activer programme', __FILE__));
         foreach ($existingModes as $modeId => $modeName) {
             if ($_name == $modeName) {
                 // log::add('elmtouch', 'debug', 'ecriture dans le thermostat value = '.$modeId);

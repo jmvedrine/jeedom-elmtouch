@@ -14,7 +14,7 @@
     "compatibility" : ["miniplus","smart","atlas","rpi","docker","diy","mobile","v4"],
 	"changelog" : "https://jmvedrine.github.io/jeedom-elmtouch/#language#/changelog",
 	"documentation" : "https://jmvedrine.github.io/jeedom-elmtouch/#language#/",
-	"changelog_beta" : "https://jmvedrine.github.io/jeedom-elmtouch/#language#/changelog",
+	"changelog_beta" : "https://raw.githubusercontent.com/jmvedrine/jeedom-elmtouch/beta/docs/fr_FR/changelog.md",
 	"documentation_beta" :  "https://jmvedrine.github.io/jeedom-elmtouch/#language#/",
     "_version" : "1.1.0"
 }

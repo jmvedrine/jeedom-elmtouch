@@ -45,6 +45,46 @@ function elmtouch_update() {
         $cron->save();
     }
 
+    foreach (eqLogic::byType('elmtouch') as $eqLogic) {
+		// Pour permettre un affichage correct du nom dans les 2 commandes action
+		$cmd = $eqLogic->getCmd(null, 'mode');
+		if (is_object($cmd)) {
+			$cmd->setName(__('Nom du mode', __FILE__));
+			$cmd->setIsVisible(0);
+		}
+		// Nouvelle commande info binary mode associée aux 2 commandes action.
+		$clockState = $eqLogic->getCmd(null, 'clock_state');
+		if (!is_object($clockState)) {
+			$clockState = new elmtouchCmd();
+			$clockState->setName(__('Mode', __FILE__));
+			$clockState->setIsVisible(0);
+		}
+		$clockState->setEqLogic_id($eqLogic->getId());
+		$clockState->setType('info');
+		$clockState->setSubType('binary');
+		$clockState->setLogicalId('clock_state');
+		$clockState->save();
+
+		// normalizeName ne marche pas sur les anciens noms ce qui empèchait d'utiliser un widget core.
+		$cmd = $eqLogic->getCmd(null, 'clock');
+		if (is_object($cmd)) {
+			$cmd->setName(__('Activer programme', __FILE__));
+			$cmd->setValue($clockState->getId());
+			$cmd->setDisplay('showNameOndashboard', 0);
+			$cmd->setDisplay('showNameOnmobile', 0);
+			$cmd->save();
+		}
+		$cmd = $eqLogic->getCmd(null, 'manual');
+		if (is_object($cmd)) {
+			$cmd->$manual->setName(__('Désactiver programme', __FILE__));
+			$cmd->setValue($clockState->getId());
+			$cmd->setDisplay('showNameOndashboard', 0);
+			$cmd->setDisplay('showNameOnmobile', 0);
+			$cmd->save();
+		}
+		$eqLogic->save();
+	}
+
     $dependencyInfo = elmtouch::dependancy_info();
     if (!isset($dependencyInfo['state'])) {
         message::add($pluginId, __('Veuilez vérifier les dépendances', __FILE__));

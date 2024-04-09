@@ -34,3 +34,11 @@
 # 19/10/2022
 
 - Compatibilté avec Jeedom 4.3 onglet commande affichage de l'état.
+
+# 11/04/2024
+
+- Suppression des widgets personnalisés, le plugin utilise maintenant les widgets core.
+Ceci devrait simplifier la compatibilité avec les évolutions de Jeedom.
+Cela a nécessité quelques changements dans les commandes :
+L'ancienne commande action string "Mode" s'appelle maintenant "Nom du mode" et une nouvelle commande info binaire "Mode" apparait qui vaut 1 si le mode est Programme (l'horloge) et 0 si le mode est Manuel (la main).
+Les 2 commandes action "Mode horloge" et "Mode manuel" s'appellent maintenant "Activer Programme" et "Désactiver programme". Attention si vous les changez de nom le widget ne fonctionnera plus correctement.

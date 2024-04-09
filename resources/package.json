@@ -1,10 +1,10 @@
 {
    "name": "jeedom_elmtouch",
    "version": "0.0.1",
-   "description": "Node to connect Nefit Easy Server to Jeedom",
+   "description": "Node to connect Nefit Easy Http Server to Jeedom",
    "license": "GPL-3.0",
    "repository": "npm/npm",
    "dependencies": {
-      "nefit-easy-http-server": "latest"
+      "nefit-easy-http-server": "^5.0.4"
    }
 }

@@ -22,8 +22,44 @@ if (!isConnect()) {
     include_file('desktop', '404', 'php');
     die();
 }
+$plugin = plugin::byId('elmtouch');
 ?>
 <form class="form-horizontal">
+ <legend>
+         <i class="fa fa-list-alt"></i> {{Général}}
+      </legend>
+      <div class="form-group">
+         <?php
+            $update = $plugin->getUpdate();
+			$nodeVer = shell_exec("node -v");
+			$npmVer = shell_exec("npm -v");
+            if (is_object($update)) {
+				echo '<div class="col-md-6">';
+				echo '<div>';
+				echo '<label>{{Branche}} :</label> '. $update->getConfiguration('version', 'stable');
+				echo '</div>';
+				echo '<div>';
+				echo '<label>{{Source}} :</label> ' . $update->getSource();
+				echo '</div>';
+				echo '<div>';
+				echo '<label>{{Version plugin}} :</label> ' . $update->getLocalVersion();
+				echo '</div>';
+				echo '<div>';
+				echo '<label>{{Version NodeJS}} :</label> ' . $nodeVer;
+				echo '</div>';
+				echo '<div>';
+				echo '<label>{{Version NPM}} :</label> ' . $npmVer;
+				echo '</div>';
+				echo '<div>';
+				echo '<label>{{Version OS}} :</label> ' . shell_exec('lsb_release -ds');
+				echo '</div>';
+				echo '</div>';
+			}
+			?>
+	  </div>
+	  	<legend>
+		    <i class="fas fa-user-cog"></i> {{Authentification}}
+		</legend>
     <fieldset>
     <div class="form-group">
         <label class="col-lg-2 control-label">{{Numéro de série}}</label>

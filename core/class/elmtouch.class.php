@@ -33,8 +33,8 @@ class elmtouch extends eqLogic {
             'template' => 'tmplimg',
             'replace' => array('#_img_light_on_#' => '<img src="plugins/elmtouch/core/template/images/flamme_On.png" width="20px">',
                                '#_img_dark_on_#' => '<img src="plugins/elmtouch/core/template/images/flamme_On.png" width="20px">',
-                               '#_img_light_off_#' => '<img src="plugins/elmtouch/core/template/images/flamme_Off.png" width="20px">',
-                               '#_img_dark_off_#' => '<img src="plugins/elmtouch/core/template/images/flamme_Off.png" width="20px">',)
+                               '#_img_light_off_#' => '<img src="plugins/elmtouch/core/template/images/flamme_Light_Off.png" width="20px">',
+                               '#_img_dark_off_#' => '<img src="plugins/elmtouch/core/template/images/flamme_Dark_Off.png" width="20px">',)
         );
         $return['info']['binary']['hotwateractive'] = array(
             'template' => 'tmplimg',

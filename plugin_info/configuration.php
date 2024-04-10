@@ -25,8 +25,9 @@ if (!isConnect()) {
 $plugin = plugin::byId('elmtouch');
 ?>
 <form class="form-horizontal">
- <legend>
-         <i class="fa fa-list-alt"></i> {{Général}}
+    <fieldset>
+      <legend>
+         <i class="fa fa-list-alt"></i> {{Informations}}
       </legend>
       <div class="form-group">
          <?php
@@ -57,6 +58,19 @@ $plugin = plugin::byId('elmtouch');
 			}
 			?>
 	  </div>
+	  </fieldset>
+	  <fieldset>
+		<legend>
+			<i class="fa fa-list-alt"></i> {{Paramètres}}
+		</legend>
+		<div class="form-group">
+			<label class="col-sm-4 control-label">{{Vous laisser personnaliser entierement les widgets}}</label>
+			<div class="col-sm-2">
+				<input type="checkbox" class="configKey tooltips" data-l1key="widgetCustomization">
+			</div>
+		</div>
+    </fieldset>
+	<fieldset>
 	  	<legend>
 		    <i class="fas fa-user-cog"></i> {{Authentification}}
 		</legend>
@@ -78,6 +92,24 @@ $plugin = plugin::byId('elmtouch');
         <div class="col-lg-2">
             <input id="elmtouchpassword" type="password" class="configKey form-control" data-l1key="password" style="margin-top:-5px" placeholder="{{Mot de passe choisi sur le smartphone}}"/>
         </div>
+        <div class="col-lg-1">
+            <i class="fas fa-eye-slash" id="bt_showPassword"></i>
+        </div>
     </div>
     </fieldset>
 </form>
+
+<script>
+$('#bt_showPassword').on('click', function() {
+        event.preventDefault();
+        if($('input.configKey[data-l1key="password"]').attr('type') == 'text'){
+            $('input.configKey[data-l1key="password"]').attr('type', 'password');
+            $('#bt_showPassword').addClass('fa-eye-slash');
+            $('#bt_showPassword').removeClass('fa-eye');
+        }else if($('input.configKey[data-l1key="password"]').attr('type') == 'password'){
+            $('input.configKey[data-l1key="password"]').attr('type', 'text');
+            $('#bt_showPassword').removeClass('fa-eye-slash');
+            $('#bt_showPassword').addClass('fa-eye');
+        }
+});
+</script>

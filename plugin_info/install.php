@@ -70,16 +70,12 @@ function elmtouch_update() {
 		if (is_object($cmd)) {
 			$cmd->setName(__('Activer programme', __FILE__));
 			$cmd->setValue($clockState->getId());
-			$cmd->setDisplay('showNameOndashboard', 0);
-			$cmd->setDisplay('showNameOnmobile', 0);
 			$cmd->save();
 		}
 		$cmd = $eqLogic->getCmd(null, 'manual');
 		if (is_object($cmd)) {
 			$cmd->$manual->setName(__('Désactiver programme', __FILE__));
 			$cmd->setValue($clockState->getId());
-			$cmd->setDisplay('showNameOndashboard', 0);
-			$cmd->setDisplay('showNameOnmobile', 0);
 			$cmd->save();
 		}
 		$eqLogic->save();

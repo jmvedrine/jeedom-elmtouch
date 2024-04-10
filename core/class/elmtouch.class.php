@@ -780,8 +780,6 @@ class elmtouch extends eqLogic {
             $clock->setSubType('other');
             $clock->setOrder(1);
             $clock->setDisplay('generic_type', 'THERMOSTAT_SET_MODE');
-            $clock->setDisplay('showNameOndashboard', 0);
-            $clock->setDisplay('showNameOnmobile', 0);
             $clock->setEqLogic_id($this->getId());
             $clock->setValue($clockState->getId());
             $clock->save();
@@ -800,8 +798,6 @@ class elmtouch extends eqLogic {
             $manual->setSubType('other');
             $manual->setOrder(1);
             $manual->setDisplay('generic_type', 'THERMOSTAT_SET_MODE');
-            $manual->setDisplay('showNameOndashboard', 0);
-            $manual->setDisplay('showNameOnmobile', 0);
             $manual->setEqLogic_id($this->getId());
             $manual->setValue($clockState->getId());
             $manual->save();
@@ -1303,6 +1299,108 @@ class elmtouchCmd extends cmd {
         return true;
     }
 
+	public function preSave() {
+		//log::add('elmtouch','debug',$this->getLogicalId());
+		if (config::byKey('widgetCustomization','elmtouch', false)) return;
+		switch($this->getLogicalId()) {
+			case 'clock':
+				$this->setOrder(1);
+				$this->setDisplay('forceReturnLineAfter', 1);
+				break;
+			case 'manual':
+				$this->setOrder(2);
+				$this->setDisplay('forceReturnLineAfter', 1);
+				break;
+			case 'clock_state':
+				$this->setOrder(3);
+				break;
+			case 'mode':
+				$this->setOrder(4);
+				break;
+			case 'hotwater_Off':
+				$this->setOrder(6);
+				break;
+			case 'hotwater_On':
+				$this->setOrder(7);
+				break;
+			case 'hotwateractive':
+				$this->setOrder(8);
+				break;
+			case 'thermostat':
+				$this->setOrder(10);
+				break;
+			case 'order':
+				$this->setOrder(11);
+				break;
+			case 'heatstatus':
+				$this->setOrder(13);
+				break;
+			case 'status':
+				$this->setOrder(14);
+				break;
+			case 'temperature':
+				$this->setOrder(18);
+				break;
+			case 'temperature_outdoor':
+				$this->setOrder(19);
+				break;
+			case 'heatingsupplytemp':
+				$this->setOrder(19);
+				break;
+			case 'averageoutdoortemp':
+				$this->setOrder(20);
+				break;
+				case 'heatingdaykwh':
+				$this->setOrder(23);
+				break;
+			case 'hotwaterdaykwh':
+				$this->setOrder(24);
+				break;
+			case 'totaldaykwh':
+				$this->setOrder(25);
+				break;
+			case 'heatingdaym3':
+				$this->setOrder(26);
+				break;
+			case 'hotwaterdaym3':
+				$this->setOrder(27);
+				break;
+			case 'totaldaym3':
+				$this->setOrder(28);
+				break;
+			case 'heatingdayeuro':
+				$this->setOrder(33);
+				break;
+			case 'hotwaterdayeuro':
+				$this->setOrder(34);
+				break;
+			case 'totaldayeuro':
+				$this->setOrder(35);
+				break;
+			case 'totalyearkwh':
+				$this->setOrder(37);
+				break;
+			case 'boilerpower':
+				$this->setOrder(42);
+				break;
+			case 'systempressure':
+				$this->setOrder(43);
+				break;
+			case 'boilerindicator':
+				$this->setOrder(44);
+				break;
+			case 'lock_state':
+				$this->setOrder(51);
+				break;
+			case 'lock':
+				$this->setOrder(52);
+				break;
+			case 'unlock':
+				$this->setOrder(53);
+				break;
+		}
+		//log::add('livebox','debug',$this->getOrder());
+	}
     public function execute($_options = array()) {
         if ($this->getType() == '') {
             return '';

@@ -42,3 +42,6 @@ Ceci devrait simplifier la compatibilité avec les évolutions de Jeedom.
 Cela a nécessité quelques changements dans les commandes :
 L'ancienne commande action string "Mode" s'appelle maintenant "Nom du mode" et une nouvelle commande info binaire "Mode" apparait qui vaut 1 si le mode est Programme (l'horloge) et 0 si le mode est Manuel (la main).
 Les 2 commandes action "Mode horloge" et "Mode manuel" s'appellent maintenant "Activer Programme" et "Désactiver programme". Attention si vous les changez de nom le widget ne fonctionnera plus correctement.
+- Nouvelle option dans la configuration du plugin "Vous laisser personnaliser entierement les widgets" si elle n'est pas cochée, lors de la sauvegarde de l'équipement ElmTouch, l'ordre des commandes est réorganisé automatiquement, si elle est cochée, le plugin vous laisse réorganiser les commandes dans le widget.
+- Bouton pour afficher/masquer le mot de passe dans la configuration du plugin.
+- Affichage des versions du plugin de NodeJS, de NPM, et de l'OS dans la configuration du plugin pour faciliter les demandes d'aide sur le forum.

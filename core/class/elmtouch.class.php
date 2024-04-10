@@ -1332,11 +1332,14 @@ class elmtouchCmd extends cmd {
 			case 'order':
 				$this->setOrder(11);
 				break;
-			case 'heatstatus':
+			case 'actif':
 				$this->setOrder(13);
 				break;
+			case 'heatstatus':
+				$this->setOrder(15);
+				break;
 			case 'status':
-				$this->setOrder(14);
+				$this->setOrder(16);
 				break;
 			case 'temperature':
 				$this->setOrder(18);

@@ -19,33 +19,33 @@
 require_once dirname(__FILE__) . '/../../../core/php/core.inc.php';
 
 function elmtouch_install() {
-    // Cron de récupération des consommations de gaz.
-    $cron = cron::byClassAndFunction('elmtouch', 'getGasDaily');
-    if (!is_object($cron)) {
-        $cron = new cron();
-        $cron->setClass('elmtouch');
-        $cron->setFunction('getGasDaily');
-        $cron->setEnable(1);
-        $cron->setDeamon(0);
-        $cron->setSchedule(rand(10, 59) . ' 0' . rand(1, 5) . ' * * *');
-        $cron->save();
-    }
+	// Cron de récupération des consommations de gaz.
+	$cron = cron::byClassAndFunction('elmtouch', 'getGasDaily');
+	if (!is_object($cron)) {
+		$cron = new cron();
+		$cron->setClass('elmtouch');
+		$cron->setFunction('getGasDaily');
+		$cron->setEnable(1);
+		$cron->setDeamon(0);
+		$cron->setSchedule(rand(10, 59) . ' 0' . rand(1, 5) . ' * * *');
+		$cron->save();
+	}
 }
 
 function elmtouch_update() {
-    $pluginId = 'elmtouch';
-    $cron = cron::byClassAndFunction($pluginId, 'getGasDaily');
-    if (!is_object($cron)) {
-        $cron = new cron();
-        $cron->setClass($pluginId);
-        $cron->setFunction('getGasDaily');
-        $cron->setEnable(1);
-        $cron->setDeamon(0);
-        $cron->setSchedule(rand(10, 59) . ' 0' . rand(1, 5) . ' * * *');
-        $cron->save();
-    }
+	$pluginId = 'elmtouch';
+	$cron = cron::byClassAndFunction($pluginId, 'getGasDaily');
+	if (!is_object($cron)) {
+		$cron = new cron();
+		$cron->setClass($pluginId);
+		$cron->setFunction('getGasDaily');
+		$cron->setEnable(1);
+		$cron->setDeamon(0);
+		$cron->setSchedule(rand(10, 59) . ' 0' . rand(1, 5) . ' * * *');
+		$cron->save();
+	}
 
-    foreach (eqLogic::byType('elmtouch') as $eqLogic) {
+	foreach (eqLogic::byType('elmtouch') as $eqLogic) {
 		// Pour permettre un affichage correct du nom dans les 2 commandes action
 		$cmd = $eqLogic->getCmd(null, 'mode');
 		if (is_object($cmd)) {
@@ -72,36 +72,65 @@ function elmtouch_update() {
 		if (is_object($cmd)) {
 			$cmd->setName(__('Activer programme', __FILE__));
 			$cmd->setValue($clockState->getId());
+			$cmd->setTemplate('dashboard', 'elmtouch::usermode');
+			$cmd->setTemplate('mobile', 'elmtouch::usermode');
 			$cmd->save();
 		}
 		$cmd = $eqLogic->getCmd(null, 'manual');
 		if (is_object($cmd)) {
 			$cmd->setName(__('Désactiver programme', __FILE__));
 			$cmd->setValue($clockState->getId());
+			$cmd->setTemplate('dashboard', 'elmtouch::usermode');
+			$cmd->setTemplate('mobile', 'elmtouch::usermode');
+			$cmd->save();
+		}
+		// Nouveaux templates
+		$cmd = $eqLogic->getCmd(null, 'hotwateractive');
+		if (is_object($cmd)) {
+			$cmd->setTemplate('dashboard', 'elmtouch::hotwateractive');
+			$cmd->setTemplate('mobile', 'elmtouch::hotwateractive');
+			$cmd->save();
+		}
+		$cmd = $eqLogic->getCmd(null, 'hotwater_Off');
+		if (is_object($cmd)) {
+			$cmd->setTemplate('dashboard', 'elmtouch::hotwater');
+			$cmd->setTemplate('mobile', 'elmtouch::hotwater');
+			$cmd->save();
+		}
+		$cmd = $eqLogic->getCmd(null, 'hotwater_On');
+		if (is_object($cmd)) {
+			$cmd->setTemplate('dashboard', 'elmtouch::hotwater');
+			$cmd->setTemplate('mobile', 'elmtouch::hotwater');
+			$cmd->save();
+		}
+		$cmd = $eqLogic->getCmd(null, 'heatstatus');
+		if (is_object($cmd)) {
+			$cmd->setTemplate('dashboard', 'elmtouch::burner');
+			$cmd->setTemplate('mobile', 'elmtouch::burner');
 			$cmd->save();
 		}
 		$eqLogic->save();
 	}
 
-    $dependencyInfo = elmtouch::dependancy_info();
-    if (!isset($dependencyInfo['state'])) {
-        message::add($pluginId, __('Veuilez vérifier les dépendances', __FILE__));
-    } elseif ($dependencyInfo['state'] == 'nok') {
-        try {
-            $plugin = plugin::byId($pluginId);
-            $plugin->dependancy_install();
-        } catch (\Throwable $th) {
-            message::add($pluginId, __('Cette mise à jour nécessite de réinstaller les dépendances même si elles sont marquées comme OK', __FILE__));
-        }
-    }
+	$dependencyInfo = elmtouch::dependancy_info();
+	if (!isset($dependencyInfo['state'])) {
+		message::add($pluginId, __('Veuilez vérifier les dépendances', __FILE__));
+	} elseif ($dependencyInfo['state'] == 'nok') {
+		try {
+			$plugin = plugin::byId($pluginId);
+			$plugin->dependancy_install();
+		} catch (\Throwable $th) {
+			message::add($pluginId, __('Cette mise à jour nécessite de réinstaller les dépendances même si elles sont marquées comme OK', __FILE__));
+		}
+	}
 }
 
 
 function elmtouch_remove() {
-    $cron = cron::byClassAndFunction('elmtouch', 'getGasDaily');
-    if (is_object($cron)) {
-        $cron->stop();
-        $cron->remove();
-    }
+	$cron = cron::byClassAndFunction('elmtouch', 'getGasDaily');
+	if (is_object($cron)) {
+		$cron->stop();
+		$cron->remove();
+	}
 }
 ?>

@@ -10,23 +10,33 @@ $eqLogics = eqLogic::byType($plugin->getId());
 <div class="row row-overflow">
 	<!-- Page d'accueil du plugin -->
   <div class="col-xs-12 eqLogicThumbnailDisplay">
-  <legend>{{Mon ELM Touch}}</legend>
   <legend><i class="fas fa-cog"></i>  {{Gestion}}</legend>
   <div class="eqLogicThumbnailContainer">
 <?php
-if (count($eqLogics) == 0) {
-      echo '<div class="cursor eqLogicAction logoPrimary" data-action="add">
-           <i class="fas fa-plus-circle"></i>
-           <br>
-          <span>{{Ajouter}}</span>
-          </div>';
-}
+  if (count($eqLogics) == 0) {
+    echo '<div class="cursor eqLogicAction logoPrimary" data-action="add">
+      <i class="fas fa-plus-circle"></i>
+      <br>
+      <span>{{Ajouter}}</span>
+    </div>';
+  }
 ?>
-      <div class="cursor eqLogicAction logoSecondary" data-action="gotoPluginConf">
-      <i class="fas fa-wrench"></i>
-    <br>
-    <span>{{Configuration}}</span>
-  </div>
+	<div class="cursor eqLogicAction logoSecondary" data-action="gotoPluginConf">
+		<i class="fas fa-wrench"></i>
+	<br>
+	<span class="txtColor">{{Configuration}}</span>
+	</div>
+
+	<?php
+	$jeedomVersion=jeedom::version() ?? '0';
+	$displayInfo=version_compare($jeedomVersion, '4.4.0', '>=');
+	if($displayInfo){
+	echo '<div class="cursor eqLogicAction warning" data-action="createCommunityPost" title="{{Ouvrir une demande d\'aide sur le forum communautaire}}">';
+	echo '<i class="fas fa-ambulance"></i>';
+	echo '<br><span>{{Community}}</span>';
+	echo '</div>';
+	}
+	?>
   </div>
   <legend><i class="fas fa-table"></i> {{Mon ELM Touch}}</legend>
 <div class="eqLogicThumbnailContainer">

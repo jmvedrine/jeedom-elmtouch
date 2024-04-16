@@ -31,31 +31,31 @@ class elmtouch extends eqLogic {
         $return = array('info' => array('binary' => array()), 'action' => array('other' => array()));
         $return['info']['binary']['burner'] = array(
             'template' => 'tmplimg',
-            'replace' => array('#_img_light_on_#' => '<img src="plugins/elmtouch/core/template/images/flamme_On.png" width="20px">',
-                               '#_img_dark_on_#' => '<img src="plugins/elmtouch/core/template/images/flamme_On.png" width="20px">',
-                               '#_img_light_off_#' => '<img src="plugins/elmtouch/core/template/images/flamme_Light_Off.png" width="20px">',
-                               '#_img_dark_off_#' => '<img src="plugins/elmtouch/core/template/images/flamme_Dark_Off.png" width="20px">',)
+            'replace' => array('#_img_light_on_#' => '<img src="plugins/elmtouch/core/template/images/flamme_On.png" width="20px" height="50px">',
+                               '#_img_dark_on_#' => '<img src="plugins/elmtouch/core/template/images/flamme_On.png" width="20px" height="50px">',
+                               '#_img_light_off_#' => '<img src="plugins/elmtouch/core/template/images/flamme_Light_Off.png" width="20px" height="50px">',
+                               '#_img_dark_off_#' => '<img src="plugins/elmtouch/core/template/images/flamme_Dark_Off.png" width="20px" height="50px">',)
         );
         $return['info']['binary']['hotwateractive'] = array(
             'template' => 'tmplimg',
-            'replace' => array('#_img_light_on_#' => '<img src="plugins/elmtouch/core/template/images/hotwater_Black_On.png" width="40px">',
-                               '#_img_dark_on_#' => '<img src="plugins/elmtouch/core/template/images/hotwater_White_On.png" width="40px">',
-                               '#_img_light_off_#' => '<img src="plugins/elmtouch/core/template/images/hotwater_Black_Off.png" width="40px">',
-                               '#_img_dark_off_#' => '<img src="plugins/elmtouch/core/template/images/hotwater_White_Off.png" width="40px">',)
+            'replace' => array('#_img_light_on_#' => '<img src="plugins/elmtouch/core/template/images/hotwater_Black_On.png" width="40px" height="40px">',
+                               '#_img_dark_on_#' => '<img src="plugins/elmtouch/core/template/images/hotwater_White_On.png" width="40px" height="40px">',
+                               '#_img_light_off_#' => '<img src="plugins/elmtouch/core/template/images/hotwater_Black_Off.png" width="40px" height="40px">',
+                               '#_img_dark_off_#' => '<img src="plugins/elmtouch/core/template/images/hotwater_White_Off.png" width="40px" height="40px">',)
         );
         $return['action']['other']['hotwater'] = array(
             'template' => 'tmplimg',
-            'replace' => array('#_img_light_on_#' => '<img src="plugins/elmtouch/core/template/images/hotwater_Black_On.png" width="40px">',
-                               '#_img_dark_on_#' => '<img src="plugins/elmtouch/core/template/images/hotwater_White_On.png" width="40px">',
-                               '#_img_light_off_#' => '<img src="plugins/elmtouch/core/template/images/hotwater_Black_Off.png" width="40px">',
-                               '#_img_dark_off_#' => '<img src="plugins/elmtouch/core/template/images/hotwater_White_Off.png" width="40px">',)
+            'replace' => array('#_img_light_on_#' => '<img src="plugins/elmtouch/core/template/images/hotwater_Black_On.png" width="40px" height="40px">',
+                               '#_img_dark_on_#' => '<img src="plugins/elmtouch/core/template/images/hotwater_White_On.png" width="40px" height="40px">',
+                               '#_img_light_off_#' => '<img src="plugins/elmtouch/core/template/images/hotwater_Black_Off.png" width="40px" height="40px">',
+                               '#_img_dark_off_#' => '<img src="plugins/elmtouch/core/template/images/hotwater_White_Off.png" width="40px" height="40px">',)
         );
         $return['action']['other']['usermode'] = array(
             'template' => 'tmplimg',
-            'replace' => array('#_img_light_on_#' => '<img src="plugins/elmtouch/core/template/images/clockmode.png" width="40px">',
-                               '#_img_dark_on_#' => '<img src="plugins/elmtouch/core/template/images/clockmode.png" width="40px">',
-                               '#_img_light_off_#' => '<img src="plugins/elmtouch/core/template/images/manualmode.png" width="40px">',
-                               '#_img_dark_off_#' => '<img src="plugins/elmtouch/core/template/images/manualmode.png" width="40px">',)
+            'replace' => array('#_img_light_on_#' => '<img src="plugins/elmtouch/core/template/images/clockmode.png" width="40px" height="40px">',
+                               '#_img_dark_on_#' => '<img src="plugins/elmtouch/core/template/images/clockmode.png" width="40px" height="40px">',
+                               '#_img_light_off_#' => '<img src="plugins/elmtouch/core/template/images/manualmode.png" width="40px" height="40px">',
+                               '#_img_dark_off_#' => '<img src="plugins/elmtouch/core/template/images/manualmode.png" width="40px" height="40px">',)
         );
         return $return;
     }

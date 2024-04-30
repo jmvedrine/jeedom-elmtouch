@@ -1,8 +1,8 @@
 {
-  "apt":{
+    "apt" : {
     "nodejs" : {}
   },
   "npm" : {
-      "plugins/elmtouch/resources": {}
+      "plugins/elmtouch/resources"  : {}
   }
 }

@@ -96,7 +96,7 @@ class elmtouch extends eqLogic {
         $serial = config::byKey('serialNumber','elmtouch');
         $access = config::byKey('accessKey','elmtouch');
         $password = config::byKey('password','elmtouch');
-        $easyserver = ' easy-server --serial=' . $serial . ' --access-key=' . $access . ' --password="' . $password . '"';
+        $easyserver = dirname(__FILE__) . '/../../resources/node_modules/nefit-easy-http-server/bin/easy-server --serial=' . $serial . ' --access-key=' . $access . ' --password="' . $password . '"';
         // check easy-server started, if not, start
         $cmd = 'if [ $(ps -ef | grep -v grep | grep "easy-server" | wc -l) -eq 0 ]; then ' . system::getCmdSudo() . $easyserver . ';echo "Démarrage easy-server";sleep 1; fi';
         log::add('elmtouch', 'debug', str_replace($password,'****',$cmd));

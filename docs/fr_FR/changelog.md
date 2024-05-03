@@ -45,3 +45,10 @@ Les 2 commandes action "Mode horloge" et "Mode manuel" s'appellent maintenant "A
 - Nouvelle option dans la configuration du plugin "Vous laisser personnaliser entierement les widgets" si elle n'est pas cochée, lors de la sauvegarde de l'équipement ElmTouch, l'ordre des commandes est réorganisé automatiquement, si elle est cochée, le plugin vous laisse réorganiser les commandes dans le widget.
 - Bouton pour afficher/masquer le mot de passe dans la configuration du plugin.
 - Affichage des versions du plugin de NodeJS, de NPM, et de l'OS dans la configuration du plugin pour faciliter les demandes d'aide sur le forum.
+
+# 03/05/2024
+
+- Bouton dans la configuration pour créer un post sur le forum dans la bonne catégorie, avec le bon tag et des renseignements sur la configuration pour aider les autres utilisateurs à vous aider ;-)
+- IMPORTANT : Correction d'une erreur dans le démarrage du démon. Je me suis rendu compte du problème à l'occasion de l'installation du plugin sur une machine vierge. 
+
+Si vous n'arrivez pas à démarrer le démon, réinstallez les dépendances et relancez le démon.

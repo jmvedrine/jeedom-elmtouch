@@ -76,40 +76,41 @@ $plugin = plugin::byId('elmtouch');
 		</legend>
     <fieldset>
     <div class="form-group">
-        <label class="col-lg-2 control-label">{{Numéro de série}}</label>
-        <div class="col-lg-2">
-            <input id="elmtouchserial" class="configKey form-control" data-l1key="serialNumber" style="margin-top:-5px" placeholder="{{Voir notice ou au dos}}"/>
+        <label class="col-md-4 control-label">{{Numéro de série}}
+        <sup><i class="fas fa-question-circle tooltips" title="{{Voir la notice ou au dos de l'appareil}}"></i></sup>
+      </label>
+        <div class="col-md-3">
+            <input id="elmtouchserial" class="configKey form-control" data-l1key="serialNumber"/>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-lg-2 control-label">{{Clé d'accès}}</label>
-        <div class="col-lg-2">
-            <input id="elmtouchaccess" class="configKey form-control" data-l1key="accessKey" style="margin-top:-5px" placeholder="{{Voir notice ou au dos}}"/>
+        <label class="col-md-4 control-label">{{Clé d'accès}}
+        <sup><i class="fas fa-question-circle tooltips" title="{{Voir la notice ou au dos de l'appareil}}"></i></sup>
+      </label>
+        <div class="col-md-3">
+            <input id="elmtouchaccess" class="configKey form-control" data-l1key="accessKey"/>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-lg-2 control-label">{{Mot de passe}}</label>
-        <div class="col-lg-2">
-            <input id="elmtouchpassword" type="password" class="configKey form-control" data-l1key="password" style="margin-top:-5px" placeholder="{{Mot de passe choisi sur le smartphone}}"/>
-        </div>
-        <div class="col-lg-1">
-            <i class="fas fa-eye-slash" id="bt_showPassword"></i>
-        </div>
+      <label class="col-md-4 control-label">{{Mot de Passe}}
+        <sup><i class="fas fa-question-circle tooltips" title="{{Renseignez le mot de passe du compte Elm Touch}}"></i></sup>
+      </label>
+      <div class="col-md-3" style="display:flex;">
+        <input type="password" class="configKey form-control" data-l1key="password"/>
+        <a class="btn btn-danger  " id="bt_show_pass"><i class="fas fa-eye"></i></a>
+      </div>
     </div>
     </fieldset>
 </form>
 
 <script>
-$('#bt_showPassword').on('click', function() {
-        event.preventDefault();
-        if($('input.configKey[data-l1key="password"]').attr('type') == 'text'){
-            $('input.configKey[data-l1key="password"]').attr('type', 'password');
-            $('#bt_showPassword').addClass('fa-eye-slash');
-            $('#bt_showPassword').removeClass('fa-eye');
-        }else if($('input.configKey[data-l1key="password"]').attr('type') == 'password'){
-            $('input.configKey[data-l1key="password"]').attr('type', 'text');
-            $('#bt_showPassword').removeClass('fa-eye-slash');
-            $('#bt_showPassword').addClass('fa-eye');
-        }
-});
+$("#bt_show_pass").on('mousedown', function(){
+    $("input[data-l1key='password']").attr('type', 'text');
+    $(this).find("i").removeClass('fa-eye').addClass('fa-eye-slash')
+
+})
+$("#bt_show_pass").on('mouseup mouseleave', function(){
+    $("input[data-l1key='password']").attr('type', 'password');
+    $(this).find("i").removeClass('fa-eye-slash').addClass('fa-eye')
+})
 </script>

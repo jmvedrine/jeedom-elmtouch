@@ -11,10 +11,14 @@
 	},
 	"licence": "AGPL",
 	"author": "JMVedrine",
-	"require": "4.2.0",
+	"require": "4.4.8",
+	"os": {
+		"min": 11,
+		"max": 12.99
+	},
 	"category": "wellness",
-	"hasDependency": 1,
-	"hasOwnDeamon": 1,
+	"hasDependency": true,
+	"hasOwnDeamon": true,
 	"maxDependancyInstallTime": 0,
 	"display": "panel",
 	"language": [
@@ -27,6 +31,7 @@
 	],
 	"compatibility": [
 		"miniplus",
+		"luna",
 		"smart",
 		"atlas",
 		"rpi",

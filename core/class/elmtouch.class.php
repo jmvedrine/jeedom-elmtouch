@@ -64,8 +64,7 @@ class elmtouch extends eqLogic {
         $update=update::byTypeAndLogicalId('plugin',__CLASS__);
         $ver=$update->getLocalVersion();
         $conf=$update->getConfiguration();
-        //log::add(__CLASS__,'debug',"Installation dépendances sur Jeedom ".jeedom::version()." sur ".trim(shell_exec("lsb_release -d -s")).'/'.trim(shell_exec('dpkg --print-architecture')).'/'.trim(shell_exec('arch')).'/'.trim(shell_exec('getconf LONG_BIT'))." aka '".jeedom::getHardwareName()."' avec nodeJS ".trim(shell_exec('node -v'))." et jsonrpc:".config::byKey('api::core::jsonrpc::mode', 'core', 'enable')." et homebridge ".$ver);
-        $CommunityInfo="== Jeedom ".jeedom::version()." sur ".trim(shell_exec("lsb_release -d -s")).'/'.trim(shell_exec('dpkg --print-architecture')).'/'.trim(shell_exec('arch')).'/'.trim(shell_exec('getconf LONG_BIT'))."bits aka '".jeedom::getHardwareName()."' avec nodeJS ".trim(shell_exec('node -v'))." et jsonrpc:".config::byKey('api::core::jsonrpc::mode', 'core', 'enable')." et ".__CLASS__." (".$conf['version'].") ".$ver." (avant:".config::byKey('previousVersion',__CLASS__,'inconnu',true).')';
+        $CommunityInfo="== Jeedom ".jeedom::version()." sur ".trim(shell_exec("lsb_release -d -s")).'/'.trim(shell_exec('dpkg --print-architecture')).'/'.trim(shell_exec('arch')).'/'.trim(shell_exec('getconf LONG_BIT'))."bits aka '".jeedom::getHardwareName()."' avec nodeJS ".trim(shell_exec('node -v'))." NPM " . trim(shell_exec("npm -v")) . " et jsonrpc:".config::byKey('api::core::jsonrpc::mode', 'core', 'enable')." et ".__CLASS__." (".$conf['version'].") ".$ver." (avant:".config::byKey('previousVersion',__CLASS__,'inconnu',true).')';
         return $CommunityInfo;
     }
 
@@ -137,7 +136,6 @@ class elmtouch extends eqLogic {
         if ($pid) {
             system::kill($pid);
         }
-        system::kill('bosch-xmpp');
         system::kill('easy-server');
         system::fuserk(3000);
 
@@ -1100,9 +1098,9 @@ class elmtouch extends eqLogic {
     public function writeThermostatData($endpoint, $data) {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, 'http://127.0.0.1:3000/bridge' . $endpoint);
-        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-        curl_setopt($ch,CURLOPT_HTTPHEADER,array('Content-Type: application/json'));
+        curl_setopt($ch,CURLOPT_HTTPHEADER,array('Content-Type: application/json', 'Content-Length: ' . strlen($data)));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $server_output = curl_exec ($ch);
         curl_close ($ch);
@@ -1225,10 +1223,10 @@ class elmtouch extends eqLogic {
         // Actualisation du status au cas où il ait changé sur le thermostat depuis le dernier cron.
         // log::add('elmtouch', 'debug', 'debut de sethotwaterstate state = ' . $state);
         $this->getThermostatStatus();
-        $currentStatus = $this->getCmd(null, 'mode')->execCmd();
+        $currentStatus = $this->getCmd(null, 'clock_state')->execCmd();
         // log::add('elmtouch', 'debug', 'Currentstatus = ' . $currentStatus);
         $value = ($state) ? 'on' : 'off';
-        if ($currentStatus == 'clock') {
+        if ($currentStatus) {
             // log::add('elmtouch', 'debug', 'On met à jour /dhwCircuits/dhwA/dhwOperationClockMode avec ' . $value);
             $this->writeThermostatData('/dhwCircuits/dhwA/dhwOperationClockMode', '{ "value" : "' .$value . '" }');
         } else {

@@ -14,7 +14,11 @@ Ce thermostat est fabriqué par Bosch et vendu suivant les pays sous divers noms
 Comme le matériel est le même et le serveur Bosch commun à tous les pays,
 ce plugin peut également être utilisé dans tous les pays
 
-ATTENTION ! Ce plugin n'est pas compatible avec les modèles CT100.2 ou CT200.
+ATTENTION ! Ce plugin n'est pas compatible avec les modèles CT100.2 ou CT200 (appelés Easy Control) mais seulement avec le modèle CT100 qui est plus ancien.
+
+Voici une image des différents modèles : de gauche à droite CT100 (alias nefit easy, alias elm touch) CT200 blanc (alias easy control alias CT100.2) et CT200 noir.
+
+![elmtouch01](../images/thermostats.png)
 
 Note : le plugin ne communique pas directement avec le thermostat,
 il interroge le serveur Bosch qui à son tour interroge le thermostat.
